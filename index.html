@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#11181b" />
-  <title>UndergrounD UtopiA｜CREW PORTAL</title>
+  <title>UndergrounD UtopiA｜地下住人専用端末</title>
   <style>
     :root{
       --bg:#0c1214;
@@ -38,6 +38,31 @@
       padding-bottom:calc(88px + env(safe-area-inset-bottom));
     }
 
+    body.home-active::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:url("asset/poster.png") center top / cover no-repeat;
+    }
+
+    body.home-active::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:
+        linear-gradient(180deg,rgba(5,9,11,.38),rgba(5,9,11,.58)),
+        radial-gradient(circle at 50% 18%,transparent 0 25%,rgba(3,7,9,.28) 70%);
+    }
+
+    .app-shell{
+      position:relative;
+      z-index:1;
+    }
+
     button,select,input{font:inherit}
     button{cursor:pointer}
     a{color:inherit}
@@ -57,6 +82,33 @@
       background:linear-gradient(180deg,rgba(9,14,16,.98),rgba(13,20,23,.94));
       border-bottom:1px solid rgba(196,139,90,.35);
       backdrop-filter:blur(14px);
+    }
+
+    body.home-active .topbar{
+      background:linear-gradient(180deg,rgba(5,10,12,.62),rgba(8,14,16,.42));
+      border-bottom-color:rgba(217,179,122,.48);
+      backdrop-filter:blur(10px) saturate(.9);
+      -webkit-backdrop-filter:blur(10px) saturate(.9);
+    }
+
+    body.home-active #page-home .hero,
+    body.home-active #page-home .card{
+      background:linear-gradient(180deg,rgba(10,17,20,.58),rgba(9,15,17,.46));
+      border-color:rgba(217,179,122,.5);
+      box-shadow:0 12px 30px rgba(0,0,0,.28);
+      backdrop-filter:blur(8px) saturate(.9);
+      -webkit-backdrop-filter:blur(8px) saturate(.9);
+    }
+
+    body.home-active #page-home .hero::after{
+      opacity:.58;
+    }
+
+    body.home-active #page-home .card-title,
+    body.home-active #page-home .today-song,
+    body.home-active #page-home .date-line,
+    body.home-active #page-home .progress-row{
+      text-shadow:0 2px 8px rgba(0,0,0,.88);
     }
 
     .brand{
@@ -145,23 +197,28 @@
     }
 
     .countdown{
-      display:flex;
-      align-items:flex-end;
-      gap:10px;
       position:relative;
       z-index:1;
+      display:flex;
+      align-items:baseline;
+      flex-wrap:wrap;
+      gap:.28em;
+      color:var(--ivory);
+      font-size:clamp(22px,6.7vw,34px);
+      font-weight:800;
+      letter-spacing:.02em;
+      line-height:1.35;
+      text-shadow:0 3px 12px rgba(0,0,0,.9);
     }
     .countdown-number{
-      font-size:clamp(48px,16vw,78px);
-      font-weight:900;
-      line-height:.9;
+      display:inline-block;
+      min-width:1.5em;
+      text-align:center;
+      font-size:1.62em;
+      font-weight:950;
+      line-height:1;
       color:var(--gold);
-      text-shadow:0 0 22px rgba(217,179,122,.12);
-    }
-    .countdown-label{
-      padding-bottom:8px;
-      color:var(--muted);
-      font-size:14px;
+      text-shadow:0 0 18px rgba(217,179,122,.28),0 3px 12px rgba(0,0,0,.9);
     }
     .date-line{
       margin-top:13px;
@@ -217,6 +274,23 @@
       color:var(--ivory);
       font-size:22px;
       font-weight:800;
+    }
+
+    .today-heading{
+      margin-bottom:14px;
+      color:var(--ivory);
+      font-size:19px;
+      letter-spacing:.04em;
+    }
+
+    .today-song{
+      margin:2px 0 6px;
+      color:var(--gold);
+      font-family:"Yu Mincho","Hiragino Mincho ProN",serif;
+      font-size:clamp(24px,7vw,34px);
+      font-weight:800;
+      line-height:1.4;
+      text-align:center;
     }
 
     .clean-list{
@@ -294,19 +368,40 @@
       font-size:13px;
     }
     .bar{
+      position:relative;
       height:9px;
-      background:#0f1719;
-      border:1px solid rgba(174,185,185,.12);
+      background:rgba(8,14,16,.82);
+      border:1px solid rgba(174,185,185,.22);
       border-radius:999px;
-      overflow:hidden;
+      overflow:visible;
+      box-shadow:inset 0 1px 4px rgba(0,0,0,.55);
     }
-    .bar > span{
+    .bar-fill{
+      position:relative;
       display:block;
       height:100%;
+      min-width:0;
       background:linear-gradient(90deg,#6d8790,#c18a59);
       border-radius:999px;
       width:0;
       transition:width .35s ease;
+    }
+    .gear-marker{
+      position:absolute;
+      right:-10px;
+      top:50%;
+      z-index:2;
+      display:grid;
+      place-items:center;
+      width:21px;
+      height:21px;
+      transform:translateY(-50%);
+      color:var(--gold);
+      font-family:"Segoe UI Symbol","Arial Unicode MS",sans-serif;
+      font-size:20px;
+      line-height:1;
+      font-weight:400;
+      text-shadow:0 2px 4px rgba(0,0,0,.95),0 0 7px rgba(217,179,122,.42);
     }
     .percent{
       text-align:right;
@@ -627,14 +722,13 @@
     }
   </style>
 </head>
-<body>
+<body class="home-active">
   <div class="app-shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark">UA</div>
         <div class="brand-text">
           <h1 class="brand-title">UndergrounD UtopiA</h1>
-          <p class="brand-sub">CREW PORTAL</p>
+          <p class="brand-sub">地下住人専用端末</p>
         </div>
         <div class="depth">DEPTH<br><strong>-135m</strong></div>
       </div>
@@ -643,31 +737,23 @@
     <main>
       <section id="page-home" class="page active">
         <div class="hero">
-          <div class="eyebrow">COUNTDOWN TO THE PERFORMANCE</div>
           <div class="countdown">
-            <div id="countdownNumber" class="countdown-number">--</div>
-            <div class="countdown-label">DAYS<br>TO GO</div>
+            <span>演奏会まで残り</span>
+            <span id="countdownNumber" class="countdown-number">--</span>
+            <span>日</span>
           </div>
           <div class="date-line">2026.11.8（日）開場13:30／開演14:00</div>
         </div>
 
-        <div class="card">
-          <div class="card-title">
-            <span>TODAY'S REHEARSAL</span>
-            <span class="section-badge">SECTION 03</span>
-          </div>
-          <div class="today-section">百鬼夜行</div>
-          <ul class="clean-list">
+        <div class="card" id="todayRehearsalCard">
+          <h2 class="card-title today-heading">今日の練習内容</h2>
+          <div id="todaySongTitle" class="today-song">「カオスが極まる」</div>
+          <ul id="todayTaskList" class="clean-list">
             <li>曲を止めずに最後まで通す</li>
             <li>イントロの入りを統一する</li>
             <li>演奏中の視線を下げすぎない</li>
           </ul>
           <button class="btn" data-open-song="chaos">練習を始める</button>
-        </div>
-
-        <div class="card">
-          <h2 class="card-title">先生からのメッセージ</h2>
-          <p class="message">今日うまく演奏することより、<br>この曲が何を表現しているのかを考えてみよう。</p>
         </div>
 
         <div class="card">
@@ -1568,7 +1654,11 @@
         row.className = "progress-row";
         row.innerHTML = `
           <span>${label}</span>
-          <div class="bar"><span style="width:${score}%"></span></div>
+          <div class="bar">
+            <span class="bar-fill" style="width:${score}%">
+              <span class="gear-marker" aria-hidden="true">⚙︎</span>
+            </span>
+          </div>
           <span class="percent">${score}%</span>
         `;
         target.appendChild(row);
@@ -1788,6 +1878,7 @@
     }
 
     function switchPage(pageName){
+      document.body.classList.toggle("home-active", pageName === "home");
       document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.remove("active"));
       document.getElementById(`page-${pageName}`).classList.add("active");
