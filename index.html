@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#11181b" />
+  <title>UndergrounD UtopiA｜CREW PORTAL</title>
+  <style>
+    :root{
+      --bg:#0c1214;
+      --bg-soft:#131c20;
+      --panel:#182226;
+      --panel-2:#202c31;
+      --line:#8a6446;
+      --line-soft:#4d3c2d;
+      --copper:#c48b5a;
+      --gold:#d9b37a;
+      --ivory:#efe8db;
+      --muted:#aeb9b9;
+      --blue:#6f8791;
+      --danger:#b86d63;
+      --success:#7d9d7d;
+      --shadow:0 14px 32px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(118,142,150,.14), transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(160,100,58,.10), transparent 24%),
+        linear-gradient(180deg,#0b1113 0%,#10181b 100%);
+      color:var(--ivory);
+      min-height:100vh;
+      padding-bottom:calc(88px + env(safe-area-inset-bottom));
+    }
+
+    button,select,input{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+
+    .app-shell{
+      width:min(100%,760px);
+      margin:0 auto;
+      padding:0 14px 26px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      margin:0 -14px 18px;
+      padding:calc(14px + env(safe-area-inset-top)) 18px 14px;
+      background:linear-gradient(180deg,rgba(9,14,16,.98),rgba(13,20,23,.94));
+      border-bottom:1px solid rgba(196,139,90,.35);
+      backdrop-filter:blur(14px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .brand-mark{
+      min-width:48px;
+      height:48px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      color:var(--gold);
+      font-weight:800;
+      letter-spacing:.04em;
+      background:
+        radial-gradient(circle,#27363a 0 42%,#11191c 43% 60%,#5b432f 61% 65%,#11191c 66%);
+      box-shadow:inset 0 0 0 4px #0c1315;
+    }
+
+    .brand-text{flex:1}
+    .brand-title{
+      margin:0;
+      font-size:clamp(20px,5.6vw,30px);
+      line-height:1;
+      letter-spacing:.025em;
+    }
+    .brand-sub{
+      margin:6px 0 0;
+      color:var(--copper);
+      font-size:11px;
+      letter-spacing:.22em;
+      font-weight:700;
+    }
+
+    .depth{
+      font-size:11px;
+      color:var(--muted);
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    main{display:block}
+    .page{display:none;animation:fade .22s ease}
+    .page.active{display:block}
+    @keyframes fade{
+      from{opacity:.45;transform:translateY(4px)}
+      to{opacity:1;transform:none}
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(196,139,90,.45);
+      border-radius:24px;
+      padding:22px;
+      margin-bottom:16px;
+      background:
+        linear-gradient(135deg,rgba(196,139,90,.12),transparent 45%),
+        linear-gradient(180deg,#1a2529,#121b1e);
+      box-shadow:var(--shadow);
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      width:150px;
+      height:150px;
+      border:18px dotted rgba(196,139,90,.13);
+      border-radius:50%;
+      right:-58px;
+      top:-62px;
+      transform:rotate(15deg);
+    }
+
+    .eyebrow{
+      color:var(--copper);
+      font-size:11px;
+      letter-spacing:.18em;
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .countdown{
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+    .countdown-number{
+      font-size:clamp(48px,16vw,78px);
+      font-weight:900;
+      line-height:.9;
+      color:var(--gold);
+      text-shadow:0 0 22px rgba(217,179,122,.12);
+    }
+    .countdown-label{
+      padding-bottom:8px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .date-line{
+      margin-top:13px;
+      color:var(--ivory);
+      font-size:13px;
+    }
+
+    .grid{
+      display:grid;
+      gap:14px;
+    }
+    .grid.two{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    @media (max-width:520px){
+      .grid.two{grid-template-columns:1fr}
+    }
+
+    .card{
+      border:1px solid rgba(138,100,70,.5);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg,rgba(31,44,49,.96),rgba(21,31,35,.96));
+      padding:17px;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+    }
+    .card + .card{margin-top:14px}
+
+    .card-title{
+      margin:0 0 12px;
+      font-size:17px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .section-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      border:1px solid rgba(196,139,90,.42);
+      color:var(--gold);
+      background:rgba(196,139,90,.08);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.08em;
+    }
+
+    .today-section{
+      margin:10px 0 4px;
+      color:var(--ivory);
+      font-size:22px;
+      font-weight:800;
+    }
+
+    .clean-list{
+      margin:12px 0 0;
+      padding:0;
+      list-style:none;
+    }
+    .clean-list li{
+      position:relative;
+      padding:9px 0 9px 20px;
+      color:#d9dddd;
+      line-height:1.65;
+      border-bottom:1px dashed rgba(174,185,185,.12);
+    }
+    .clean-list li:last-child{border-bottom:0}
+    .clean-list li::before{
+      content:"";
+      position:absolute;
+      left:2px;
+      top:17px;
+      width:7px;
+      height:7px;
+      border:1px solid var(--copper);
+      transform:rotate(45deg);
+    }
+
+    .btn{
+      width:100%;
+      border:1px solid var(--copper);
+      background:linear-gradient(180deg,#bd8454,#8e5f3c);
+      color:#fff9ef;
+      font-weight:800;
+      border-radius:13px;
+      padding:13px 15px;
+      margin-top:14px;
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.secondary{
+      background:#1b292e;
+      color:var(--ivory);
+      border-color:#58707a;
+    }
+    .btn.ghost{
+      background:transparent;
+      color:var(--muted);
+      border-color:rgba(174,185,185,.25);
+    }
+    .btn.small{
+      width:auto;
+      margin:0;
+      padding:8px 11px;
+      font-size:12px;
+    }
+
+    .message{
+      font-family:"Yu Mincho","Hiragino Mincho ProN",serif;
+      font-size:17px;
+      line-height:1.85;
+      color:#f0e6d6;
+      border-left:3px solid var(--copper);
+      padding-left:14px;
+      margin:0;
+    }
+
+    .progress-list{
+      display:grid;
+      gap:13px;
+    }
+    .progress-row{
+      display:grid;
+      grid-template-columns:72px 1fr 44px;
+      align-items:center;
+      gap:10px;
+      font-size:13px;
+    }
+    .bar{
+      height:9px;
+      background:#0f1719;
+      border:1px solid rgba(174,185,185,.12);
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .bar > span{
+      display:block;
+      height:100%;
+      background:linear-gradient(90deg,#6d8790,#c18a59);
+      border-radius:999px;
+      width:0;
+      transition:width .35s ease;
+    }
+    .percent{
+      text-align:right;
+      color:var(--gold);
+      font-variant-numeric:tabular-nums;
+    }
+
+    .page-title{
+      margin:8px 2px 16px;
+      font-size:24px;
+    }
+    .lead{
+      color:#d7dede;
+      line-height:1.9;
+      margin:0;
+    }
+
+    .story-map{
+      position:relative;
+      padding-left:28px;
+      margin-top:16px;
+    }
+    .story-map::before{
+      content:"";
+      position:absolute;
+      left:10px;
+      top:7px;
+      bottom:16px;
+      width:2px;
+      background:linear-gradient(var(--copper),var(--blue));
+    }
+    .story-card{
+      position:relative;
+      margin-bottom:14px;
+    }
+    .story-card::before{
+      content:"";
+      position:absolute;
+      left:-24px;
+      top:24px;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:var(--gold);
+      border:3px solid #10181b;
+      box-shadow:0 0 0 1px var(--copper);
+    }
+    .story-card h3{
+      margin:10px 0 10px;
+      font-size:20px;
+    }
+    .story-card p{
+      color:#d4dddd;
+      line-height:1.85;
+      margin:9px 0;
+    }
+    .label{
+      display:block;
+      color:var(--copper);
+      font-size:11px;
+      letter-spacing:.12em;
+      font-weight:800;
+      margin-top:14px;
+    }
+    .keywords{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      margin-top:8px;
+    }
+    .keyword{
+      border:1px solid rgba(111,135,145,.45);
+      background:rgba(111,135,145,.08);
+      color:#d8e0e2;
+      border-radius:999px;
+      padding:6px 9px;
+      font-size:12px;
+    }
+
+    .filters{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding:2px 0 12px;
+      scrollbar-width:none;
+    }
+    .filters::-webkit-scrollbar{display:none}
+    .filter-btn{
+      flex:0 0 auto;
+      border:1px solid rgba(174,185,185,.2);
+      background:#142025;
+      color:var(--muted);
+      border-radius:999px;
+      padding:9px 12px;
+      font-size:12px;
+    }
+    .filter-btn.active{
+      border-color:var(--copper);
+      color:var(--ivory);
+      background:rgba(196,139,90,.13);
+    }
+
+    .song-list{
+      display:grid;
+      gap:12px;
+    }
+    .song-card{
+      text-align:left;
+      width:100%;
+      border:1px solid rgba(138,100,70,.42);
+      border-radius:16px;
+      background:linear-gradient(180deg,#1d292e,#152025);
+      color:inherit;
+      padding:16px;
+      box-shadow:0 8px 18px rgba(0,0,0,.14);
+    }
+    .song-card-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .song-title{
+      margin:0;
+      font-size:18px;
+    }
+    .song-meta{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:6px;
+    }
+    .song-score{
+      color:var(--gold);
+      font-size:14px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .detail-panel{
+      position:fixed;
+      inset:0;
+      z-index:50;
+      background:rgba(4,8,10,.78);
+      backdrop-filter:blur(10px);
+      display:none;
+      padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+    .detail-panel.open{display:block}
+    .detail-inner{
+      width:min(100%,760px);
+      height:100%;
+      margin:0 auto;
+      overflow-y:auto;
+      background:linear-gradient(180deg,#10191c,#0b1214);
+      padding:14px 14px 34px;
+    }
+    .detail-head{
+      position:sticky;
+      top:0;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:4px 0 13px;
+      background:linear-gradient(180deg,#10191c 72%,transparent);
+    }
+    .back-btn{
+      border:1px solid rgba(174,185,185,.25);
+      background:#1a272b;
+      color:var(--ivory);
+      border-radius:12px;
+      padding:10px 12px;
+    }
+    .detail-title{
+      margin:0;
+      font-size:21px;
+    }
+    .detail-copy{
+      color:#d5dddd;
+      line-height:1.85;
+      margin:0;
+    }
+
+    .check-item{
+      display:flex;
+      gap:11px;
+      align-items:flex-start;
+      padding:11px 0;
+      border-bottom:1px dashed rgba(174,185,185,.12);
+      color:#dfe3e3;
+      line-height:1.55;
+    }
+    .check-item:last-child{border-bottom:0}
+    .check-item input{
+      width:20px;
+      height:20px;
+      accent-color:#b87a4a;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+
+    .part-grid{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+    .part{
+      border:1px solid rgba(111,135,145,.26);
+      border-radius:12px;
+      background:#142025;
+      padding:12px;
+    }
+    .part strong{
+      display:block;
+      color:var(--gold);
+      margin-bottom:5px;
+    }
+    .part span{
+      color:#d6dede;
+      line-height:1.65;
+      font-size:14px;
+    }
+
+    .progress-summary{
+      text-align:center;
+      padding:22px 10px;
+    }
+    .big-score{
+      font-size:54px;
+      font-weight:900;
+      color:var(--gold);
+      line-height:1;
+    }
+
+    .progress-song{
+      margin-top:13px;
+    }
+    .progress-song h3{
+      margin:0 0 4px;
+      font-size:18px;
+    }
+    .progress-song .song-meta{margin-bottom:13px}
+    .select-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    @media (max-width:430px){
+      .select-grid{grid-template-columns:1fr}
+    }
+    .select-wrap label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    select{
+      width:100%;
+      border:1px solid rgba(111,135,145,.45);
+      background:#111a1d;
+      color:var(--ivory);
+      border-radius:11px;
+      padding:11px 10px;
+    }
+
+    .todo-list{
+      margin:0;
+      padding-left:20px;
+      color:#d7dddd;
+      line-height:1.9;
+    }
+
+    .bottom-nav{
+      position:fixed;
+      z-index:30;
+      left:50%;
+      bottom:0;
+      transform:translateX(-50%);
+      width:min(100%,760px);
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+      background:rgba(9,14,16,.96);
+      border-top:1px solid rgba(196,139,90,.35);
+      backdrop-filter:blur(16px);
+    }
+    .nav-btn{
+      border:0;
+      background:transparent;
+      color:#8f9a9c;
+      border-radius:12px;
+      padding:8px 4px 6px;
+      font-size:11px;
+    }
+    .nav-btn span{
+      display:block;
+      font-size:19px;
+      line-height:1;
+      margin-bottom:6px;
+    }
+    .nav-btn.active{
+      color:var(--gold);
+      background:rgba(196,139,90,.09);
+    }
+
+    .empty{
+      color:var(--muted);
+      text-align:center;
+      padding:26px 10px;
+    }
+
+    .footer-note{
+      text-align:center;
+      color:#69777a;
+      font-size:11px;
+      margin-top:22px;
+      line-height:1.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">UA</div>
+        <div class="brand-text">
+          <h1 class="brand-title">UndergrounD UtopiA</h1>
+          <p class="brand-sub">CREW PORTAL</p>
+        </div>
+        <div class="depth">DEPTH<br><strong>-135m</strong></div>
+      </div>
+    </header>
+
+    <main>
+      <section id="page-home" class="page active">
+        <div class="hero">
+          <div class="eyebrow">COUNTDOWN TO THE PERFORMANCE</div>
+          <div class="countdown">
+            <div id="countdownNumber" class="countdown-number">--</div>
+            <div class="countdown-label">DAYS<br>TO GO</div>
+          </div>
+          <div class="date-line">2026.11.8（日）開場13:30／開演14:00</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>TODAY'S REHEARSAL</span>
+            <span class="section-badge">SECTION 03</span>
+          </div>
+          <div class="today-section">百鬼夜行</div>
+          <ul class="clean-list">
+            <li>曲を止めずに最後まで通す</li>
+            <li>イントロの入りを統一する</li>
+            <li>演奏中の視線を下げすぎない</li>
+          </ul>
+          <button class="btn" data-open-song="chaos">練習を始める</button>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">先生からのメッセージ</h2>
+          <p class="message">今日うまく演奏することより、<br>この曲が何を表現しているのかを考えてみよう。</p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">現在の進捗</h2>
+          <div id="homeProgress" class="progress-list"></div>
+        </div>
+      </section>
+
+      <section id="page-story" class="page">
+        <h2 class="page-title">物語を知る</h2>
+        <div class="card">
+          <div class="eyebrow">THE STORY OF UNDERGROUND UTOPIA</div>
+          <p class="lead">
+            ここは、何者にもなれなかった人たちが流れ着く地下。かつて夢を見ていた彼らは、どこかにあるはずのユートピアを目指して歩き始める。
+            しかし、たどり着いた先でも現実は簡単には変わらない。それでも、誰かが隣にいることで、今日が少しだけ良い日になる。
+            これは、何者にもなれなかった人たちが、もう一度自分の人生へ帰っていく物語。
+          </p>
+        </div>
+        <div id="storyMap" class="story-map"></div>
+      </section>
+
+      <section id="page-songs" class="page">
+        <h2 class="page-title">曲一覧</h2>
+        <div id="songFilters" class="filters"></div>
+        <div id="songList" class="song-list"></div>
+      </section>
+
+      <section id="page-progress" class="page">
+        <h2 class="page-title">自分の進捗</h2>
+        <div class="card progress-summary">
+          <div class="eyebrow">TOTAL PROGRESS</div>
+          <div id="totalScore" class="big-score">0%</div>
+          <p class="song-meta">この端末に自動保存されます</p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">項目別</h2>
+          <div id="progressSummary" class="progress-list"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">次に確認したいこと</h2>
+          <ul id="todoList" class="todo-list"></ul>
+        </div>
+
+        <div id="progressEditor"></div>
+
+        <button id="resetProgress" class="btn ghost">この端末の進捗をリセット</button>
+        <p class="footer-note">保存先はこの端末のブラウザ内です。ブラウザのデータを削除すると進捗も消えます。</p>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="メインメニュー">
+    <button class="nav-btn active" data-page="home"><span>⌂</span>ホーム</button>
+    <button class="nav-btn" data-page="story"><span>◎</span>物語</button>
+    <button class="nav-btn" data-page="songs"><span>♫</span>曲一覧</button>
+    <button class="nav-btn" data-page="progress"><span>▥</span>進捗</button>
+  </nav>
+
+  <aside id="detailPanel" class="detail-panel" aria-hidden="true">
+    <div class="detail-inner">
+      <div class="detail-head">
+        <button id="closeDetail" class="back-btn">← 戻る</button>
+        <h2 id="detailHeading" class="detail-title">曲詳細</h2>
+      </div>
+      <div id="detailContent"></div>
+    </div>
+  </aside>
+
+  <script>
+    // ============================
+    // 編集しやすい公演データ
+    // ============================
+    const concertDate = new Date("2026-11-08T14:00:00+09:00");
+
+    const sections = [
+      {
+        id:"underground",
+        no:"01",
+        title:"地下",
+        story:"夢や自信を失った人たちが暮らす場所。まだ互いを信じられず、それぞれが孤独を抱えている。",
+        keywords:["閉塞感","孤独","警戒","静かな怒り"],
+        direction:"明るく見せすぎない。客席にすぐ心を開かず、内側へ向かうように演奏する。"
+      },
+      {
+        id:"youth",
+        no:"02",
+        title:"青春と記憶",
+        story:"地下の住民たちは、かつて自分たちにも夢があったことを思い出す。",
+        keywords:["懐かしさ","純粋さ","痛み","失われた時間"],
+        direction:"ただ楽しく演奏するのではなく、もう戻れない時間への切なさも残す。"
+      },
+      {
+        id:"hyakki",
+        no:"03",
+        title:"百鬼夜行",
+        story:"抑えていた感情が解放され、地下の住民たちは理性と混乱の境界を越えていく。",
+        keywords:["暴走","不気味さ","高揚","統制されたカオス"],
+        direction:"音楽は荒れていても、演奏そのものは崩さない。全員で同じ方向へ暴走する。"
+      },
+      {
+        id:"utopia",
+        no:"04",
+        title:"楽園？",
+        story:"ついにユートピアへたどり着いたように見える。しかし、それが本当の救いなのか、一瞬の夢なのかは分からない。",
+        keywords:["解放","祝祭","眩しさ","違和感"],
+        direction:"公演最大の盛り上がり。ただし、完全なハッピーエンドには見せない。"
+      },
+      {
+        id:"return",
+        no:"05",
+        title:"地下への帰還",
+        story:"現実は大きく変わらず、彼らは再び地下へ戻る。それでも最初の地下とは、少しだけ見え方が違っている。",
+        keywords:["静けさ","受容","小さな救い","帰る場所"],
+        direction:"絶望だけでは終わらせない。「何も解決していないけれど、一人ではない」という感覚を残す。"
+      },
+      {
+        id:"encore",
+        no:"06",
+        title:"アンコール",
+        story:"物語を演じていた高校生たちが、自分自身として観客の前に戻ってくる。",
+        keywords:["生命力","現在","肯定","未来"],
+        direction:"ここでは遠慮せず、心から楽しむ。最後は「僕は僕を生きる」という肯定へつなげる。"
+      }
+    ];
+
+    const songs = [
+      {
+            "id": "time-machine",
+            "title": "タイムマシン",
+            "section": "underground",
+            "role": "公演の扉を開き、過去へ戻りたい気持ちと、地下へ流れ着いた人々の時間を提示する曲。",
+            "keywords": [
+                  "時間",
+                  "後悔",
+                  "入口",
+                  "遠い記憶"
+            ],
+            "points": [
+                  "冒頭の空気を全員でそろえる",
+                  "焦らず、言葉と余韻を届ける",
+                  "静かな部分でテンポを前へ押しすぎない",
+                  "次の曲へ向かう緊張感を残す"
+            ],
+            "parts": {
+                  "ボーカル": "思い出を語るように歌い、最初から感情を出し切らない。",
+                  "ギター": "音の隙間と余韻を大切にする。",
+                  "ベース": "低音で時間の流れを静かに支える。",
+                  "ドラム": "音数を抑え、曲の入口を丁寧に作る。"
+            },
+            "stage": [
+                  "公演冒頭は客席を見すぎない",
+                  "大きな動きよりも空気づくりを優先する",
+                  "曲後の余韻を切らず次へつなぐ"
+            ],
+            "order": 1
+      },
+      {
+            "id": "sazanka",
+            "title": "サザンカ",
+            "section": "underground",
+            "role": "結果が出なくても歩き続けてきた人々の姿を描き、地下の住民たちに残る小さな意志を示す曲。",
+            "keywords": [
+                  "努力",
+                  "傷",
+                  "静かな意志",
+                  "継続"
+            ],
+            "points": [
+                  "歌詞を急がず一語ずつ届ける",
+                  "サビで音量だけを上げない",
+                  "全体の呼吸をそろえる",
+                  "最後まで温度を保つ"
+            ],
+            "parts": {
+                  "ボーカル": "励ますのではなく、隣で見守るように歌う。",
+                  "ギター": "歌を包む柔らかな音色を作る。",
+                  "ベース": "和声の変化を丁寧につなぐ。",
+                  "ドラム": "強く叩きすぎず、前進する足取りを作る。"
+            },
+            "stage": [
+                  "序盤は内向きの姿勢を残す",
+                  "サビから少しずつ視線を上げる",
+                  "笑顔にしすぎず希望をにじませる"
+            ],
+            "order": 2
+      },
+      {
+            "id": "downtown",
+            "title": "DOWNTOWN",
+            "section": "underground",
+            "role": "地下の暮らしにある雑踏や日常を映し、孤独な人々が同じ場所に存在していることを見せる曲。",
+            "keywords": [
+                  "街",
+                  "雑踏",
+                  "日常",
+                  "距離感"
+            ],
+            "points": [
+                  "グルーヴを重くしすぎない",
+                  "リズムの細かなズレをなくす",
+                  "各パートの音量バランスをそろえる",
+                  "軽さの中に乾いた空気を残す"
+            ],
+            "parts": {
+                  "ボーカル": "力まず、街角を歩くような自然さを出す。",
+                  "ギター": "カッティングの粒をそろえる。",
+                  "ベース": "跳ねすぎず、一定のグルーヴを保つ。",
+                  "ドラム": "ハイハットとスネアの位置を安定させる。"
+            },
+            "stage": [
+                  "個々が別方向を向く場面を作る",
+                  "曲中盤から互いの存在を感じ始める",
+                  "明るい曲でも世界観を崩しすぎない"
+            ],
+            "order": 3
+      },
+      {
+            "id": "chiisana-koi",
+            "title": "小さな恋のうた",
+            "section": "youth",
+            "role": "地下の住民たちが、かつて誰かをまっすぐ好きだった青春の記憶を呼び戻す曲。",
+            "keywords": [
+                  "初恋",
+                  "まっすぐさ",
+                  "青春",
+                  "遠い記憶"
+            ],
+            "points": [
+                  "勢いだけでテンポを走らせない",
+                  "ユニゾンとコーラスをそろえる",
+                  "言葉を雑にしない",
+                  "サビの開放感を全員で作る"
+            ],
+            "parts": {
+                  "ボーカル": "若さと不器用さを隠さず、まっすぐ歌う。",
+                  "ギター": "コードの切り替えを明確にし、推進力を作る。",
+                  "ベース": "ルート感を強く出して曲を前へ進める。",
+                  "ドラム": "八分音符の流れを安定させる。"
+            },
+            "stage": [
+                  "ここから少し客席へ開く",
+                  "メンバー同士の視線を増やす",
+                  "青春の眩しさを素直に見せる"
+            ],
+            "order": 4
+      },
+      {
+            "id": "star-marker",
+            "title": "スターマーカー",
+            "section": "youth",
+            "role": "届かなかった夢を、もう一度自分たちの手で描こうとする瞬間を表す曲。",
+            "keywords": [
+                  "夢",
+                  "再出発",
+                  "色彩",
+                  "高揚"
+            ],
+            "points": [
+                  "イントロの入りを鮮やかにそろえる",
+                  "細かなリズムを曖昧にしない",
+                  "サビで音像を広げる",
+                  "終盤まで集中力を落とさない"
+            ],
+            "parts": {
+                  "ボーカル": "明るさの中に必死さを残す。",
+                  "ギター": "フレーズの輪郭をはっきり出す。",
+                  "ベース": "動くラインでも拍の中心を保つ。",
+                  "ドラム": "フィル後の着地を全員と合わせる。"
+            },
+            "stage": [
+                  "動きを一段階大きくする",
+                  "視線を上方向へ向ける場面を作る",
+                  "サビは客席までエネルギーを飛ばす"
+            ],
+            "order": 5
+      },
+      {
+            "id": "calc",
+            "title": "Calc.",
+            "section": "youth",
+            "role": "過ぎ去った関係を計算では整理できないまま、それでも前へ進もうとする青春の痛みを描く曲。",
+            "keywords": [
+                  "別れ",
+                  "未練",
+                  "整理できない感情",
+                  "前進"
+            ],
+            "points": [
+                  "速さより言葉の明瞭さを優先する",
+                  "Aメロとサビの温度差をつける",
+                  "走りやすい箇所を重点確認する",
+                  "最後の余韻を大切にする"
+            ],
+            "parts": {
+                  "ボーカル": "感情を押しつけず、思い出を手放す過程を歌う。",
+                  "ギター": "疾走感と切なさを両立する。",
+                  "ベース": "細かな動きを歌とぶつけない。",
+                  "ドラム": "一定のテンポを保ち、展開を明確にする。"
+            },
+            "stage": [
+                  "最初は個人の記憶として見せる",
+                  "後半で全体の物語へ広げる",
+                  "曲後は明るく切り替えすぎない"
+            ],
+            "order": 6
+      },
+      {
+            "id": "90s-medley",
+            "title": "90’sメドレー",
+            "section": "youth",
+            "role": "観客それぞれの「あの頃」を呼び起こし、舞台と客席の記憶をつなぐ時間。",
+            "keywords": [
+                  "懐メロ",
+                  "共有記憶",
+                  "遊び心",
+                  "時代"
+            ],
+            "points": [
+                  "曲ごとのテンポと雰囲気を切り替える",
+                  "つなぎ部分を止めずに通す",
+                  "原曲らしいリズムを確認する",
+                  "メドレー全体の山を作る"
+            ],
+            "parts": {
+                  "ボーカル": "曲ごとの歌い方を切り替え、客席を置いていかない。",
+                  "ギター": "音色切り替えと曲間の準備を確実にする。",
+                  "ベース": "転調や曲替わりの着地点を明確にする。",
+                  "ドラム": "カウントとつなぎを主導し、全体を迷わせない。"
+            },
+            "stage": [
+                  "曲ごとに表情と動きを変える",
+                  "観客が知っている瞬間を意識する",
+                  "内輪の盛り上がりにしない"
+            ],
+            "order": 7
+      },
+      {
+            "id": "velvet",
+            "title": "ベルベットの詩",
+            "section": "youth",
+            "role": "夢を追うことの痛みと、それでも音楽を手放せない人々の感情を深く掘り下げる曲。",
+            "keywords": [
+                  "夢",
+                  "傷",
+                  "執念",
+                  "歌う理由"
+            ],
+            "points": [
+                  "曲全体のダイナミクスを設計する",
+                  "声と伴奏の密度をぶつけすぎない",
+                  "サビの言葉を前へ出す",
+                  "終盤の高まりを早く作りすぎない"
+            ],
+            "parts": {
+                  "ボーカル": "歌う理由そのものを問いかけるように表現する。",
+                  "ギター": "歪ませすぎず、言葉の隙間を残す。",
+                  "ベース": "重心を低く保ち、感情の土台を作る。",
+                  "ドラム": "クレッシェンドを長い目で組み立てる。"
+            },
+            "stage": [
+                  "派手な動きを抑えて歌へ集中する",
+                  "サビで正面を向く",
+                  "演奏後は一呼吸置く"
+            ],
+            "order": 8
+      },
+      {
+            "id": "yozakura-haiiro",
+            "title": "夜桜～灰色と青",
+            "section": "youth",
+            "role": "美しい記憶と色あせた現在を重ね、青春セクションを次の暗い世界へつなぐ曲。",
+            "keywords": [
+                  "夜",
+                  "記憶",
+                  "喪失",
+                  "色彩"
+            ],
+            "points": [
+                  "曲間の接続を自然にする",
+                  "静かな場面の音程を丁寧に取る",
+                  "情緒を出してもテンポを揺らしすぎない",
+                  "終わりの空気を全員で共有する"
+            ],
+            "parts": {
+                  "ボーカル": "景色が見えるように、言葉の色を変える。",
+                  "ギター": "残響を使い、夜の広がりを作る。",
+                  "ベース": "音数を整理し、旋律を支える。",
+                  "ドラム": "余白を守り、必要な場所だけ強くする。"
+            },
+            "stage": [
+                  "照明と呼吸を合わせる",
+                  "前半と後半で表情を変える",
+                  "最後は次の百鬼夜行への不穏さを残す"
+            ],
+            "order": 9
+      },
+      {
+            "id": "kyouai",
+            "title": "狂愛",
+            "section": "hyakki",
+            "role": "愛が救いではなく執着へ変わり、地下に潜んでいた危うさが表面へ現れる曲。",
+            "keywords": [
+                  "執着",
+                  "狂気",
+                  "欲望",
+                  "危うさ"
+            ],
+            "points": [
+                  "リズムの粘りを全員で統一する",
+                  "表情をきれいにまとめすぎない",
+                  "静と動の切り替えを鋭くする",
+                  "終止のタイミングをそろえる"
+            ],
+            "parts": {
+                  "ボーカル": "甘さと怖さを同時に含ませる。",
+                  "ギター": "不協和感や切れ味を生かす。",
+                  "ベース": "うねりを出しつつテンポは固定する。",
+                  "ドラム": "重いビートでも後ろへ引きずらない。"
+            },
+            "stage": [
+                  "視線を客席へ突き刺すように使う",
+                  "メンバー間の距離感を不自然に見せる",
+                  "笑顔ではなく異様な高揚を作る"
+            ],
+            "order": 10
+      },
+      {
+            "id": "angel-devil",
+            "title": "天使と悪魔",
+            "section": "hyakki",
+            "role": "善悪が単純に分けられない地下世界で、人の中に同居する二面性を見せる曲。",
+            "keywords": [
+                  "二面性",
+                  "誘惑",
+                  "葛藤",
+                  "反転"
+            ],
+            "points": [
+                  "場面ごとのキャラクターを切り替える",
+                  "ユニゾンの発音をそろえる",
+                  "ブレイク前後のテンポを確認する",
+                  "音量だけで善悪を表さない"
+            ],
+            "parts": {
+                  "ボーカル": "声色や視線で二面性を表現する。",
+                  "ギター": "フレーズごとの質感を明確に変える。",
+                  "ベース": "場面転換の軸を作る。",
+                  "ドラム": "ブレイクと再開を正確にそろえる。"
+            },
+            "stage": [
+                  "左右や立ち位置で対立を見せる",
+                  "途中で関係が逆転するように動く",
+                  "最後はどちらが勝ったか決めすぎない"
+            ],
+            "order": 11
+      },
+      {
+            "id": "kakumei-douchuu",
+            "title": "革命道中",
+            "section": "hyakki",
+            "role": "地下の住民たちが現状を壊そうと動き出し、百鬼夜行が集団の熱狂へ変わる曲。",
+            "keywords": [
+                  "革命",
+                  "行進",
+                  "反抗",
+                  "集団熱"
+            ],
+            "points": [
+                  "全員の縦を強くそろえる",
+                  "掛け声やアクセントを統一する",
+                  "テンポが上がらないよう注意する",
+                  "終盤の高揚を段階的に作る"
+            ],
+            "parts": {
+                  "ボーカル": "一人の叫びから群衆の声へ広げる。",
+                  "ギター": "リフの粒をそろえ、重さを出す。",
+                  "ベース": "行進するような芯を作る。",
+                  "ドラム": "キックとスネアで集団の足音を作る。"
+            },
+            "stage": [
+                  "全員の動きをそろえる場面を入れる",
+                  "中央へ集まる流れを作る",
+                  "観客を巻き込むが明るくしすぎない"
+            ],
+            "order": 12
+      },
+      {
+            "id": "woman-w",
+            "title": "Woman “Wの悲劇”より",
+            "section": "hyakki",
+            "role": "熱狂の中で一度時間を止め、人間の孤独と悲劇性を静かに浮かび上がらせる曲。",
+            "keywords": [
+                  "悲劇",
+                  "孤独",
+                  "静寂",
+                  "大人の痛み"
+            ],
+            "points": [
+                  "音程と息の流れを最優先する",
+                  "伴奏を歌より前へ出しすぎない",
+                  "一音ごとの終わりをそろえる",
+                  "静けさを怖がらない"
+            ],
+            "parts": {
+                  "ボーカル": "感情を叫ばず、抑えることで深さを出す。",
+                  "ギター": "音を置く場所を厳選する。",
+                  "ベース": "長い音で空気を支える。",
+                  "ドラム": "叩かない時間も演奏として扱う。"
+            },
+            "stage": [
+                  "動きを最小限にする",
+                  "照明と表情で場面を変える",
+                  "曲後の静寂を残す"
+            ],
+            "order": 13
+      },
+      {
+            "id": "gurenge-flying",
+            "title": "紅蓮華＋Flying Messenger",
+            "section": "hyakki",
+            "role": "戦う意志と疾走感を結びつけ、百鬼夜行を最大規模の衝突へ押し上げるメドレー。",
+            "keywords": [
+                  "戦い",
+                  "疾走",
+                  "炎",
+                  "突破"
+            ],
+            "points": [
+                  "2曲の切り替え位置を徹底確認する",
+                  "速いテンポでも音を潰さない",
+                  "ユニゾンのアクセントをそろえる",
+                  "最後まで体力配分を保つ"
+            ],
+            "parts": {
+                  "ボーカル": "強さだけでなく、必死さを言葉に乗せる。",
+                  "ギター": "高速フレーズの輪郭を保つ。",
+                  "ベース": "ドラムと密着し、転換を支える。",
+                  "ドラム": "フィルで急がず、次の拍へ正確に着地する。"
+            },
+            "stage": [
+                  "メドレー切り替えで景色を一気に変える",
+                  "大きな動きでも演奏精度を落とさない",
+                  "終盤はカオスが極まるへ熱を渡す"
+            ],
+            "order": 14
+      },
+      {
+            "id": "chaos",
+            "title": "カオスが極まる",
+            "section": "hyakki",
+            "role": "地下の住民たちが抑えていた感情を完全に解放し、理性と混乱の境界を越える場面。",
+            "keywords": [
+                  "不気味",
+                  "暴走",
+                  "高揚",
+                  "統制"
+            ],
+            "points": [
+                  "イントロの入りをそろえる",
+                  "サビ前でテンポを走らせない",
+                  "演奏中の視線を下げない",
+                  "最後の音を全員で切る"
+            ],
+            "parts": {
+                  "ボーカル": "言葉をきれいに歌いすぎず、切迫感を出す。",
+                  "ギター": "音数よりもリズムの切れ味を優先する。",
+                  "ベース": "ドラムと一体になって前へ押す。",
+                  "ドラム": "速くなっても拍の中心を失わない。"
+            },
+            "stage": [
+                  "イントロは客席を見ない",
+                  "1番サビから徐々に動きを大きくする",
+                  "最後は全員が中央方向を見る"
+            ],
+            "order": 15
+      },
+      {
+            "id": "peace-sign",
+            "title": "ピースサイン",
+            "section": "utopia",
+            "role": "百鬼夜行を抜け、地下の住民たちが初めて未来へ手を伸ばす、楽園への入口となる曲。",
+            "keywords": [
+                  "突破",
+                  "希望",
+                  "参加",
+                  "上昇"
+            ],
+            "points": [
+                  "客席参加の合図を明確にする",
+                  "コーラスと掛け声をそろえる",
+                  "勢いの中でも歌詞を届ける",
+                  "テンポを最後まで安定させる"
+            ],
+            "parts": {
+                  "ボーカル": "客席を導き、参加しやすい空気を作る。",
+                  "ギター": "疾走感を出しながら音を重くしすぎない。",
+                  "ベース": "メロディーの上昇感を支える。",
+                  "ドラム": "全体を前へ運び、掛け声の位置を明確にする。"
+            },
+            "stage": [
+                  "手を上げる合図を大きく見せる",
+                  "客席と一緒に「Oh」を作る",
+                  "ここから正面へ完全に開く"
+            ],
+            "order": 16
+      },
+      {
+            "id": "fukkatsu",
+            "title": "ふっかつのじゅもん",
+            "section": "utopia",
+            "role": "失敗しても何度でも戻ってこられるという遊び心を使い、再出発の軽やかさを見せる曲。",
+            "keywords": [
+                  "復活",
+                  "遊び心",
+                  "再挑戦",
+                  "解放"
+            ],
+            "points": [
+                  "言葉の多い部分を明瞭にする",
+                  "リズムの跳ね方をそろえる",
+                  "コミカルでも演奏を雑にしない",
+                  "曲の展開を全員で共有する"
+            ],
+            "parts": {
+                  "ボーカル": "言葉遊びを客席へはっきり届ける。",
+                  "ギター": "軽快な音色とリズムを作る。",
+                  "ベース": "細かな動きでもグルーヴを崩さない。",
+                  "ドラム": "遊びのあるフィルを正確に入れる。"
+            },
+            "stage": [
+                  "メンバー同士のやり取りを増やす",
+                  "客席が笑える余裕を作る",
+                  "物語から外れず、解放感として見せる"
+            ],
+            "order": 17
+      },
+      {
+            "id": "kirakira",
+            "title": "きらきら",
+            "section": "utopia",
+            "role": "理想郷の眩しさを最も美しく見せながら、その光が永遠ではないことも予感させる曲。",
+            "keywords": [
+                  "光",
+                  "幸福",
+                  "儚さ",
+                  "憧れ"
+            ],
+            "points": [
+                  "音を明るくしすぎて薄くしない",
+                  "歌と伴奏の呼吸を合わせる",
+                  "美しい和音を丁寧にそろえる",
+                  "終盤に儚さを残す"
+            ],
+            "parts": {
+                  "ボーカル": "幸福を信じたい気持ちと不安を同時に含ませる。",
+                  "ギター": "透明感のある響きを作る。",
+                  "ベース": "和音の土台を柔らかく支える。",
+                  "ドラム": "軽やかさを保ち、叩き込みすぎない。"
+            },
+            "stage": [
+                  "照明の明るさに負けない表情を作る",
+                  "全員が客席へ開く",
+                  "最後にわずかな違和感を残す"
+            ],
+            "order": 18
+      },
+      {
+            "id": "ketsui",
+            "title": "決意の朝に",
+            "section": "utopia",
+            "role": "理想が完全でなくても、自分の弱さを抱えたまま進む決意を示す曲。",
+            "keywords": [
+                  "決意",
+                  "弱さ",
+                  "自己受容",
+                  "一歩"
+            ],
+            "points": [
+                  "歌詞の内容を全員で共有する",
+                  "サビを力任せにしない",
+                  "前半から終盤への成長を作る",
+                  "ラストの言葉を丁寧に届ける"
+            ],
+            "parts": {
+                  "ボーカル": "強い人を演じず、弱さを認めるところから歌う。",
+                  "ギター": "伴奏の厚みを段階的に増やす。",
+                  "ベース": "曲の大きな流れを安定させる。",
+                  "ドラム": "クライマックスまで力を残す。"
+            },
+            "stage": [
+                  "最初は一人ひとりの決意として見せる",
+                  "終盤で全員の方向をそろえる",
+                  "勝利ではなく歩き出す姿で終える"
+            ],
+            "order": 19
+      },
+      {
+            "id": "tomorrow-never-knows",
+            "title": "Tomorrow never knows",
+            "section": "return",
+            "role": "楽園の夢から現実へ戻り、答えのない明日をそれでも生きるという本編終盤の核となる曲。",
+            "keywords": [
+                  "現実",
+                  "明日",
+                  "迷い",
+                  "生き続ける"
+            ],
+            "points": [
+                  "大きなフレーズを意識する",
+                  "歌詞を急がず客席へ届ける",
+                  "サビで全体の音像を広げる",
+                  "感情の頂点を早く作りすぎない"
+            ],
+            "parts": {
+                  "ボーカル": "断言ではなく、迷いながら進む人の声として歌う。",
+                  "ギター": "広がりのある音を作り、歌を包む。",
+                  "ベース": "長い流れの中で重心を保つ。",
+                  "ドラム": "曲全体のドラマを見通して強弱を作る。"
+            },
+            "stage": [
+                  "派手な動きから静かな強さへ切り替える",
+                  "客席を一人ひとり見る意識を持つ",
+                  "本編の結末へ向けて空気を落ち着かせる"
+            ],
+            "order": 20
+      },
+      {
+            "id": "yasashisa",
+            "title": "やさしさに包まれたなら",
+            "section": "return",
+            "role": "何も完全には解決しなくても、誰かのやさしさによって「今日は帰ろう」と思える小さな救いを残す曲。",
+            "keywords": [
+                  "やさしさ",
+                  "帰る場所",
+                  "受容",
+                  "小さな救い"
+            ],
+            "points": [
+                  "柔らかなテンポを全員で共有する",
+                  "音を詰め込みすぎない",
+                  "コーラスの響きをそろえる",
+                  "本編最後の余韻を壊さない"
+            ],
+            "parts": {
+                  "ボーカル": "観客を包み込むように、自然な言葉で歌う。",
+                  "ギター": "角のない音色で余白を作る。",
+                  "ベース": "安心できる低音を保つ。",
+                  "ドラム": "拍を主張しすぎず、全体をそっと支える。"
+            },
+            "stage": [
+                  "全員の表情を穏やかにする",
+                  "メンバー同士の存在を感じる",
+                  "最後は大げさに解決したように見せない"
+            ],
+            "order": 21
+      },
+      {
+            "id": "zenshin",
+            "title": "全力少年",
+            "section": "encore",
+            "role": "物語から現実へ戻り、高校生自身の現在のエネルギーを観客へ放つアンコール曲。",
+            "keywords": [
+                  "疾走",
+                  "生命力",
+                  "解放",
+                  "現在"
+            ],
+            "points": [
+                  "最初から客席へ開く",
+                  "リズムを前へ運ぶ",
+                  "コーラスをそろえる",
+                  "最後まで勢いを落とさない"
+            ],
+            "parts": {
+                  "ボーカル": "笑顔と勢いを優先し、客席を巻き込む。",
+                  "ギター": "軽快さを出し、音を重くしすぎない。",
+                  "ベース": "跳ねるリズムを意識する。",
+                  "ドラム": "走らず、全体を前へ押す。"
+            },
+            "stage": [
+                  "客席へ積極的に視線を送る",
+                  "メンバー同士でも笑顔を見せる",
+                  "終盤は全員で盛り上げる"
+            ],
+            "order": 22
+      },
+      {
+            "id": "universe",
+            "title": "Universe",
+            "section": "encore",
+            "role": "「僕は僕を生きる」という肯定で、UndergrounD UtopiAの物語すべてを締めくくる最後の曲。",
+            "keywords": [
+                  "肯定",
+                  "未来",
+                  "自分自身",
+                  "光"
+            ],
+            "points": [
+                  "歌詞の意味を全員で共有する",
+                  "盛り上がりだけで雑にならない",
+                  "最後のフレーズを丁寧に届ける",
+                  "公演全体の終わりを意識する"
+            ],
+            "parts": {
+                  "ボーカル": "一人ひとりへ語りかけるように歌う。",
+                  "ギター": "広がりのある音色を作る。",
+                  "ベース": "大きな流れを安定させる。",
+                  "ドラム": "感情を押し上げながら、最後まで丁寧に。"
+            },
+            "stage": [
+                  "全員が客席へ開く",
+                  "最後はメンバー同士の存在も感じる",
+                  "締めの余韻を壊さない"
+            ],
+            "order": 23
+      }
+];
+
+    const progressOptions = {
+      play:["未着手","練習中","だいたいできる","できる"],
+      memory:["未着手","練習中","だいたいできる","できる"],
+      stage:["未確認","確認中","だいたい覚えた","覚えた"],
+      story:["分からない","少し分かる","だいたい説明できる","説明できる"]
+    };
+
+    const progressLabels = {
+      play:"演奏",
+      memory:"暗譜",
+      stage:"演出",
+      story:"物語理解"
+    };
+
+    const storageKey = "underground-utopia-progress-v2";
+    let activeFilter = "all";
+    let progress = loadProgress();
+
+    function loadProgress(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(storageKey));
+        if(saved && typeof saved === "object") return saved;
+      }catch(e){}
+      const initial = {};
+      songs.forEach(song=>{
+        initial[song.id] = {play:0,memory:0,stage:0,story:0,checks:{}};
+      });
+      return initial;
+    }
+
+    function normalizeProgress(){
+      songs.forEach(song=>{
+        if(!progress[song.id]){
+          progress[song.id] = {play:0,memory:0,stage:0,story:0,checks:{}};
+        }
+        if(!progress[song.id].checks) progress[song.id].checks = {};
+      });
+    }
+
+    function saveProgress(){
+      localStorage.setItem(storageKey, JSON.stringify(progress));
+    }
+
+    function sectionById(id){
+      return sections.find(section=>section.id===id);
+    }
+
+    function songScore(songId){
+      const p = progress[songId];
+      const total = p.play + p.memory + p.stage + p.story;
+      return Math.round(total / 12 * 100);
+    }
+
+    function categoryScore(key){
+      if(!songs.length) return 0;
+      const total = songs.reduce((sum,song)=>sum + (progress[song.id][key] || 0),0);
+      return Math.round(total / (songs.length * 3) * 100);
+    }
+
+    function totalProgress(){
+      const values = Object.keys(progressLabels).map(categoryScore);
+      return Math.round(values.reduce((a,b)=>a+b,0) / values.length);
+    }
+
+    function renderCountdown(){
+      const now = new Date();
+      const diff = concertDate - now;
+      const days = Math.max(0, Math.ceil(diff / 86400000));
+      document.getElementById("countdownNumber").textContent = days;
+    }
+
+    function renderProgressBars(targetId){
+      const target = document.getElementById(targetId);
+      target.innerHTML = "";
+      Object.entries(progressLabels).forEach(([key,label])=>{
+        const score = categoryScore(key);
+        const row = document.createElement("div");
+        row.className = "progress-row";
+        row.innerHTML = `
+          <span>${label}</span>
+          <div class="bar"><span style="width:${score}%"></span></div>
+          <span class="percent">${score}%</span>
+        `;
+        target.appendChild(row);
+      });
+    }
+
+    function renderStories(){
+      const map = document.getElementById("storyMap");
+      map.innerHTML = sections.map(section=>`
+        <article class="card story-card">
+          <span class="section-badge">SECTION ${section.no}</span>
+          <h3>${section.title}</h3>
+          <span class="label">STORY</span>
+          <p>${section.story}</p>
+          <span class="label">KEYWORDS</span>
+          <div class="keywords">
+            ${section.keywords.map(word=>`<span class="keyword">${word}</span>`).join("")}
+          </div>
+          <span class="label">演奏者の意識</span>
+          <p>${section.direction}</p>
+        </article>
+      `).join("");
+    }
+
+    function renderFilters(){
+      const filters = [{id:"all",title:"すべて"},...sections];
+      const root = document.getElementById("songFilters");
+      root.innerHTML = filters.map(item=>`
+        <button class="filter-btn ${activeFilter===item.id?"active":""}" data-filter="${item.id}">
+          ${item.id==="all" ? item.title : item.title}
+        </button>
+      `).join("");
+
+      root.querySelectorAll("[data-filter]").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          activeFilter = btn.dataset.filter;
+          renderFilters();
+          renderSongs();
+        });
+      });
+    }
+
+    function renderSongs(){
+      const root = document.getElementById("songList");
+      const list = activeFilter==="all"
+        ? songs
+        : songs.filter(song=>song.section===activeFilter);
+
+      if(!list.length){
+        root.innerHTML = `<div class="empty">このセクションには、まだ曲が登録されていません。</div>`;
+        return;
+      }
+
+      root.innerHTML = list.map(song=>{
+        const section = sectionById(song.section);
+        return `
+          <button class="song-card" data-open-song="${song.id}">
+            <div class="song-card-top">
+              <div>
+                <h3 class="song-title">${song.title}</h3>
+                <div class="song-meta">SETLIST ${String(song.order).padStart(2,"0")}｜SECTION ${section.no}｜${section.title}</div>
+              </div>
+              <div class="song-score">${songScore(song.id)}%</div>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      bindSongButtons();
+    }
+
+    function renderDetail(songId){
+      const song = songs.find(item=>item.id===songId);
+      if(!song) return;
+      const section = sectionById(song.section);
+      const checks = progress[song.id].checks || {};
+      document.getElementById("detailHeading").textContent = song.title;
+      document.getElementById("detailContent").innerHTML = `
+        <div class="card">
+          <span class="section-badge">SETLIST ${String(song.order).padStart(2,"0")}｜SECTION ${section.no}｜${section.title}</span>
+          <span class="label">この曲の役割</span>
+          <p class="detail-copy">${song.role}</p>
+          <span class="label">演奏キーワード</span>
+          <div class="keywords">
+            ${song.keywords.map(word=>`<span class="keyword">${word}</span>`).join("")}
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">練習ポイント</h3>
+          ${song.points.map((point,index)=>`
+            <label class="check-item">
+              <input type="checkbox" data-song="${song.id}" data-check="${index}" ${checks[index]?"checked":""}>
+              <span>${point}</span>
+            </label>
+          `).join("")}
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">パート別メモ</h3>
+          <div class="part-grid">
+            ${Object.entries(song.parts).map(([part,text])=>`
+              <div class="part"><strong>${part}</strong><span>${text}</span></div>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">ステージ演出</h3>
+          <ul class="clean-list">
+            ${song.stage.map(item=>`<li>${item}</li>`).join("")}
+          </ul>
+        </div>
+
+        <button class="btn secondary" data-go-progress="${song.id}">この曲の進捗を記録する</button>
+      `;
+
+      document.querySelectorAll("[data-check]").forEach(box=>{
+        box.addEventListener("change",()=>{
+          const sid = box.dataset.song;
+          progress[sid].checks[box.dataset.check] = box.checked;
+          saveProgress();
+        });
+      });
+
+      document.querySelector("[data-go-progress]").addEventListener("click",()=>{
+        closeDetail();
+        switchPage("progress");
+        setTimeout(()=>{
+          document.getElementById(`progress-${song.id}`)?.scrollIntoView({behavior:"smooth",block:"start"});
+        },120);
+      });
+
+      const panel = document.getElementById("detailPanel");
+      panel.classList.add("open");
+      panel.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDetail(){
+      const panel = document.getElementById("detailPanel");
+      panel.classList.remove("open");
+      panel.setAttribute("aria-hidden","true");
+      document.body.style.overflow = "";
+    }
+
+    function renderProgressEditor(){
+      const root = document.getElementById("progressEditor");
+      root.innerHTML = songs.map(song=>{
+        const section = sectionById(song.section);
+        return `
+          <article id="progress-${song.id}" class="card progress-song">
+            <h3>${song.title}</h3>
+            <div class="song-meta">SETLIST ${String(song.order).padStart(2,"0")}｜SECTION ${section.no}｜${section.title}｜進捗 ${songScore(song.id)}%</div>
+            <div class="select-grid">
+              ${Object.entries(progressLabels).map(([key,label])=>`
+                <div class="select-wrap">
+                  <label for="${song.id}-${key}">${label}</label>
+                  <select id="${song.id}-${key}" data-song="${song.id}" data-key="${key}">
+                    ${progressOptions[key].map((option,index)=>`
+                      <option value="${index}" ${progress[song.id][key]===index?"selected":""}>${option}</option>
+                    `).join("")}
+                  </select>
+                </div>
+              `).join("")}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      root.querySelectorAll("select").forEach(select=>{
+        select.addEventListener("change",()=>{
+          const songId = select.dataset.song;
+          const key = select.dataset.key;
+          progress[songId][key] = Number(select.value);
+          saveProgress();
+          renderAllProgress();
+          renderSongs();
+          const meta = document.querySelector(`#progress-${songId} .song-meta`);
+          if(meta){
+            const section = sectionById(songs.find(s=>s.id===songId).section);
+            meta.textContent = `SETLIST ${String(songs.find(s=>s.id===songId).order).padStart(2,"0")}｜SECTION ${section.no}｜${section.title}｜進捗 ${songScore(songId)}%`;
+          }
+        });
+      });
+    }
+
+    function renderTodo(){
+      const todos = [];
+      songs.forEach(song=>{
+        const p = progress[song.id];
+        if(p.play < 2) todos.push(`「${song.title}」の演奏を安定させる`);
+        if(p.memory < 2) todos.push(`「${song.title}」の暗譜を進める`);
+        if(p.stage < 2) todos.push(`「${song.title}」のステージ演出を確認する`);
+        if(p.story < 2) todos.push(`「${song.title}」が物語で果たす役割を確認する`);
+      });
+
+      const root = document.getElementById("todoList");
+      const shown = todos.slice(0,6);
+      root.innerHTML = shown.length
+        ? shown.map(item=>`<li>${item}</li>`).join("")
+        : `<li>すべての項目が順調です。次は細部の完成度を高めよう。</li>`;
+    }
+
+    function renderAllProgress(){
+      normalizeProgress();
+      renderProgressBars("homeProgress");
+      renderProgressBars("progressSummary");
+      document.getElementById("totalScore").textContent = `${totalProgress()}%`;
+      renderTodo();
+    }
+
+    function bindSongButtons(){
+      document.querySelectorAll("[data-open-song]").forEach(button=>{
+        button.onclick = ()=>renderDetail(button.dataset.openSong);
+      });
+    }
+
+    function switchPage(pageName){
+      document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.remove("active"));
+      document.getElementById(`page-${pageName}`).classList.add("active");
+      document.querySelector(`.nav-btn[data-page="${pageName}"]`).classList.add("active");
+      window.scrollTo({top:0,behavior:"smooth"});
+      if(pageName==="progress"){
+        renderProgressEditor();
+        renderAllProgress();
+      }
+      if(pageName==="songs"){
+        renderSongs();
+      }
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(button=>{
+      button.addEventListener("click",()=>switchPage(button.dataset.page));
+    });
+
+    document.getElementById("closeDetail").addEventListener("click",closeDetail);
+    document.getElementById("detailPanel").addEventListener("click",event=>{
+      if(event.target.id==="detailPanel") closeDetail();
+    });
+
+    document.getElementById("resetProgress").addEventListener("click",()=>{
+      const ok = confirm("この端末に保存されている進捗をすべてリセットします。よろしいですか？");
+      if(!ok) return;
+      localStorage.removeItem(storageKey);
+      progress = loadProgress();
+      renderProgressEditor();
+      renderAllProgress();
+      renderSongs();
+    });
+
+    normalizeProgress();
+    renderCountdown();
+    renderStories();
+    renderFilters();
+    renderSongs();
+    renderProgressEditor();
+    renderAllProgress();
+    bindSongButtons();
+  </script>
+</body>
+</html>
