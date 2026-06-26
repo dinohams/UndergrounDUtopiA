@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#11181b" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
   <style>
     :root{
@@ -22,13 +25,14 @@
       --success:#7d9d7d;
       --shadow:0 14px 32px rgba(0,0,0,.28);
       --radius:18px;
+      --home-poster-url:none;
     }
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
       margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+      font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
       background:
         radial-gradient(circle at 10% 0%, rgba(118,142,150,.14), transparent 30%),
         radial-gradient(circle at 90% 20%, rgba(160,100,58,.10), transparent 24%),
@@ -44,7 +48,11 @@
       inset:0;
       z-index:0;
       pointer-events:none;
-      background:url("asset/poster.png") center top / cover no-repeat;
+      background-image:var(--home-poster-url);
+      background-position:center top;
+      background-size:cover;
+      background-repeat:no-repeat;
+      background-color:#0b1113;
     }
 
     body.home-active::after{
@@ -136,9 +144,11 @@
     .brand-text{flex:1}
     .brand-title{
       margin:0;
+      font-family:Georgia,"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;
       font-size:clamp(20px,5.6vw,30px);
+      font-weight:700;
       line-height:1;
-      letter-spacing:.025em;
+      letter-spacing:.045em;
     }
     .brand-sub{
       margin:6px 0 0;
@@ -146,6 +156,14 @@
       font-size:11px;
       letter-spacing:.22em;
       font-weight:700;
+    }
+
+    h1,h2,h3,.card-title,.page-title,.today-song,.section-badge,.filter-btn,.nav-btn{
+      font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    }
+
+    .countdown-number,.percent,.big-score,.song-score{
+      font-family:Georgia,"Times New Roman","Yu Mincho",serif;
     }
 
     .depth{
@@ -200,25 +218,40 @@
       position:relative;
       z-index:1;
       display:flex;
-      align-items:baseline;
-      flex-wrap:wrap;
-      gap:.28em;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+      text-align:center;
       color:var(--ivory);
-      font-size:clamp(22px,6.7vw,34px);
-      font-weight:800;
-      letter-spacing:.02em;
-      line-height:1.35;
       text-shadow:0 3px 12px rgba(0,0,0,.9);
+    }
+    .countdown-label{
+      font-size:clamp(15px,4.4vw,20px);
+      font-weight:700;
+      letter-spacing:.09em;
+      line-height:1.4;
+    }
+    .countdown-value{
+      display:flex;
+      align-items:baseline;
+      justify-content:center;
+      gap:.18em;
+      line-height:1;
     }
     .countdown-number{
       display:inline-block;
-      min-width:1.5em;
-      text-align:center;
-      font-size:1.62em;
-      font-weight:950;
-      line-height:1;
+      min-width:1.4em;
       color:var(--gold);
+      font-family:Georgia,"Times New Roman","Yu Mincho",serif;
+      font-size:clamp(38px,12vw,58px);
+      font-weight:700;
+      line-height:1;
       text-shadow:0 0 18px rgba(217,179,122,.28),0 3px 12px rgba(0,0,0,.9);
+    }
+    .countdown-unit{
+      font-size:clamp(17px,5vw,23px);
+      font-weight:700;
     }
     .date-line{
       margin-top:13px;
@@ -738,9 +771,11 @@
       <section id="page-home" class="page active">
         <div class="hero">
           <div class="countdown">
-            <span>演奏会まで残り</span>
-            <span id="countdownNumber" class="countdown-number">--</span>
-            <span>日</span>
+            <div class="countdown-label">演奏会まで残り</div>
+            <div class="countdown-value">
+              <span id="countdownNumber" class="countdown-number">--</span>
+              <span class="countdown-unit">日</span>
+            </div>
           </div>
           <div class="date-line">2026.11.8（日）開場13:30／開演14:00</div>
         </div>
@@ -753,7 +788,6 @@
             <li>イントロの入りを統一する</li>
             <li>演奏中の視線を下げすぎない</li>
           </ul>
-          <button class="btn" data-open-song="chaos">練習を始める</button>
         </div>
 
         <div class="card">
@@ -1912,6 +1946,33 @@
       renderSongs();
     });
 
+    function applyPosterBackground(){
+      const version = "20260626-3";
+      const candidates = [
+        `./asset/poster.png?v=${version}`,
+        `./poster.png?v=${version}`
+      ];
+
+      const tryLoad = (index)=>{
+        if(index >= candidates.length){
+          console.warn("poster.png が見つかりませんでした", candidates);
+          return;
+        }
+        const image = new Image();
+        image.onload = ()=>{
+          document.documentElement.style.setProperty(
+            "--home-poster-url",
+            `url("${candidates[index]}")`
+          );
+        };
+        image.onerror = ()=>tryLoad(index + 1);
+        image.src = candidates[index];
+      };
+
+      tryLoad(0);
+    }
+
+    applyPosterBackground();
     normalizeProgress();
     renderCountdown();
     renderStories();
