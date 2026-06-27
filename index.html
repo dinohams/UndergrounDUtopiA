@@ -8,8 +8,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
-  <meta name="application-name" content="UndergrounD UtopiA Portal v25" />
-  <meta name="app-build" content="20260627-v25" />
+  <meta name="application-name" content="UndergrounD UtopiA Portal v26" />
+  <meta name="app-build" content="20260627-v26" />
   <style>
     :root{
       --bg:#0c1214;
@@ -143,7 +143,10 @@
       box-shadow:inset 0 0 0 4px #0c1315;
     }
 
-    .brand-text{flex:1}
+    .brand-text{
+      flex:1;
+      min-width:0;
+    }
     .brand-title{
       margin:0;
       font-family:Georgia,"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;
@@ -172,9 +175,9 @@
       flex:0 0 auto;
       display:flex;
       align-items:center;
-      gap:10px;
-      min-width:190px;
-      padding:8px 10px 7px;
+      gap:12px;
+      min-width:216px;
+      padding:10px 12px 9px;
       border:1px solid rgba(217,179,122,.34);
       border-radius:14px;
       background:
@@ -187,13 +190,13 @@
     }
 
     .depth-gauge{
-      --gauge-size:60px;
-      --gauge-half:30px;
+      --gauge-size:70px;
+      --gauge-half:35px;
       --gauge-top:5px;
       position:relative;
-      width:68px;
-      height:38px;
-      flex:0 0 68px;
+      width:80px;
+      height:44px;
+      flex:0 0 80px;
       overflow:hidden;
     }
 
@@ -254,7 +257,7 @@
       left:-1px;
       bottom:0;
       width:2px;
-      height:28px;
+      height:33px;
       border-radius:999px;
       background:linear-gradient(180deg,#f0c58b,#a9663e);
       box-shadow:0 0 7px rgba(217,179,122,.30);
@@ -271,8 +274,8 @@
       position:absolute;
       left:50%;
       top:calc(var(--gauge-top) + var(--gauge-half));
-      width:9px;
-      height:9px;
+      width:10px;
+      height:10px;
       transform:translate(-50%,-50%);
       border:1px solid rgba(239,232,219,.58);
       border-radius:50%;
@@ -293,7 +296,7 @@
     .depth-label{
       color:var(--muted);
       font-family:Georgia,"Times New Roman",serif;
-      font-size:9px;
+      font-size:10px;
       letter-spacing:.18em;
     }
 
@@ -301,7 +304,7 @@
       margin-top:2px;
       color:var(--ivory);
       font-family:Georgia,"Times New Roman",serif;
-      font-size:18px;
+      font-size:21px;
       font-weight:600;
       font-variant-numeric:tabular-nums;
       letter-spacing:.02em;
@@ -311,7 +314,7 @@
       margin-top:3px;
       color:var(--copper);
       font-family:Georgia,"Times New Roman",serif;
-      font-size:8px;
+      font-size:9px;
       letter-spacing:.10em;
     }
 
@@ -322,7 +325,7 @@
       margin-top:4px;
       color:#9daa9f;
       font-family:Arial,sans-serif;
-      font-size:7px;
+      font-size:8px;
       letter-spacing:.10em;
     }
 
@@ -346,48 +349,48 @@
       }
 
       .depth-panel{
-        min-width:136px;
-        gap:6px;
-        padding:6px 7px;
+        min-width:156px;
+        gap:8px;
+        padding:7px 9px;
         border-radius:12px;
       }
 
       .depth-gauge{
-        --gauge-size:42px;
-        --gauge-half:21px;
+        --gauge-size:50px;
+        --gauge-half:25px;
         --gauge-top:4px;
-        width:50px;
-        height:29px;
-        flex-basis:50px;
+        width:58px;
+        height:34px;
+        flex-basis:58px;
       }
 
       .depth-needle-arm{
-        height:20px;
+        height:24px;
       }
 
       .depth-hub{
-        width:7px;
-        height:7px;
+        width:8px;
+        height:8px;
       }
 
       .depth-readout strong{
-        font-size:14px;
+        font-size:17px;
       }
 
       .depth-label{
-        font-size:7px;
+        font-size:8px;
       }
 
       .depth-sector{
-        font-size:6.3px;
+        font-size:7px;
       }
 
       .depth-signal{
         display:flex;
         gap:3px;
         margin-top:2px;
-        font-size:5.5px;
-        letter-spacing:.06em;
+        font-size:6px;
+        letter-spacing:.07em;
       }
 
       .depth-signal i{
@@ -397,21 +400,134 @@
     }
 
     @media (max-width:390px){
-      .depth-sector{
-        display:none;
-      }
-
       .depth-panel{
-        min-width:118px;
+        min-width:146px;
+        padding-inline:7px;
       }
 
       .depth-gauge{
-        width:44px;
-        flex-basis:44px;
+        --gauge-size:46px;
+        --gauge-half:23px;
+        width:52px;
+        height:32px;
+        flex-basis:52px;
+      }
+
+      .depth-needle-arm{
+        height:22px;
+      }
+
+      .depth-readout strong{
+        font-size:16px;
+      }
+
+      .depth-sector{
+        font-size:6.5px;
       }
 
       .depth-signal{
-        font-size:5.2px;
+        font-size:5.6px;
+      }
+    }
+
+
+    .terminal-auth-bar{
+      display:grid;
+      grid-template-columns:auto minmax(220px,auto) minmax(0,1fr);
+      align-items:center;
+      gap:8px 16px;
+      margin-top:11px;
+      padding:8px 11px;
+      border:1px solid rgba(217,179,122,.28);
+      border-radius:11px;
+      background:
+        linear-gradient(90deg,rgba(71,48,31,.30),rgba(10,18,21,.52) 42%,rgba(10,18,21,.42));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025),
+        0 7px 18px rgba(0,0,0,.16);
+      backdrop-filter:blur(8px) saturate(.88);
+      -webkit-backdrop-filter:blur(8px) saturate(.88);
+    }
+
+    .terminal-auth-field{
+      min-width:0;
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+      white-space:nowrap;
+    }
+
+    .terminal-auth-label{
+      flex:0 0 auto;
+      color:var(--copper);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:8px;
+      font-weight:700;
+      letter-spacing:.12em;
+    }
+
+    .terminal-auth-value{
+      min-width:0;
+      color:#e9e2d6;
+      font-family:"Courier New",ui-monospace,monospace;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.035em;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .terminal-auth-order{
+      overflow:hidden;
+    }
+
+    .terminal-auth-order .terminal-auth-value{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      color:#ddd5c8;
+      font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+      font-weight:600;
+      letter-spacing:.015em;
+    }
+
+    @media (max-width:650px){
+      .terminal-auth-bar{
+        grid-template-columns:auto minmax(0,1fr);
+        gap:6px 12px;
+        margin-top:9px;
+        padding:7px 9px;
+      }
+
+      .terminal-auth-order{
+        grid-column:1 / -1;
+      }
+
+      .terminal-auth-label{
+        font-size:7px;
+      }
+
+      .terminal-auth-value{
+        font-size:9px;
+      }
+
+      .terminal-auth-order .terminal-auth-value{
+        white-space:normal;
+        line-height:1.45;
+      }
+    }
+
+    @media (max-width:390px){
+      .terminal-auth-bar{
+        gap:5px 8px;
+        padding-inline:7px;
+      }
+
+      .terminal-auth-label{
+        font-size:6.5px;
+        letter-spacing:.09em;
+      }
+
+      .terminal-auth-value{
+        font-size:8.2px;
       }
     }
 
@@ -2975,6 +3091,21 @@
           </div>
         </div>
       </div>
+
+      <div class="terminal-auth-bar" aria-label="地下住民認証情報">
+        <div class="terminal-auth-field">
+          <span class="terminal-auth-label">ID :</span>
+          <strong id="residentIdValue" class="terminal-auth-value">UG-00A-0000</strong>
+        </div>
+        <div class="terminal-auth-field">
+          <span class="terminal-auth-label">ACCESS LEVEL :</span>
+          <strong id="accessLevelValue" class="terminal-auth-value">001 / NEW RESIDENT</strong>
+        </div>
+        <div class="terminal-auth-field terminal-auth-order">
+          <span class="terminal-auth-label">ORDER :</span>
+          <span id="terminalOrderValue" class="terminal-auth-value">通信指令を受信しています。</span>
+        </div>
+      </div>
     </header>
 
     <main>
@@ -3402,7 +3533,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260627-v25";
+    const APP_BUILD_VERSION = "20260627-v26";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -3441,6 +3572,143 @@
         checkForAppUpdate();
       }
     });
+
+    // ============================
+    // 地下住民ID・アクセス階級・中央管理局指令
+    // ============================
+    const residentIdStorageKey = "underground-utopia-resident-id-v1";
+    const accessCountStorageKey = "underground-utopia-access-count-v1";
+    const lastAccessStorageKey = "underground-utopia-last-access-v1";
+    const accessCountIntervalMs = 30 * 60 * 1000;
+
+    const accessRanks = [
+      {count:1,title:"NEW RESIDENT"},
+      {count:10,title:"REGISTERED RESIDENT"},
+      {count:20,title:"VERIFIED RESIDENT"},
+      {count:30,title:"SENIOR RESIDENT"},
+      {count:40,title:"RESIDENT GUIDE"},
+      {count:50,title:"SECTOR WORKER"},
+      {count:60,title:"MAINTENANCE TECHNICIAN"},
+      {count:70,title:"ARCHIVE KEEPER"},
+      {count:80,title:"SIGNAL OPERATOR"},
+      {count:90,title:"ROUTE SURVEYOR"},
+      {count:100,title:"SECTOR OFFICER"},
+      {count:110,title:"SECTOR SUPERVISOR"},
+      {count:120,title:"DISTRICT COORDINATOR"},
+      {count:130,title:"OPERATIONS CHIEF"},
+      {count:140,title:"ADMINISTRATIVE INSPECTOR"},
+      {count:150,title:"COUNCIL SECRETARY"},
+      {count:160,title:"COUNCIL DELEGATE"},
+      {count:170,title:"COUNCILOR"},
+      {count:180,title:"UTOPIA COMMISSIONER"},
+      {count:190,title:"DEPUTY GOVERNOR"},
+      {count:200,title:"UNDERGROUND GOVERNOR"}
+    ];
+
+    const terminalOrders = [
+      "本日の探索は第13区画から開始せよ。",
+      "灯りの消えた通路へ単独で入るな。",
+      "楽園の座標は未確定。記録を続けよ。",
+      "隣人の歩調を確認し、隊列を乱すな。",
+      "音の反響を手がかりに旧坑道を調査せよ。",
+      "第7配管区の異音を確認せよ。",
+      "失われた地図の断片を回収せよ。",
+      "本日の合言葉は「帰る場所はつくれる」。",
+      "不要な照明を落とし、電力を温存せよ。",
+      "楽園は発見するものではない。築け。",
+      "誰かが遅れている。先へ行かず、待て。",
+      "見つからない道は、音で示せ。",
+      "本日の任務：昨日より良い地下を残せ。",
+      "古い扉には印を付け、無理に開くな。",
+      "持ち場を離れる際は必ず記録を残せ。",
+      "第24区画の通信状況を報告せよ。",
+      "地下水路の増水に警戒せよ。",
+      "予備電源の残量を確認せよ。",
+      "不安は隠すな。共有し、軽くせよ。",
+      "使われていない椅子を一つ空けておけ。",
+      "今日の失敗を、明日の地図に加えよ。",
+      "進路不明時は最も近い灯りへ戻れ。",
+      "無音区域では足音を合わせよ。",
+      "誰かの名前を忘れないこと。それも任務だ。",
+      "楽園候補地の環境記録を更新せよ。",
+      "旧居住区の壁面文字を保存せよ。",
+      "食料庫の配給記録を確認せよ。",
+      "本日の探索終了後、全員の帰還を確認せよ。",
+      "ここを楽園に変える作業を続行せよ。",
+      "目的地より、共に進む者を見失うな。"
+    ];
+
+    function secureRandomInteger(maxExclusive){
+      if(window.crypto?.getRandomValues){
+        const values = new Uint32Array(1);
+        window.crypto.getRandomValues(values);
+        return values[0] % maxExclusive;
+      }
+      return Math.floor(Math.random() * maxExclusive);
+    }
+
+    function createResidentId(){
+      const sectorNumber = String(secureRandomInteger(100)).padStart(2,"0");
+      const sectorLetter = String.fromCharCode(65 + secureRandomInteger(26));
+      const serialNumber = String(secureRandomInteger(10000)).padStart(4,"0");
+      return `UG-${sectorNumber}${sectorLetter}-${serialNumber}`;
+    }
+
+    function getOrCreateResidentId(){
+      let residentId = localStorage.getItem(residentIdStorageKey) || "";
+      if(!/^UG-\d{2}[A-Z]-\d{4}$/.test(residentId)){
+        residentId = createResidentId();
+        localStorage.setItem(residentIdStorageKey,residentId);
+      }
+      return residentId;
+    }
+
+    function registerTerminalAccess(){
+      const now = Date.now();
+      const previousAccess = Number(localStorage.getItem(lastAccessStorageKey) || 0);
+      let count = Math.max(0,Number(localStorage.getItem(accessCountStorageKey) || 0));
+
+      if(!previousAccess || now - previousAccess >= accessCountIntervalMs){
+        count += 1;
+        localStorage.setItem(accessCountStorageKey,String(count));
+        localStorage.setItem(lastAccessStorageKey,String(now));
+      }else if(!count){
+        count = 1;
+        localStorage.setItem(accessCountStorageKey,"1");
+      }
+
+      return count;
+    }
+
+    function getAccessRank(accessCount){
+      let currentRank = accessRanks[0];
+      accessRanks.forEach(rank=>{
+        if(accessCount >= rank.count) currentRank = rank;
+      });
+      return currentRank;
+    }
+
+    function initializeTerminalIdentity(){
+      const residentId = getOrCreateResidentId();
+      const accessCount = registerTerminalAccess();
+      const accessRank = getAccessRank(accessCount);
+      const randomOrder = terminalOrders[secureRandomInteger(terminalOrders.length)];
+
+      const residentElement = document.getElementById("residentIdValue");
+      const accessElement = document.getElementById("accessLevelValue");
+      const orderElement = document.getElementById("terminalOrderValue");
+
+      if(residentElement) residentElement.textContent = residentId;
+      if(accessElement){
+        const displayedCount = String(accessCount).padStart(3,"0");
+        accessElement.textContent = `${displayedCount} / ${accessRank.title}`;
+        accessElement.title = `アクセス回数 ${accessCount}回`;
+      }
+      if(orderElement){
+        orderElement.textContent = randomOrder;
+        orderElement.title = randomOrder;
+      }
+    }
 
     // ============================
     // 編集しやすい公演データ
@@ -7363,6 +7631,7 @@
 
     async function initializeApp(){
       applyPosterBackground();
+      initializeTerminalIdentity();
       updateDepthPanel("home",false);
       initializeHomeData();
       initializeSongDetails();
