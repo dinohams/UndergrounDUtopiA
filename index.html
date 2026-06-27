@@ -1520,12 +1520,12 @@
     .countdown-card{
       position:relative;
       overflow:hidden;
-      flex:1 0 300px;
+      flex:0 0 clamp(255px,28vw,320px);
       min-width:0;
       scroll-snap-align:start;
       border:1px solid rgba(217,179,122,.48);
       border-radius:22px;
-      padding:18px 20px;
+      padding:16px 18px;
       background:linear-gradient(180deg,rgba(10,17,20,.65),rgba(9,15,17,.50));
       box-shadow:0 14px 32px rgba(0,0,0,.28);
       backdrop-filter:blur(8px) saturate(.9);
@@ -1534,7 +1534,7 @@
 
     @media (max-width:680px){
       .countdown-card{
-        flex-basis:84vw;
+        flex-basis:min(76vw,290px);
       }
     }
 
@@ -1754,8 +1754,13 @@
     }
 
     .admin-panel:not(.admin-authorized) .admin-edit-zone::before{display:block}
-    .admin-panel:not(.admin-authorized) .admin-tab-panel,
-    .admin-panel:not(.admin-authorized) .admin-global-footer{
+    .admin-panel:not(.admin-authorized) .admin-tab-panel{
+      pointer-events:none;
+      opacity:.43;
+      filter:grayscale(.25);
+    }
+
+    .admin-panel:not(.admin-authorized) #adminSave{
       pointer-events:none;
       opacity:.43;
       filter:grayscale(.25);
@@ -2114,7 +2119,7 @@
         <div class="admin-footer-actions admin-global-footer">
           <button id="adminCancel" class="admin-btn ghost" type="button">変更を破棄</button>
           <button id="adminSave" class="admin-btn secondary" type="button">この端末に下書き保存</button>
-          <button id="firebasePublish" class="admin-btn primary" type="button" disabled>全員へ反映</button>
+          <button id="firebasePublish" class="admin-btn primary" type="button">全員へ反映</button>
         </div>
       </div>
     </div>
@@ -4850,6 +4855,7 @@
         signOutButton.hidden = false;
         copyUidButton.hidden = false;
         publishButton.disabled = false;
+        publishButton.title = "ホーム情報とセットリストを全員へ反映";
         statusDot.classList.add("online");
       }else if(user){
         authStatus.textContent = "このGoogleアカウントには編集権限がありません";
@@ -4857,7 +4863,8 @@
         signInButton.hidden = true;
         signOutButton.hidden = false;
         copyUidButton.hidden = false;
-        publishButton.disabled = true;
+        publishButton.disabled = false;
+        publishButton.title = "このアカウントには公開権限がありません";
         statusDot.classList.remove("online");
         statusDot.classList.add("warning");
       }else{
@@ -4866,7 +4873,8 @@
         signInButton.hidden = false;
         signOutButton.hidden = true;
         copyUidButton.hidden = true;
-        publishButton.disabled = true;
+        publishButton.disabled = false;
+        publishButton.title = "先にGoogleで管理者ログインしてください";
         statusDot.classList.remove("online","warning");
       }
     }
@@ -4903,8 +4911,14 @@
     }
 
     async function publishSetlists(){
-      if(!currentFirebaseUser || currentFirebaseUser.uid !== ADMIN_UID){
-        alert("管理者としてログインしてください。");
+      if(!currentFirebaseUser){
+        setDataStatus("先にGoogleで管理者ログインしてください。", "warning");
+        alert("先にGoogleで管理者ログインしてください。");
+        return;
+      }
+      if(currentFirebaseUser.uid !== ADMIN_UID){
+        setDataStatus("このGoogleアカウントには公開権限がありません。", "warning");
+        alert("このGoogleアカウントには公開権限がありません。");
         return;
       }
       const bridge = window.utopiaSetlistApp;
@@ -4949,7 +4963,7 @@
         alert(firebaseErrorMessage(error));
       }finally{
         publishButton.textContent = originalText;
-        publishButton.disabled = !(currentFirebaseUser && currentFirebaseUser.uid === ADMIN_UID);
+        publishButton.disabled = false;
       }
     }
 
