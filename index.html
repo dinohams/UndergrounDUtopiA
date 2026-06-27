@@ -8,8 +8,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
-  <meta name="application-name" content="UndergrounD UtopiA Portal v24" />
-  <meta name="app-build" content="20260627-v24" />
+  <meta name="application-name" content="UndergrounD UtopiA Portal v25" />
+  <meta name="app-build" content="20260627-v25" />
   <style>
     :root{
       --bg:#0c1214;
@@ -1117,7 +1117,6 @@
     body.home-active .lead,
     body.home-active .detail-copy,
     body.home-active .progress-row,
-    body.home-active .todo-list,
     body.home-active .story-card p{
       text-shadow:0 2px 8px rgba(0,0,0,.88);
     }
@@ -2599,6 +2598,121 @@
       margin-top:10px;
     }
 
+    .song-source-card{
+      display:grid;
+      grid-template-columns:132px minmax(0,1fr);
+      gap:12px;
+      align-items:center;
+      margin-top:8px;
+      padding:10px;
+      border:1px solid rgba(217,179,122,.30);
+      border-radius:13px;
+      background:rgba(9,15,17,.46);
+      color:var(--ivory);
+      text-decoration:none;
+    }
+
+    .song-source-card:hover{
+      border-color:rgba(217,179,122,.62);
+      background:rgba(32,43,47,.66);
+    }
+
+    .song-source-thumb{
+      width:132px;
+      aspect-ratio:16/9;
+      object-fit:cover;
+      border-radius:9px;
+      background:#0b1113;
+      box-shadow:0 8px 18px rgba(0,0,0,.24);
+    }
+
+    .song-source-copy{
+      min-width:0;
+      display:grid;
+      gap:5px;
+    }
+
+    .song-source-copy strong{
+      color:var(--gold);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .song-source-copy span{
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.55;
+      overflow-wrap:anywhere;
+    }
+
+    .song-progress-block{
+      margin-top:8px;
+    }
+
+    .song-progress-score{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .song-progress-score strong{
+      color:var(--gold);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:22px;
+      font-weight:600;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .song-detail-info-card .card-title{
+      overflow-wrap:anywhere;
+    }
+
+    .youtube-editor-preview{
+      margin-top:9px;
+    }
+
+    .youtube-editor-preview .song-source-card{
+      margin-top:0;
+    }
+
+    .youtube-editor-message{
+      padding:11px 12px;
+      border:1px dashed rgba(174,185,185,.24);
+      border-radius:11px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    @media (max-width:520px){
+      .song-source-card{
+        grid-template-columns:108px minmax(0,1fr);
+        gap:9px;
+      }
+
+      .song-source-thumb{
+        width:108px;
+      }
+
+      .song-progress-block .select-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
+    @media (max-width:360px){
+      .song-source-card{
+        grid-template-columns:1fr;
+      }
+
+      .song-source-thumb{
+        width:100%;
+      }
+    }
+
     .admin-detail-editor .admin-textarea{
       min-height:110px;
     }
@@ -2884,10 +2998,6 @@
           <ul id="todayTaskList" class="clean-list"></ul>
         </div>
 
-        <div class="card">
-          <h2 class="card-title">現在の進捗</h2>
-          <div id="homeProgress" class="progress-list"></div>
-        </div>
       </section>
 
       <section id="page-story" class="page">
@@ -2931,12 +3041,6 @@
           <div id="progressSummary" class="progress-list"></div>
         </div>
 
-        <div class="card">
-          <h2 class="card-title">次に確認したいこと</h2>
-          <ul id="todoList" class="todo-list"></ul>
-        </div>
-
-        <div id="progressEditor"></div>
 
         <button id="resetProgress" class="btn ghost">この端末の進捗をリセット</button>
         <p class="footer-note">保存先はこの端末のブラウザ内です。ブラウザのデータを削除すると進捗も消えます。</p>
@@ -3298,7 +3402,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260627-v24";
+    const APP_BUILD_VERSION = "20260627-v25";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -4442,23 +4546,13 @@
       return [];
     }
 
-    function normalizeParts(value){
-      if(!value || typeof value !== "object" || Array.isArray(value)) return {};
-      return Object.fromEntries(
-        Object.entries(value)
-          .map(([part,text])=>[String(part || "").trim(),String(text || "").trim()])
-          .filter(([part,text])=>part && text)
-      );
-    }
-
     function buildDefaultSongDetails(){
       return songs.map(song=>({
         id:song.id || makeLocalId("song-detail"),
         title:String(song.title || "").trim(),
-        role:String(song.role || "").trim(),
-        keywords:normalizeStringList(song.keywords),
-        points:normalizeStringList(song.points),
-        parts:normalizeParts(song.parts),
+        youtubeUrl:"",
+        infoTitle:"この曲の役割",
+        infoBody:String(song.role || "").trim(),
         stage:normalizeStringList(song.stage)
       }));
     }
@@ -4479,10 +4573,9 @@
           byTitle.set(key,{
             id:raw.id || existing.id || makeLocalId("song-detail"),
             title,
-            role:String(raw.role ?? existing.role ?? "").trim(),
-            keywords:normalizeStringList(raw.keywords ?? existing.keywords),
-            points:normalizeStringList(raw.points ?? existing.points),
-            parts:normalizeParts(raw.parts ?? existing.parts),
+            youtubeUrl:String(raw.youtubeUrl ?? existing.youtubeUrl ?? "").trim(),
+            infoTitle:String(raw.infoTitle ?? existing.infoTitle ?? "この曲の役割").trim() || "この曲の役割",
+            infoBody:String(raw.infoBody ?? raw.role ?? existing.infoBody ?? "").trim(),
             stage:normalizeStringList(raw.stage ?? existing.stage)
           });
         });
@@ -4521,10 +4614,9 @@
       const detail = {
         id:makeLocalId("song-detail"),
         title:cleanTitle,
-        role:"",
-        keywords:[],
-        points:[],
-        parts:{},
+        youtubeUrl:"",
+        infoTitle:"この曲の役割",
+        infoBody:"",
         stage:[]
       };
       songDetailsCatalog.push(detail);
@@ -4538,10 +4630,9 @@
       const next = {
         id:existing?.id || makeLocalId("song-detail"),
         title:cleanTitle,
-        role:String(patch.role || "").trim(),
-        keywords:normalizeStringList(patch.keywords),
-        points:normalizeStringList(patch.points),
-        parts:normalizeParts(patch.parts),
+        youtubeUrl:String(patch.youtubeUrl || "").trim(),
+        infoTitle:String(patch.infoTitle || "この曲の役割").trim() || "この曲の役割",
+        infoBody:String(patch.infoBody || "").trim(),
         stage:normalizeStringList(patch.stage)
       };
       songDetailsCatalog = songDetailsCatalog.filter(detail=>normalizeSongTitleKey(detail.title)!==key);
@@ -4558,29 +4649,69 @@
         || null;
     }
 
-    function partsToEditorText(parts){
-      return Object.entries(normalizeParts(parts))
-        .map(([part,text])=>`${part}：${text}`)
-        .join("\n");
+    function getProgressIdForItem(item){
+      const knownSong = getProgressSongForItem(item);
+      if(knownSong) return knownSong.id;
+      const key = normalizeSongTitleKey(item?.title);
+      return key ? `title:${key}` : `item:${item?.id || "unknown"}`;
     }
 
-    function parsePartsEditorText(value){
-      const parts = {};
-      String(value || "").split(/\r?\n/).forEach(line=>{
-        const clean = line.trim();
-        if(!clean) return;
-        const separator = clean.search(/[：:]/);
-        if(separator < 0){
-          parts[clean] = "";
-          return;
-        }
-        const part = clean.slice(0,separator).trim();
-        const text = clean.slice(separator + 1).trim();
-        if(part && text) parts[part] = text;
+    function ensureProgressEntry(progressId){
+      if(!progress[progressId] || typeof progress[progressId] !== "object"){
+        progress[progressId] = {play:0,memory:0,stage:0,story:0,checks:{}};
+      }
+      Object.keys(progressLabels).forEach(key=>{
+        const value = Number(progress[progressId][key]);
+        progress[progressId][key] = Number.isFinite(value) ? Math.max(0,Math.min(3,value)) : 0;
       });
-      return parts;
+      if(!progress[progressId].checks) progress[progressId].checks = {};
+      return progress[progressId];
     }
 
+    function extractYouTubeVideoId(value){
+      const input = String(value || "").trim();
+      if(!input) return "";
+      if(/^[A-Za-z0-9_-]{11}$/.test(input)) return input;
+      try{
+        const url = new URL(input);
+        const host = url.hostname.replace(/^www\./i,"").toLowerCase();
+        if(host === "youtu.be"){
+          return url.pathname.split("/").filter(Boolean)[0] || "";
+        }
+        if(host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com" || host === "youtube-nocookie.com"){
+          const watchId = url.searchParams.get("v");
+          if(watchId) return watchId;
+          const parts = url.pathname.split("/").filter(Boolean);
+          const markerIndex = parts.findIndex(part=>["shorts","embed","live"].includes(part));
+          if(markerIndex >= 0) return parts[markerIndex + 1] || "";
+        }
+      }catch(error){}
+      return "";
+    }
+
+    function normalizeYouTubeUrl(value){
+      const videoId = extractYouTubeVideoId(value);
+      return videoId ? `https://www.youtube.com/watch?v=${videoId}` : "";
+    }
+
+    function renderYouTubeSource(url,options={}){
+      const videoId = extractYouTubeVideoId(url);
+      if(!videoId){
+        return options.editor
+          ? `<div class="youtube-editor-message">YouTubeのURLを入力すると、ここにサムネイルが表示されます。</div>`
+          : `<p class="detail-copy">音源は未登録です。</p>`;
+      }
+      const normalizedUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      return `
+        <a class="song-source-card" href="${escapeHtml(normalizedUrl)}" target="_blank" rel="noopener noreferrer">
+          <img class="song-source-thumb" src="https://img.youtube.com/vi/${escapeHtml(videoId)}/hqdefault.jpg" alt="YouTube音源のサムネイル" loading="lazy">
+          <span class="song-source-copy">
+            <strong>YouTubeで音源を開く</strong>
+            <span>${escapeHtml(normalizedUrl)}</span>
+          </span>
+        </a>
+      `;
+    }
 
 
     function normalizeGeoAccessConfig(value){
@@ -6426,12 +6557,31 @@
       return initial;
     }
 
+    function getProgressIdsForSummary(){
+      const ids = [];
+      const seen = new Set();
+      const add = id=>{
+        if(!id || seen.has(id)) return;
+        seen.add(id);
+        ids.push(id);
+      };
+
+      performanceCatalog.forEach(performance=>{
+        (performance.items || []).forEach(item=>{
+          if(item.type === "song" || item.type === "medley") add(getProgressIdForItem(item));
+        });
+      });
+
+      if(!ids.length) songs.forEach(song=>add(song.id));
+      return ids;
+    }
+
     function normalizeProgress(){
-      songs.forEach(song=>{
-        if(!progress[song.id]){
-          progress[song.id] = {play:0,memory:0,stage:0,story:0,checks:{}};
-        }
-        if(!progress[song.id].checks) progress[song.id].checks = {};
+      songs.forEach(song=>ensureProgressEntry(song.id));
+      performanceCatalog.forEach(performance=>{
+        (performance.items || []).forEach(item=>{
+          if(item.type === "song" || item.type === "medley") ensureProgressEntry(getProgressIdForItem(item));
+        });
       });
     }
 
@@ -6443,21 +6593,22 @@
       return sections.find(section=>section.id===id);
     }
 
-    function songScore(songId){
-      const p = progress[songId];
-      const total = p.play + p.memory + p.stage + p.story;
-      return Math.round(total / 12 * 100);
+    function songScore(progressId){
+      const p = ensureProgressEntry(progressId);
+      const total = Object.keys(progressLabels).reduce((sum,key)=>sum + Number(p[key] || 0),0);
+      return Math.round(total / (Object.keys(progressLabels).length * 3) * 100);
     }
 
     function categoryScore(key){
-      if(!songs.length) return 0;
-      const total = songs.reduce((sum,song)=>sum + (progress[song.id][key] || 0),0);
-      return Math.round(total / (songs.length * 3) * 100);
+      const ids = getProgressIdsForSummary();
+      if(!ids.length) return 0;
+      const total = ids.reduce((sum,id)=>sum + Number(ensureProgressEntry(id)[key] || 0),0);
+      return Math.round(total / (ids.length * 3) * 100);
     }
 
     function totalProgress(){
       const values = Object.keys(progressLabels).map(categoryScore);
-      return Math.round(values.reduce((a,b)=>a+b,0) / values.length);
+      return values.length ? Math.round(values.reduce((a,b)=>a+b,0) / values.length) : 0;
     }
 
     function formatHomePerformanceDate(performance){
@@ -6729,6 +6880,7 @@
 
     function renderProgressBars(targetId){
       const target = document.getElementById(targetId);
+      if(!target) return;
       target.innerHTML = "";
       Object.entries(progressLabels).forEach(([key,label])=>{
         const score = categoryScore(key);
@@ -6822,14 +6974,14 @@
     }
 
     function renderSongCard(item,performance,songNumber){
-      const progressSong = getProgressSongForItem(item);
+      const progressId = getProgressIdForItem(item);
       const medleyTitles = item.type === "medley" && Array.isArray(item.medley)
         ? item.medley
         : [];
       const medley = medleyTitles.length
         ? `<ul class="medley-list">${medleyTitles.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
         : "";
-      const score = progressSong ? `<div class="song-score">${songScore(progressSong.id)}%</div>` : "";
+      const score = `<div class="song-score">${songScore(progressId)}%</div>`;
 
       return `
         <button class="song-card" data-open-performance-item="${escapeHtml(item.id)}">
@@ -6900,29 +7052,53 @@
       renderSharedSongDetail(item,performance,context);
     }
 
+    function renderSongProgressControls(progressId){
+      const entry = ensureProgressEntry(progressId);
+      return `
+        <div class="song-progress-block">
+          <div class="song-progress-score">
+            <span>この曲の総合進捗</span>
+            <strong data-detail-progress-score>${songScore(progressId)}%</strong>
+          </div>
+          <div class="select-grid">
+            ${Object.entries(progressLabels).map(([key,label])=>`
+              <div class="select-wrap">
+                <label>${escapeHtml(label)}</label>
+                <select data-detail-progress-id="${escapeHtml(progressId)}" data-detail-progress-key="${escapeHtml(key)}">
+                  ${progressOptions[key].map((option,index)=>`
+                    <option value="${index}" ${entry[key]===index?"selected":""}>${escapeHtml(option)}</option>
+                  `).join("")}
+                </select>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function bindSongProgressControls(){
+      document.querySelectorAll("[data-detail-progress-id]").forEach(select=>{
+        select.addEventListener("change",()=>{
+          const progressId = select.dataset.detailProgressId;
+          const key = select.dataset.detailProgressKey;
+          const entry = ensureProgressEntry(progressId);
+          entry[key] = Number(select.value);
+          saveProgress();
+          const score = document.querySelector("[data-detail-progress-score]");
+          if(score) score.textContent = `${songScore(progressId)}%`;
+          renderAllProgress();
+          renderSongs();
+        });
+      });
+    }
+
     function renderSharedSongDetail(item,performance,context){
       const detail = ensureSharedSongDetail(item.title);
-      const progressSong = getProgressSongForItem(item);
-      const checks = progressSong ? (progress[progressSong.id]?.checks || {}) : {};
+      const progressId = getProgressIdForItem(item);
+      ensureProgressEntry(progressId);
       const medleyContents = item.type === "medley" && Array.isArray(item.medley) && item.medley.length
         ? `<span class="label">メドレー構成</span><ul class="clean-list">${item.medley.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
         : "";
-      const keywordContents = detail.keywords.length
-        ? `<div class="keywords">${detail.keywords.map(word=>`<span class="keyword">${escapeHtml(word)}</span>`).join("")}</div>`
-        : `<p class="detail-copy">未登録です。</p>`;
-      const pointContents = detail.points.length
-        ? (progressSong
-          ? detail.points.map((point,index)=>`
-              <label class="check-item">
-                <input type="checkbox" data-song="${escapeHtml(progressSong.id)}" data-check="${index}" ${checks[index]?"checked":""}>
-                <span>${escapeHtml(point)}</span>
-              </label>
-            `).join("")
-          : `<ul class="clean-list">${detail.points.map(point=>`<li>${escapeHtml(point)}</li>`).join("")}</ul>`)
-        : `<div class="home-empty">練習ポイントは未登録です。</div>`;
-      const partContents = Object.keys(detail.parts).length
-        ? `<div class="part-grid">${Object.entries(detail.parts).map(([part,text])=>`<div class="part"><strong>${escapeHtml(part)}</strong><span>${escapeHtml(text)}</span></div>`).join("")}</div>`
-        : `<div class="home-empty">パート別メモは未登録です。</div>`;
       const stageContents = detail.stage.length
         ? `<ul class="clean-list">${detail.stage.map(text=>`<li>${escapeHtml(text)}</li>`).join("")}</ul>`
         : `<div class="home-empty">ステージ演出は未登録です。</div>`;
@@ -6933,21 +7109,16 @@
           <span class="section-badge">M-${context.songNumber}${context.section ? `｜${escapeHtml(context.section.label)} ${escapeHtml(context.section.title)}` : ""}</span>
           <span class="label">本番</span>
           <p class="detail-copy">${escapeHtml(performance.title)}</p>
-          <span class="label">この曲の役割</span>
-          <p class="detail-copy">${detail.role ? nl2br(detail.role) : "未登録です。"}</p>
-          <span class="label">演奏キーワード</span>
-          ${keywordContents}
+          <span class="label">音源</span>
+          ${renderYouTubeSource(detail.youtubeUrl)}
+          <span class="label">進捗</span>
+          ${renderSongProgressControls(progressId)}
           ${medleyContents}
         </div>
 
-        <div class="card">
-          <h3 class="card-title">練習ポイント</h3>
-          ${pointContents}
-        </div>
-
-        <div class="card">
-          <h3 class="card-title">パート別メモ</h3>
-          ${partContents}
+        <div class="card song-detail-info-card">
+          <h3 class="card-title">${escapeHtml(detail.infoTitle || "この曲の役割")}</h3>
+          <p class="detail-copy">${detail.infoBody ? nl2br(detail.infoBody) : "未登録です。"}</p>
         </div>
 
         <div class="card">
@@ -6956,27 +7127,9 @@
         </div>
 
         ${adminAuthorized ? `<button id="editSharedSongDetail" class="btn secondary" type="button">共通楽曲詳細を編集</button>` : ""}
-        ${progressSong ? `<button class="btn secondary" data-go-progress="${escapeHtml(progressSong.id)}">この曲の進捗を記録する</button>` : ""}
       `;
 
-      document.querySelectorAll("[data-check]").forEach(box=>{
-        box.addEventListener("change",()=>{
-          const sid = box.dataset.song;
-          if(!progress[sid]) return;
-          progress[sid].checks[box.dataset.check] = box.checked;
-          saveProgress();
-        });
-      });
-
-      document.querySelector("[data-go-progress]")?.addEventListener("click",event=>{
-        const songId = event.currentTarget.dataset.goProgress;
-        closeDetail();
-        switchPage("progress");
-        setTimeout(()=>{
-          document.getElementById(`progress-${songId}`)?.scrollIntoView({behavior:"smooth",block:"start"});
-        },120);
-      });
-
+      bindSongProgressControls();
       document.getElementById("editSharedSongDetail")?.addEventListener("click",()=>{
         renderSharedSongDetailEditor(item,performance,context,detail);
       });
@@ -6990,23 +7143,19 @@
           <p class="song-detail-edit-note">同じ曲名の楽曲は、すべての本番でこの内容を共有します。この端末へ保存後、管理画面の「全員へ反映」で全端末へ公開できます。</p>
 
           <label class="admin-field">
-            <span class="admin-field-label">この曲の役割</span>
-            <textarea id="sharedSongRole" class="admin-textarea">${escapeHtml(detail.role)}</textarea>
+            <span class="admin-field-label">YouTube音源URL</span>
+            <input id="sharedSongYoutubeUrl" class="admin-input" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=..." value="${escapeHtml(detail.youtubeUrl)}">
+          </label>
+          <div id="sharedSongYoutubePreview" class="youtube-editor-preview">${renderYouTubeSource(detail.youtubeUrl,{editor:true})}</div>
+
+          <label class="admin-field" style="display:block;margin-top:12px">
+            <span class="admin-field-label">2番目のカードのタイトル</span>
+            <input id="sharedSongInfoTitle" class="admin-input" value="${escapeHtml(detail.infoTitle || "この曲の役割")}" placeholder="例：この曲の役割">
           </label>
 
           <label class="admin-field" style="display:block;margin-top:12px">
-            <span class="admin-field-label">演奏キーワード（1行につき1つ）</span>
-            <textarea id="sharedSongKeywords" class="admin-textarea">${escapeHtml(detail.keywords.join("\n"))}</textarea>
-          </label>
-
-          <label class="admin-field" style="display:block;margin-top:12px">
-            <span class="admin-field-label">練習ポイント（1行につき1つ）</span>
-            <textarea id="sharedSongPoints" class="admin-textarea">${escapeHtml(detail.points.join("\n"))}</textarea>
-          </label>
-
-          <label class="admin-field" style="display:block;margin-top:12px">
-            <span class="admin-field-label">パート別メモ（「パート名：内容」で1行につき1項目）</span>
-            <textarea id="sharedSongParts" class="admin-textarea">${escapeHtml(partsToEditorText(detail.parts))}</textarea>
+            <span class="admin-field-label">2番目のカードの本文</span>
+            <textarea id="sharedSongInfoBody" class="admin-textarea">${escapeHtml(detail.infoBody)}</textarea>
           </label>
 
           <label class="admin-field" style="display:block;margin-top:12px">
@@ -7021,15 +7170,25 @@
         </div>
       `;
 
+      const youtubeInput = document.getElementById("sharedSongYoutubeUrl");
+      const youtubePreview = document.getElementById("sharedSongYoutubePreview");
+      youtubeInput?.addEventListener("input",()=>{
+        youtubePreview.innerHTML = renderYouTubeSource(youtubeInput.value,{editor:true});
+      });
+
       document.getElementById("cancelSharedSongDetail")?.addEventListener("click",()=>{
         renderSharedSongDetail(item,performance,context);
       });
       document.getElementById("saveSharedSongDetail")?.addEventListener("click",()=>{
+        const rawYoutubeUrl = document.getElementById("sharedSongYoutubeUrl").value.trim();
+        if(rawYoutubeUrl && !extractYouTubeVideoId(rawYoutubeUrl)){
+          alert("YouTubeのURLを確認してください。通常動画・短縮URL・ShortsのURLに対応しています。");
+          return;
+        }
         upsertSharedSongDetail(item.title,{
-          role:document.getElementById("sharedSongRole").value,
-          keywords:document.getElementById("sharedSongKeywords").value,
-          points:document.getElementById("sharedSongPoints").value,
-          parts:parsePartsEditorText(document.getElementById("sharedSongParts").value),
+          youtubeUrl:normalizeYouTubeUrl(rawYoutubeUrl),
+          infoTitle:document.getElementById("sharedSongInfoTitle").value,
+          infoBody:document.getElementById("sharedSongInfoBody").value,
           stage:document.getElementById("sharedSongStage").value
         });
         alert("共通楽曲詳細をこの端末に保存しました。全員へ公開する場合は、管理画面から「全員へ反映」を押してください。");
@@ -7070,70 +7229,11 @@
       document.body.style.overflow = "";
     }
 
-    function renderProgressEditor(){
-      const root = document.getElementById("progressEditor");
-      root.innerHTML = songs.map(song=>{
-        const section = sectionById(song.section);
-        return `
-          <article id="progress-${song.id}" class="card progress-song">
-            <h3>${song.title}</h3>
-            <div class="song-meta">M-${song.order}｜${section.no} ${section.title}｜進捗 ${songScore(song.id)}%</div>
-            <div class="select-grid">
-              ${Object.entries(progressLabels).map(([key,label])=>`
-                <div class="select-wrap">
-                  <label for="${song.id}-${key}">${label}</label>
-                  <select id="${song.id}-${key}" data-song="${song.id}" data-key="${key}">
-                    ${progressOptions[key].map((option,index)=>`
-                      <option value="${index}" ${progress[song.id][key]===index?"selected":""}>${option}</option>
-                    `).join("")}
-                  </select>
-                </div>
-              `).join("")}
-            </div>
-          </article>
-        `;
-      }).join("");
-
-      root.querySelectorAll("select").forEach(select=>{
-        select.addEventListener("change",()=>{
-          const songId = select.dataset.song;
-          const key = select.dataset.key;
-          progress[songId][key] = Number(select.value);
-          saveProgress();
-          renderAllProgress();
-          renderSongs();
-          const meta = document.querySelector(`#progress-${songId} .song-meta`);
-          if(meta){
-            const section = sectionById(songs.find(s=>s.id===songId).section);
-            meta.textContent = `M-${songs.find(s=>s.id===songId).order}｜${section.no} ${section.title}｜進捗 ${songScore(songId)}%`;
-          }
-        });
-      });
-    }
-
-    function renderTodo(){
-      const todos = [];
-      songs.forEach(song=>{
-        const p = progress[song.id];
-        if(p.play < 2) todos.push(`「${song.title}」の演奏を安定させる`);
-        if(p.memory < 2) todos.push(`「${song.title}」の暗譜を進める`);
-        if(p.stage < 2) todos.push(`「${song.title}」のステージ演出を確認する`);
-        if(p.story < 2) todos.push(`「${song.title}」が物語で果たす役割を確認する`);
-      });
-
-      const root = document.getElementById("todoList");
-      const shown = todos.slice(0,6);
-      root.innerHTML = shown.length
-        ? shown.map(item=>`<li>${item}</li>`).join("")
-        : `<li>すべての項目が順調です。次は細部の完成度を高めよう。</li>`;
-    }
-
     function renderAllProgress(){
       normalizeProgress();
-      renderProgressBars("homeProgress");
       renderProgressBars("progressSummary");
-      document.getElementById("totalScore").textContent = `${totalProgress()}%`;
-      renderTodo();
+      const total = document.getElementById("totalScore");
+      if(total) total.textContent = `${totalProgress()}%`;
     }
 
     function bindSetlistButtons(){
@@ -7207,7 +7307,6 @@
       updateDepthPanel(pageName,true);
       window.scrollTo({top:0,behavior:"smooth"});
       if(pageName==="progress"){
-        renderProgressEditor();
         renderAllProgress();
       }
       if(pageName==="songs"){
@@ -7231,7 +7330,7 @@
       if(!ok) return;
       localStorage.removeItem(storageKey);
       progress = loadProgress();
-      renderProgressEditor();
+      normalizeProgress();
       renderAllProgress();
       renderSongs();
     });
@@ -7274,7 +7373,6 @@
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
-      renderProgressEditor();
       renderAllProgress();
       bindSetlistButtons();
       bindAdminControls();
@@ -7463,7 +7561,7 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:6,
+          version:7,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
