@@ -1834,6 +1834,28 @@
     .upcoming-schedule-list{
       display:grid;
       gap:12px;
+      max-height:330px;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      padding-right:8px;
+      scrollbar-gutter:stable;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(217,179,122,.52) rgba(9,15,17,.20);
+    }
+
+    .upcoming-schedule-list::-webkit-scrollbar{
+      width:7px;
+    }
+
+    .upcoming-schedule-list::-webkit-scrollbar-track{
+      background:rgba(9,15,17,.20);
+      border-radius:999px;
+    }
+
+    .upcoming-schedule-list::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg,rgba(217,179,122,.68),rgba(138,100,70,.58));
+      border-radius:999px;
     }
 
     .schedule-day-group{
@@ -2042,6 +2064,31 @@
       margin-top:12px;
     }
 
+    .admin-schedule-editor{
+      max-height:min(52vh,560px);
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      padding-right:8px;
+      scrollbar-gutter:stable;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(217,179,122,.52) rgba(9,15,17,.20);
+    }
+
+    .admin-schedule-editor::-webkit-scrollbar{
+      width:8px;
+    }
+
+    .admin-schedule-editor::-webkit-scrollbar-track{
+      background:rgba(9,15,17,.20);
+      border-radius:999px;
+    }
+
+    .admin-schedule-editor::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg,rgba(217,179,122,.68),rgba(138,100,70,.58));
+      border-radius:999px;
+    }
+
     .admin-simple-row,
     .admin-schedule-row,
     .admin-timeline-row{
@@ -2112,11 +2159,19 @@
       .admin-schedule-row,
       .admin-timeline-row{grid-template-columns:1fr}
       .admin-row-actions{justify-content:flex-end}
+
+      .admin-schedule-editor{
+        max-height:46vh;
+      }
     }
 
     @media (max-width:520px){
       .schedule-day-group{grid-template-columns:1fr;gap:6px}
       .countdown-days{font-size:34px}
+
+      .upcoming-schedule-list{
+        max-height:300px;
+      }
     }
 
   </style>
@@ -3962,9 +4017,10 @@
       renderAdminScheduleItems();
     }
 
-    function renderAdminScheduleItems(){
+    function renderAdminScheduleItems(options = {}){
       const root = document.getElementById("adminScheduleItems");
       if(!root) return;
+      const previousScrollTop = root.scrollTop;
       const items = adminWorkingHome.schedule;
       root.innerHTML = items.length ? items.map((item,index)=>`
         <div class="admin-schedule-row" data-admin-schedule-id="${escapeHtml(item.id)}">
@@ -4004,6 +4060,16 @@
           adminWorkingHome.schedule.splice(Number(button.dataset.deleteSchedule),1);
           renderAdminScheduleItems();
         });
+      });
+
+      window.requestAnimationFrame(()=>{
+        if(options.scrollToEnd){
+          root.scrollTop = root.scrollHeight;
+          const lastRow = root.querySelector(".admin-schedule-row:last-child");
+          lastRow?.querySelector("input")?.focus();
+        }else{
+          root.scrollTop = previousScrollTop;
+        }
       });
     }
 
@@ -4062,7 +4128,7 @@
 
     function addAdminScheduleItem(){
       adminWorkingHome.schedule.push({id:makeLocalId("schedule"),date:"",title:"",startTime:"",endTime:"",note:""});
-      renderAdminScheduleItems();
+      renderAdminScheduleItems({scrollToEnd:true});
     }
 
     function addAdminTimelineItem(){
