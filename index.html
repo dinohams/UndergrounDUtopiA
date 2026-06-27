@@ -8,6 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
+  <meta name="application-name" content="UndergrounD UtopiA Portal v13" />
   <style>
     :root{
       --bg:#0c1214;
@@ -1520,12 +1521,14 @@
     .countdown-card{
       position:relative;
       overflow:hidden;
-      flex:0 0 clamp(255px,28vw,320px);
-      min-width:0;
+      flex:0 0 auto;
+      width:fit-content;
+      min-width:230px;
+      max-width:340px;
       scroll-snap-align:start;
       border:1px solid rgba(217,179,122,.48);
       border-radius:22px;
-      padding:16px 18px;
+      padding:16px 52px 16px 18px;
       background:linear-gradient(180deg,rgba(10,17,20,.65),rgba(9,15,17,.50));
       box-shadow:0 14px 32px rgba(0,0,0,.28);
       backdrop-filter:blur(8px) saturate(.9);
@@ -1534,13 +1537,52 @@
 
     @media (max-width:680px){
       .countdown-card{
-        flex-basis:min(76vw,290px);
+        min-width:220px;
+        max-width:min(82vw,310px);
       }
     }
 
+    .countdown-card::before{
+      content:"";
+      position:absolute;
+      right:-7px;
+      top:50%;
+      width:46px;
+      height:46px;
+      transform:translateY(-50%);
+      border:2px solid rgba(217,179,122,.16);
+      border-radius:50%;
+      box-shadow:
+        0 -29px 0 -20px rgba(217,179,122,.20),
+        21px -21px 0 -20px rgba(217,179,122,.20),
+        29px 0 0 -20px rgba(217,179,122,.20),
+        21px 21px 0 -20px rgba(217,179,122,.20),
+        0 29px 0 -20px rgba(217,179,122,.20),
+        -21px 21px 0 -20px rgba(217,179,122,.20),
+        -29px 0 0 -20px rgba(217,179,122,.20),
+        -21px -21px 0 -20px rgba(217,179,122,.20);
+      pointer-events:none;
+    }
+
     .countdown-card::after{
-      display:none;
-      content:none;
+      content:"";
+      position:absolute;
+      right:12px;
+      top:50%;
+      width:8px;
+      height:8px;
+      transform:translateY(-50%) rotate(45deg);
+      background:rgba(217,179,122,.18);
+      box-shadow:
+        0 -28px 0 rgba(217,179,122,.18),
+        20px -20px 0 rgba(217,179,122,.18),
+        28px 0 0 rgba(217,179,122,.18),
+        20px 20px 0 rgba(217,179,122,.18),
+        0 28px 0 rgba(217,179,122,.18),
+        -20px 20px 0 rgba(217,179,122,.18),
+        -28px 0 0 rgba(217,179,122,.18),
+        -20px -20px 0 rgba(217,179,122,.18);
+      pointer-events:none;
     }
 
     .countdown-performance-title{
@@ -4896,11 +4938,31 @@
     function firebaseErrorMessage(error){
       const code = error?.code || "";
       if(code.includes("permission-denied")){
-        return "Firestoreの書き込み権限がまだ設定されていません。UIDを使ってルールを設定してください。";
+        return "Firestoreの書き込み権限が拒否されました。ルールとUIDを確認してください。";
+      }
+      if(code.includes("unavailable")){
+        return "Firebaseへ接続できません。通信状態やブラウザの追跡防止設定を確認してください。";
+      }
+      if(code.includes("deadline-exceeded") || code.includes("timeout")){
+        return "Firebaseから一定時間応答がありませんでした。再読み込み後にもう一度お試しください。";
       }
       if(code.includes("popup-closed-by-user")) return "Googleログイン画面が閉じられました。";
       if(code.includes("unauthorized-domain")) return "このドメインがFirebaseの承認済みドメインに登録されていません。";
       return error?.message || "Firebaseでエラーが発生しました。";
+    }
+
+    function withTimeout(promise, milliseconds, message){
+      let timerId;
+      const timeoutPromise = new Promise((_,reject)=>{
+        timerId = window.setTimeout(()=>{
+          const error = new Error(message || "処理がタイムアウトしました。");
+          error.code = "app/timeout";
+          reject(error);
+        },milliseconds);
+      });
+      return Promise.race([promise,timeoutPromise]).finally(()=>{
+        window.clearTimeout(timerId);
+      });
     }
 
     async function signInAdministrator(){
@@ -4925,7 +4987,7 @@
     }
 
     async function publishSetlists(){
-      setDataStatus("「全員へ反映」を受け付けました。確認しています…", "warning");
+      setDataStatus("公開処理を開始しました。", "warning");
 
       if(!currentFirebaseUser){
         setDataStatus("先にGoogleで管理者ログインしてください。", "warning");
@@ -4937,31 +4999,26 @@
         alert("このGoogleアカウントには公開権限がありません。");
         return;
       }
+
       const bridge = window.utopiaSetlistApp;
       if(!bridge){
         setDataStatus("アプリ本体の準備が終わっていません。", "warning");
-        alert("アプリの準備が終わっていません。ページを再読み込みしてから再度お試しください。");
+        alert("ページを再読み込みしてから、もう一度お試しください。");
         return;
       }
-
-      let portalData;
-      try{
-        portalData = bridge.getPortalDataForPublish();
-      }catch(error){
-        alert(error.message);
-        return;
-      }
-
-      if(!confirm("ホーム情報とセットリストを全員の画面へ反映しますか？")) return;
 
       publishButton.disabled = true;
       const originalText = publishButton.textContent;
-      publishButton.textContent = "公開中…";
-      setDataStatus("Firebaseへ公開データを書き込んでいます…", "warning");
+      publishButton.textContent = "確認中…";
 
       try{
-        await setDoc(setlistsRef, {
-          version:2,
+        setDataStatus("編集内容を確認しています…", "warning");
+        const portalData = bridge.getPortalDataForPublish();
+
+        const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
+        const payload = {
+          version:3,
+          publishId,
           catalog:portalData.catalog,
           home:portalData.home,
           updatedAt:serverTimestamp(),
@@ -4970,19 +5027,49 @@
             displayName:currentFirebaseUser.displayName || "",
             email:currentFirebaseUser.email || ""
           }
-        });
+        };
+
+        publishButton.textContent = "送信中…";
+        setDataStatus("Firebaseへ送信しています…", "warning");
+
+        await withTimeout(
+          setDoc(setlistsRef,payload),
+          15000,
+          "Firebaseへの書き込みが15秒以内に完了しませんでした。"
+        );
+
+        publishButton.textContent = "確認中…";
+        setDataStatus("保存結果を確認しています…", "warning");
+
+        const verification = await withTimeout(
+          getDoc(setlistsRef),
+          10000,
+          "保存結果の確認が10秒以内に完了しませんでした。"
+        );
+
+        if(!verification.exists()){
+          throw new Error("Firestoreに公開データが作成されていません。");
+        }
+
+        const savedData = verification.data() || {};
+        if(savedData.publishId !== publishId){
+          throw new Error("Firestore上の保存内容を確認できませんでした。");
+        }
+
         bridge.applyPublishedPortalData(portalData);
-        setDataStatus("公開版は最新です。全員の端末へ反映されました。", "online");
+        setDataStatus("全員への反映が完了しました。", "online");
         alert("ホーム情報とセットリストを全員へ反映しました。");
       }catch(error){
-        console.error(error);
-        setDataStatus(firebaseErrorMessage(error), "warning");
-        alert(firebaseErrorMessage(error));
+        console.error("Firebase publish error",error);
+        const message = firebaseErrorMessage(error);
+        setDataStatus(message, "warning");
+        alert(message);
       }finally{
         publishButton.textContent = originalText;
         publishButton.disabled = false;
       }
     }
+
 
     function startSetlistListener(){
       if(unsubscribeSetlists) unsubscribeSetlists();
