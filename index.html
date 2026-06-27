@@ -1491,6 +1491,352 @@
       }
     }
 
+  
+
+    /* =========================================
+       ホーム情報ダッシュボード
+       ========================================= */
+    .countdown-list{
+      display:grid;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .countdown-card{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(217,179,122,.48);
+      border-radius:22px;
+      padding:18px 20px;
+      background:linear-gradient(180deg,rgba(10,17,20,.65),rgba(9,15,17,.50));
+      box-shadow:0 14px 32px rgba(0,0,0,.28);
+      backdrop-filter:blur(8px) saturate(.9);
+      -webkit-backdrop-filter:blur(8px) saturate(.9);
+    }
+
+    .countdown-card::after{
+      content:"";
+      position:absolute;
+      width:96px;
+      height:96px;
+      border:12px dotted rgba(217,179,122,.10);
+      border-radius:50%;
+      right:-36px;
+      top:-34px;
+    }
+
+    .countdown-performance-title{
+      position:relative;
+      z-index:1;
+      margin:0 0 8px;
+      color:var(--ivory);
+      font-size:18px;
+      line-height:1.45;
+    }
+
+    .countdown-main-line{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:baseline;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .countdown-prefix{
+      color:#d7dede;
+      font-size:14px;
+    }
+
+    .countdown-days{
+      color:var(--gold);
+      font-size:38px;
+      font-weight:900;
+      line-height:1;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .countdown-days small{
+      margin-left:4px;
+      font-size:17px;
+    }
+
+    .countdown-date{
+      position:relative;
+      z-index:1;
+      margin-top:9px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.65;
+    }
+
+    .home-information-card{margin-top:14px}
+
+    .home-empty{
+      padding:14px 4px 4px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .upcoming-schedule-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .schedule-day-group{
+      display:grid;
+      grid-template-columns:minmax(92px,118px) 1fr;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px dashed rgba(217,179,122,.18);
+    }
+
+    .schedule-day-group:last-child{border-bottom:0}
+
+    .schedule-date-label{
+      color:var(--gold);
+      font-size:14px;
+      font-weight:800;
+      line-height:1.45;
+    }
+
+    .schedule-events{display:grid;gap:9px}
+
+    .schedule-event{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:10px;
+      align-items:start;
+    }
+
+    .schedule-time{
+      min-width:52px;
+      color:#b8c8cc;
+      font-size:12px;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .schedule-event-title{
+      color:var(--ivory);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .schedule-event-note{
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+
+    .home-expand-button{
+      width:100%;
+      margin-top:10px;
+      border:1px solid rgba(217,179,122,.30);
+      border-radius:11px;
+      padding:10px 12px;
+      background:rgba(9,15,17,.46);
+      color:var(--gold);
+    }
+
+    .performance-timetable-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .timetable-link{
+      width:100%;
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:center;
+      gap:12px;
+      text-align:left;
+      border:1px solid rgba(217,179,122,.30);
+      border-radius:13px;
+      padding:13px 14px;
+      background:rgba(9,15,17,.48);
+      color:var(--ivory);
+    }
+
+    .timetable-link-title{
+      display:block;
+      font-size:15px;
+      font-weight:800;
+      line-height:1.45;
+    }
+
+    .timetable-link-date{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .timetable-link-arrow{
+      color:var(--copper);
+      font-size:24px;
+    }
+
+    .today-song-list{
+      display:grid;
+      gap:7px;
+      margin:8px 0 9px;
+    }
+
+    .today-song-item{
+      color:var(--gold);
+      font-size:19px;
+      font-weight:800;
+      line-height:1.45;
+      text-shadow:0 2px 8px rgba(0,0,0,.88);
+    }
+
+    .timeline-view{
+      display:grid;
+      gap:0;
+    }
+
+    .timeline-view-row{
+      display:grid;
+      grid-template-columns:72px 1fr;
+      gap:13px;
+      padding:13px 0;
+      border-bottom:1px dashed rgba(217,179,122,.18);
+    }
+
+    .timeline-view-row:last-child{border-bottom:0}
+    .timeline-view-time{color:var(--gold);font-weight:900;font-variant-numeric:tabular-nums}
+    .timeline-view-title{color:var(--ivory);font-weight:800;line-height:1.5}
+    .timeline-view-note{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.6}
+
+    /* =========================================
+       総合管理画面
+       ========================================= */
+    .admin-edit-zone{position:relative}
+
+    .admin-edit-zone::before{
+      content:"Google管理者ログイン後に編集できます";
+      display:none;
+      margin:12px 0;
+      padding:12px 14px;
+      border:1px solid rgba(217,179,122,.34);
+      border-radius:12px;
+      background:rgba(9,15,17,.64);
+      color:var(--gold);
+      text-align:center;
+      font-size:13px;
+    }
+
+    .admin-panel:not(.admin-authorized) .admin-edit-zone::before{display:block}
+    .admin-panel:not(.admin-authorized) .admin-tab-panel,
+    .admin-panel:not(.admin-authorized) .admin-global-footer{
+      pointer-events:none;
+      opacity:.43;
+      filter:grayscale(.25);
+    }
+
+    .admin-tabs{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin:16px 0;
+    }
+
+    .admin-tab-button{
+      border:1px solid rgba(217,179,122,.28);
+      border-radius:12px;
+      padding:11px 12px;
+      background:rgba(9,15,17,.52);
+      color:var(--muted);
+      font-weight:800;
+    }
+
+    .admin-tab-button.active{
+      border-color:rgba(217,179,122,.70);
+      background:rgba(196,139,90,.18);
+      color:var(--ivory);
+    }
+
+    .admin-tab-panel{display:none}
+    .admin-tab-panel.active{display:block}
+
+    .admin-dashboard-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .admin-dashboard-card{
+      border:1px solid rgba(217,179,122,.24);
+      border-radius:15px;
+      padding:14px;
+      background:rgba(9,15,17,.38);
+    }
+
+    .admin-dashboard-card.wide{grid-column:1/-1}
+
+    .admin-simple-list,
+    .admin-schedule-editor,
+    .admin-timeline-editor{
+      display:grid;
+      gap:9px;
+      margin-top:12px;
+    }
+
+    .admin-simple-row,
+    .admin-schedule-row,
+    .admin-timeline-row{
+      display:grid;
+      gap:8px;
+      align-items:start;
+      border:1px solid rgba(174,185,185,.16);
+      border-radius:12px;
+      padding:10px;
+      background:rgba(12,20,23,.62);
+    }
+
+    .admin-simple-row{grid-template-columns:1fr auto}
+    .admin-schedule-row{grid-template-columns:135px 105px minmax(180px,1fr) minmax(180px,1fr) auto}
+    .admin-timeline-row{grid-template-columns:105px minmax(180px,1fr) minmax(180px,1fr) auto}
+
+    .admin-row-actions{display:flex;gap:6px;align-items:center}
+
+    .admin-checkbox-field{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      border:1px solid rgba(217,179,122,.20);
+      border-radius:12px;
+      padding:12px 13px;
+      color:#dfe3e3;
+      background:rgba(9,15,17,.36);
+    }
+
+    .admin-checkbox-field input{
+      width:19px;
+      height:19px;
+      accent-color:#b87a4a;
+      flex:0 0 auto;
+    }
+
+    .admin-timeline-head{margin-top:18px}
+    .admin-global-footer{position:sticky;bottom:0;margin-top:16px;padding:12px 0;background:linear-gradient(180deg,transparent,rgba(8,14,16,.96) 24%)}
+
+    @media (max-width:780px){
+      .admin-dashboard-grid{grid-template-columns:1fr}
+      .admin-dashboard-card.wide{grid-column:auto}
+      .admin-schedule-row,
+      .admin-timeline-row{grid-template-columns:1fr}
+      .admin-row-actions{justify-content:flex-end}
+    }
+
+    @media (max-width:520px){
+      .schedule-day-group{grid-template-columns:1fr;gap:6px}
+      .countdown-days{font-size:34px}
+    }
+
   </style>
 </head>
 <body class="home-active">
@@ -1507,25 +1853,23 @@
 
     <main>
       <section id="page-home" class="page active">
-        <div class="hero">
-          <div class="countdown">
-            <div class="countdown-label">演奏会まで残り</div>
-            <div class="countdown-value">
-              <span id="countdownNumber" class="countdown-number">--</span>
-              <span class="countdown-unit">日</span>
-            </div>
-          </div>
-          <div class="date-line">2026.11.8（日）開場13:30／開演14:00</div>
+        <div id="countdownList" class="countdown-list" aria-live="polite"></div>
+
+        <div class="card home-information-card" id="upcomingScheduleCard">
+          <h2 class="card-title today-heading">直近の予定</h2>
+          <div id="upcomingScheduleList" class="upcoming-schedule-list"></div>
+          <button id="toggleScheduleButton" class="home-expand-button" type="button" hidden>その先の予定を見る</button>
+        </div>
+
+        <div class="card home-information-card" id="performanceTimetableCard">
+          <h2 class="card-title today-heading">本番のタイムスケジュール</h2>
+          <div id="performanceTimetableList" class="performance-timetable-list"></div>
         </div>
 
         <div class="card" id="todayRehearsalCard">
           <h2 class="card-title today-heading">今日の練習内容</h2>
-          <div id="todaySongTitle" class="today-song">「カオスが極まる」</div>
-          <ul id="todayTaskList" class="clean-list">
-            <li>曲を止めずに最後まで通す</li>
-            <li>イントロの入りを統一する</li>
-            <li>演奏中の視線を下げすぎない</li>
-          </ul>
+          <div id="todaySongList" class="today-song-list"></div>
+          <ul id="todayTaskList" class="clean-list"></ul>
         </div>
 
         <div class="card">
@@ -1599,14 +1943,14 @@
       <div class="admin-head">
         <div>
           <div class="eyebrow">HIDDEN ADMIN MODE</div>
-          <h2 class="admin-title">本番・セットリスト編集</h2>
+          <h2 class="admin-title">地下住人専用端末 管理画面</h2>
         </div>
         <button id="closeAdmin" class="back-btn" type="button">閉じる</button>
       </div>
 
       <div class="admin-note">
         <strong>この端末に下書き保存</strong>は、操作中の端末だけに反映されます。
-        Google管理者ログイン後に<strong>全員へ反映</strong>を押すと、Firebase上の公開セットリストを更新します。
+        Google管理者ログイン後に<strong>全員へ反映</strong>を押すと、ホーム情報とセットリストをまとめて全端末へ公開します。
       </div>
 
       <div class="firebase-admin-box" aria-live="polite">
@@ -1625,6 +1969,50 @@
         </div>
       </div>
 
+      <div id="adminEditZone" class="admin-edit-zone">
+        <div class="admin-tabs" role="tablist" aria-label="管理画面の編集対象">
+          <button class="admin-tab-button active" type="button" data-admin-tab="home" role="tab">ホーム編集</button>
+          <button class="admin-tab-button" type="button" data-admin-tab="setlists" role="tab">本番・セットリスト</button>
+        </div>
+
+        <section id="adminTabHome" class="admin-tab-panel active" data-admin-panel="home">
+          <div class="admin-dashboard-grid">
+            <section class="admin-dashboard-card">
+              <div class="admin-setlist-head">
+                <div>
+                  <div class="admin-field-label">今日の練習曲</div>
+                  <div class="admin-hint">複数の曲を登録できます。</div>
+                </div>
+                <button id="adminAddPracticeSong" class="admin-btn compact" type="button">＋ 曲を追加</button>
+              </div>
+              <div id="adminPracticeSongs" class="admin-simple-list"></div>
+            </section>
+
+            <section class="admin-dashboard-card">
+              <div class="admin-setlist-head">
+                <div>
+                  <div class="admin-field-label">今日やること</div>
+                  <div class="admin-hint">合奏内容や確認事項を登録します。</div>
+                </div>
+                <button id="adminAddPracticeTask" class="admin-btn compact" type="button">＋ 内容を追加</button>
+              </div>
+              <div id="adminPracticeTasks" class="admin-simple-list"></div>
+            </section>
+
+            <section class="admin-dashboard-card wide">
+              <div class="admin-setlist-head">
+                <div>
+                  <div class="admin-field-label">予定表</div>
+                  <div class="admin-hint">ホームには予定がある直近3日分を表示します。</div>
+                </div>
+                <button id="adminAddSchedule" class="admin-btn compact" type="button">＋ 予定を追加</button>
+              </div>
+              <div id="adminScheduleItems" class="admin-schedule-editor"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="adminTabSetlists" class="admin-tab-panel" data-admin-panel="setlists">
       <div class="admin-layout">
         <section class="admin-side">
           <label class="admin-field-label" for="adminPerformanceSelect">編集する本番</label>
@@ -1665,7 +2053,21 @@
               <label class="admin-field-label" for="adminPerformanceVenue">会場・補足</label>
               <input id="adminPerformanceVenue" class="admin-input" type="text" placeholder="例：体育館／開場13:30">
             </div>
+
+            <label class="admin-checkbox-field wide">
+              <input id="adminPerformanceShowHome" type="checkbox">
+              <span>ホームのカウントダウンとタイムスケジュール一覧に表示する</span>
+            </label>
           </div>
+
+          <div class="admin-setlist-head admin-timeline-head">
+            <div>
+              <div class="admin-field-label">当日のタイムスケジュール</div>
+              <div class="admin-hint">時刻・内容・補足を入力し、必要に応じて並べ替えます。</div>
+            </div>
+            <button id="adminAddTimelineItem" class="admin-btn compact" type="button">＋ 時程を追加</button>
+          </div>
+          <div id="adminTimelineItems" class="admin-timeline-editor"></div>
 
           <div class="admin-setlist-head">
             <div>
@@ -1681,12 +2083,15 @@
 
           <div id="adminItems" class="admin-items"></div>
 
-          <div class="admin-footer-actions">
-            <button id="adminCancel" class="admin-btn ghost" type="button">変更を破棄</button>
-            <button id="adminSave" class="admin-btn secondary" type="button">この端末に下書き保存</button>
-            <button id="firebasePublish" class="admin-btn primary" type="button" disabled>全員へ反映</button>
-          </div>
         </section>
+      </div>
+        </section>
+
+        <div class="admin-footer-actions admin-global-footer">
+          <button id="adminCancel" class="admin-btn ghost" type="button">変更を破棄</button>
+          <button id="adminSave" class="admin-btn secondary" type="button">この端末に下書き保存</button>
+          <button id="firebasePublish" class="admin-btn primary" type="button" disabled>全員へ反映</button>
+        </div>
       </div>
     </div>
   </aside>
@@ -2768,6 +3173,12 @@
     let adminWorkingCatalog = [];
     let adminSelectedPerformanceId = defaultPerformanceId;
 
+    const homeStorageKey = "underground-utopia-home-dashboard-v1";
+    let homeData = buildDefaultHomeData();
+    let adminWorkingHome = buildDefaultHomeData();
+    let scheduleExpanded = false;
+    let adminAuthorized = false;
+
     function makeLocalId(prefix="item"){
       if(window.crypto && typeof window.crypto.randomUUID === "function"){
         return `${prefix}-${window.crypto.randomUUID()}`;
@@ -2777,6 +3188,63 @@
 
     function cloneData(value){
       return JSON.parse(JSON.stringify(value));
+    }
+
+
+    function buildDefaultHomeData(){
+      return {
+        practice:{
+          songs:["カオスが極まる"],
+          tasks:[
+            "曲を止めずに最後まで通す",
+            "イントロの入りを統一する",
+            "演奏中の視線を下げすぎない"
+          ]
+        },
+        schedule:[]
+      };
+    }
+
+    function normalizeHomeData(value){
+      const source = value && typeof value === "object" ? value : {};
+      const practice = source.practice && typeof source.practice === "object" ? source.practice : {};
+      return {
+        practice:{
+          songs:Array.isArray(practice.songs)
+            ? practice.songs.map(item=>String(item || "").trim()).filter(Boolean)
+            : [],
+          tasks:Array.isArray(practice.tasks)
+            ? practice.tasks.map(item=>String(item || "").trim()).filter(Boolean)
+            : []
+        },
+        schedule:Array.isArray(source.schedule)
+          ? source.schedule.map(item=>({
+              id:item.id || makeLocalId("schedule"),
+              date:item.date || "",
+              time:item.time || "",
+              title:String(item.title || "").trim(),
+              note:String(item.note || "").trim()
+            }))
+          : []
+      };
+    }
+
+    function initializeHomeData(){
+      const local = localStorage.getItem(homeStorageKey);
+      if(local){
+        try{
+          homeData = normalizeHomeData(JSON.parse(local));
+          return;
+        }catch(error){
+          console.warn("端末内のホーム情報を読み込めませんでした", error);
+        }
+      }
+      homeData = buildDefaultHomeData();
+    }
+
+    function saveHomeData(){
+      homeData = normalizeHomeData(homeData);
+      localStorage.setItem(homeStorageKey, JSON.stringify(homeData));
     }
 
     function buildDefaultPerformance(){
@@ -2830,6 +3298,8 @@
         date:"2026-11-08",
         time:"14:00",
         venue:"栃木県立益子芳星高等学校 体育館／開場13:30",
+        showOnHome:true,
+        timeline:[],
         items
       };
     }
@@ -2841,8 +3311,17 @@
         date:performance.date || "",
         time:performance.time || "",
         venue:performance.venue || "",
+        showOnHome:performance.showOnHome !== false,
+        timeline:Array.isArray(performance.timeline) ? performance.timeline : [],
         items:Array.isArray(performance.items) ? performance.items : []
       };
+
+      normalized.timeline = normalized.timeline.map(item=>({
+        id:item.id || makeLocalId("timeline"),
+        time:item.time || "",
+        title:String(item.title || "").trim(),
+        note:String(item.note || "").trim()
+      }));
 
       normalized.items = normalized.items.map(item=>({
         id:item.id || makeLocalId(item.type || "item"),
@@ -2860,10 +3339,7 @@
     function normalizeCatalog(catalog){
       if(!Array.isArray(catalog)) return [buildDefaultPerformance()];
       const normalized = catalog.map(normalizePerformance);
-      if(!normalized.some(item=>item.id===defaultPerformanceId)){
-        normalized.unshift(buildDefaultPerformance());
-      }
-      return normalized;
+      return normalized.length ? normalized : [buildDefaultPerformance()];
     }
 
     async function initializePerformanceCatalog(){
@@ -2952,6 +3428,7 @@
         renderPerformanceSelector();
         renderFilters();
         renderSongs();
+        renderHomeDashboard();
       };
     }
 
@@ -3053,12 +3530,15 @@
     // ----------------------------
     function openAdmin(){
       adminWorkingCatalog = cloneData(performanceCatalog);
+      adminWorkingHome = cloneData(homeData);
       adminSelectedPerformanceId = activePerformanceId;
       if(!adminWorkingCatalog.some(item=>item.id===adminSelectedPerformanceId)){
         adminSelectedPerformanceId = adminWorkingCatalog[0]?.id || "";
       }
       renderAdminPerformanceSelect();
       renderAdminEditor();
+      renderAdminHomeEditor();
+      switchAdminTab("home");
 
       const panel = document.getElementById("adminPanel");
       panel.classList.add("open");
@@ -3100,13 +3580,17 @@
       document.getElementById("adminPerformanceDate").disabled = disabled;
       document.getElementById("adminPerformanceTime").disabled = disabled;
       document.getElementById("adminPerformanceVenue").disabled = disabled;
-      document.getElementById("adminDeletePerformance").disabled = disabled || performance.id===defaultPerformanceId;
+      document.getElementById("adminPerformanceShowHome").disabled = disabled;
+      document.getElementById("adminDeletePerformance").disabled = disabled || adminWorkingCatalog.length<=1;
+      document.getElementById("adminAddTimelineItem").disabled = disabled;
 
       if(!performance){
         document.getElementById("adminPerformanceTitle").value = "";
         document.getElementById("adminPerformanceDate").value = "";
         document.getElementById("adminPerformanceTime").value = "";
         document.getElementById("adminPerformanceVenue").value = "";
+        document.getElementById("adminPerformanceShowHome").checked = false;
+        document.getElementById("adminTimelineItems").innerHTML = `<div class="admin-empty">本番を追加してください。</div>`;
         document.getElementById("adminItems").innerHTML = `<div class="admin-empty">本番を追加してください。</div>`;
         return;
       }
@@ -3115,7 +3599,9 @@
       document.getElementById("adminPerformanceDate").value = performance.date || "";
       document.getElementById("adminPerformanceTime").value = performance.time || "";
       document.getElementById("adminPerformanceVenue").value = performance.venue || "";
+      document.getElementById("adminPerformanceShowHome").checked = performance.showOnHome !== false;
 
+      renderAdminTimelineItems();
       renderAdminItems();
     }
 
@@ -3126,6 +3612,151 @@
       performance.date = document.getElementById("adminPerformanceDate").value;
       performance.time = document.getElementById("adminPerformanceTime").value;
       performance.venue = document.getElementById("adminPerformanceVenue").value.trim();
+      performance.showOnHome = document.getElementById("adminPerformanceShowHome").checked;
+    }
+
+    function switchAdminTab(tabName){
+      document.querySelectorAll("[data-admin-tab]").forEach(button=>{
+        button.classList.toggle("active",button.dataset.adminTab===tabName);
+      });
+      document.querySelectorAll("[data-admin-panel]").forEach(panel=>{
+        panel.classList.toggle("active",panel.dataset.adminPanel===tabName);
+      });
+    }
+
+    function renderAdminSimpleList(rootId,values,field){
+      const root = document.getElementById(rootId);
+      if(!root) return;
+      root.innerHTML = values.length ? values.map((value,index)=>`
+        <div class="admin-simple-row">
+          <input class="admin-input" value="${escapeHtml(value)}" data-home-simple-field="${field}" data-home-simple-index="${index}">
+          <button class="admin-icon-btn" type="button" data-delete-home-simple="${field}" data-home-simple-index="${index}" title="削除">×</button>
+        </div>
+      `).join("") : `<div class="admin-empty">まだ登録されていません。</div>`;
+
+      root.querySelectorAll("[data-home-simple-field]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          adminWorkingHome.practice[input.dataset.homeSimpleField][Number(input.dataset.homeSimpleIndex)] = input.value;
+        });
+      });
+      root.querySelectorAll("[data-delete-home-simple]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          adminWorkingHome.practice[button.dataset.deleteHomeSimple].splice(Number(button.dataset.homeSimpleIndex),1);
+          renderAdminHomeEditor();
+        });
+      });
+    }
+
+    function renderAdminHomeEditor(){
+      if(!adminWorkingHome || typeof adminWorkingHome !== "object") adminWorkingHome = buildDefaultHomeData();
+      if(!adminWorkingHome.practice || typeof adminWorkingHome.practice !== "object"){
+        adminWorkingHome.practice = {songs:[],tasks:[]};
+      }
+      if(!Array.isArray(adminWorkingHome.practice.songs)) adminWorkingHome.practice.songs = [];
+      if(!Array.isArray(adminWorkingHome.practice.tasks)) adminWorkingHome.practice.tasks = [];
+      if(!Array.isArray(adminWorkingHome.schedule)) adminWorkingHome.schedule = [];
+      renderAdminSimpleList("adminPracticeSongs",adminWorkingHome.practice.songs,"songs");
+      renderAdminSimpleList("adminPracticeTasks",adminWorkingHome.practice.tasks,"tasks");
+      renderAdminScheduleItems();
+    }
+
+    function renderAdminScheduleItems(){
+      const root = document.getElementById("adminScheduleItems");
+      if(!root) return;
+      const items = adminWorkingHome.schedule;
+      root.innerHTML = items.length ? items.map((item,index)=>`
+        <div class="admin-schedule-row" data-admin-schedule-id="${escapeHtml(item.id)}">
+          <input class="admin-input" type="date" value="${escapeHtml(item.date)}" data-schedule-field="date" data-schedule-index="${index}">
+          <input class="admin-input" type="time" value="${escapeHtml(item.time)}" data-schedule-field="time" data-schedule-index="${index}">
+          <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="予定名" data-schedule-field="title" data-schedule-index="${index}">
+          <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="補足" data-schedule-field="note" data-schedule-index="${index}">
+          <div class="admin-row-actions">
+            <button class="admin-icon-btn" type="button" data-delete-schedule="${index}" title="削除">×</button>
+          </div>
+        </div>
+      `).join("") : `<div class="admin-empty">予定はまだ登録されていません。</div>`;
+
+      root.querySelectorAll("[data-schedule-field]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          adminWorkingHome.schedule[Number(input.dataset.scheduleIndex)][input.dataset.scheduleField] = input.value;
+        });
+      });
+      root.querySelectorAll("[data-delete-schedule]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          adminWorkingHome.schedule.splice(Number(button.dataset.deleteSchedule),1);
+          renderAdminScheduleItems();
+        });
+      });
+    }
+
+    function renderAdminTimelineItems(){
+      const root = document.getElementById("adminTimelineItems");
+      const performance = getAdminPerformance();
+      if(!root) return;
+      if(!performance){
+        root.innerHTML = `<div class="admin-empty">本番を追加してください。</div>`;
+        return;
+      }
+      performance.timeline = Array.isArray(performance.timeline) ? performance.timeline : [];
+      root.innerHTML = performance.timeline.length ? performance.timeline.map((item,index)=>`
+        <div class="admin-timeline-row">
+          <input class="admin-input" type="time" value="${escapeHtml(item.time)}" data-timeline-field="time" data-timeline-index="${index}">
+          <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="内容" data-timeline-field="title" data-timeline-index="${index}">
+          <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="補足" data-timeline-field="note" data-timeline-index="${index}">
+          <div class="admin-row-actions">
+            <button class="admin-icon-btn" type="button" data-move-timeline="${index}" data-direction="-1" ${index===0?"disabled":""}>↑</button>
+            <button class="admin-icon-btn" type="button" data-move-timeline="${index}" data-direction="1" ${index===performance.timeline.length-1?"disabled":""}>↓</button>
+            <button class="admin-icon-btn" type="button" data-delete-timeline="${index}">×</button>
+          </div>
+        </div>
+      `).join("") : `<div class="admin-empty">当日の時程はまだ登録されていません。</div>`;
+
+      root.querySelectorAll("[data-timeline-field]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          performance.timeline[Number(input.dataset.timelineIndex)][input.dataset.timelineField] = input.value;
+        });
+      });
+      root.querySelectorAll("[data-move-timeline]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const index = Number(button.dataset.moveTimeline);
+          const next = index + Number(button.dataset.direction);
+          if(next<0 || next>=performance.timeline.length) return;
+          [performance.timeline[index],performance.timeline[next]] = [performance.timeline[next],performance.timeline[index]];
+          renderAdminTimelineItems();
+        });
+      });
+      root.querySelectorAll("[data-delete-timeline]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          performance.timeline.splice(Number(button.dataset.deleteTimeline),1);
+          renderAdminTimelineItems();
+        });
+      });
+    }
+
+    function addAdminPracticeEntry(field){
+      adminWorkingHome.practice[field].push("");
+      renderAdminHomeEditor();
+      requestAnimationFrame(()=>{
+        const inputs = document.querySelectorAll(`[data-home-simple-field="${field}"]`);
+        inputs[inputs.length-1]?.focus();
+      });
+    }
+
+    function addAdminScheduleItem(){
+      adminWorkingHome.schedule.push({id:makeLocalId("schedule"),date:"",time:"",title:"",note:""});
+      renderAdminScheduleItems();
+    }
+
+    function addAdminTimelineItem(){
+      const performance = getAdminPerformance();
+      if(!performance) return;
+      performance.timeline.push({id:makeLocalId("timeline"),time:"",title:"",note:""});
+      renderAdminTimelineItems();
+    }
+
+    function setAdminAuthorized(value){
+      adminAuthorized = Boolean(value);
+      document.getElementById("adminPanel")?.classList.toggle("admin-authorized",adminAuthorized);
     }
 
     function renderAdminItems(){
@@ -3252,6 +3883,8 @@
         date:"",
         time:"",
         venue:"",
+        showOnHome:true,
+        timeline:[],
         items:[
           {
             id:makeLocalId("section"),
@@ -3272,7 +3905,7 @@
 
     function deleteAdminPerformance(){
       const performance = getAdminPerformance();
-      if(!performance || performance.id===defaultPerformanceId) return;
+      if(!performance || adminWorkingCatalog.length<=1) return;
       if(!confirm(`「${performance.title}」を削除しますか？`)) return;
       adminWorkingCatalog = adminWorkingCatalog.filter(item=>item.id!==performance.id);
       adminSelectedPerformanceId = adminWorkingCatalog[0]?.id || "";
@@ -3280,58 +3913,78 @@
       renderAdminEditor();
     }
 
-    function saveAdminChanges(){
+    function validateAdminData(){
       syncAdminPerformanceFields();
       const invalid = adminWorkingCatalog.find(performance=>!performance.title.trim());
-      if(invalid){
-        alert("本番名を入力してください。");
+      if(invalid) throw new Error("本番名を入力してください。");
+      return {
+        catalog:cloneData(normalizeCatalog(adminWorkingCatalog)),
+        home:cloneData(normalizeHomeData(adminWorkingHome))
+      };
+    }
+
+    function saveAdminChanges(){
+      let data;
+      try{
+        data = validateAdminData();
+      }catch(error){
+        alert(error.message);
         return;
       }
 
-      performanceCatalog = normalizeCatalog(adminWorkingCatalog);
+      performanceCatalog = data.catalog;
+      homeData = data.home;
       activePerformanceId = adminSelectedPerformanceId || performanceCatalog[0].id;
       savePerformanceCatalog();
+      saveHomeData();
 
       activeFilter = "all";
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
+      renderHomeDashboard();
       closeAdmin();
     }
 
-    function getAdminCatalogForPublish(){
-      syncAdminPerformanceFields();
-      const invalid = adminWorkingCatalog.find(performance=>!performance.title.trim());
-      if(invalid){
-        throw new Error("本番名を入力してください。");
-      }
-      return cloneData(normalizeCatalog(adminWorkingCatalog));
+    function getPortalDataForPublish(){
+      return validateAdminData();
     }
 
-    function applyPublishedPerformanceCatalog(catalog){
-      performanceCatalog = normalizeCatalog(catalog);
+    function applyPublishedPortalData(data){
+      const catalog = Array.isArray(data) ? data : data?.catalog;
+      const incomingHome = Array.isArray(data) ? null : data?.home;
+      if(Array.isArray(catalog)) performanceCatalog = normalizeCatalog(catalog);
+      if(incomingHome) homeData = normalizeHomeData(incomingHome);
       if(!performanceCatalog.some(item=>item.id===activePerformanceId)){
         activePerformanceId = performanceCatalog[0]?.id || defaultPerformanceId;
       }
       savePerformanceCatalog();
+      saveHomeData();
       activeFilter = "all";
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
+      renderHomeDashboard();
 
       const panel = document.getElementById("adminPanel");
       if(panel?.classList.contains("open")){
         adminWorkingCatalog = cloneData(performanceCatalog);
+        adminWorkingHome = cloneData(homeData);
         adminSelectedPerformanceId = activePerformanceId;
         renderAdminPerformanceSelect();
         renderAdminEditor();
+        renderAdminHomeEditor();
       }
     }
 
     window.utopiaSetlistApp = {
-      getCatalogForPublish:getAdminCatalogForPublish,
+      getPortalDataForPublish,
+      getCatalogForPublish:()=>getPortalDataForPublish().catalog,
       getCurrentCatalog:()=>cloneData(performanceCatalog),
-      applyPublishedCatalog:applyPublishedPerformanceCatalog,
+      getCurrentHome:()=>cloneData(homeData),
+      applyPublishedPortalData,
+      applyPublishedCatalog:catalog=>applyPublishedPortalData({catalog}),
+      setAdminAuthorized,
       openAdmin,
       closeAdmin
     };
@@ -3373,6 +4026,14 @@
       document.getElementById("adminDeletePerformance").addEventListener("click",deleteAdminPerformance);
       document.getElementById("adminSave").addEventListener("click",saveAdminChanges);
       document.getElementById("adminExport").addEventListener("click",exportPerformanceCatalog);
+      document.getElementById("adminAddPracticeSong").addEventListener("click",()=>addAdminPracticeEntry("songs"));
+      document.getElementById("adminAddPracticeTask").addEventListener("click",()=>addAdminPracticeEntry("tasks"));
+      document.getElementById("adminAddSchedule").addEventListener("click",addAdminScheduleItem);
+      document.getElementById("adminAddTimelineItem").addEventListener("click",addAdminTimelineItem);
+
+      document.querySelectorAll("[data-admin-tab]").forEach(button=>{
+        button.addEventListener("click",()=>switchAdminTab(button.dataset.adminTab));
+      });
 
       document.querySelectorAll("[data-add-item]").forEach(button=>{
         button.addEventListener("click",()=>addAdminItem(button.dataset.addItem));
@@ -3387,9 +4048,10 @@
       });
 
       document.getElementById("adminReloadPublic").addEventListener("click",()=>{
-        if(!confirm("この端末だけに保存した本番データを削除し、GitHub上の公開版を読み直しますか？")) return;
+        if(!confirm("この端末だけに保存したデータを削除し、Firebase上の公開版を読み直しますか？")) return;
         localStorage.removeItem(performanceStorageKey);
         localStorage.removeItem(activePerformanceStorageKey);
+        localStorage.removeItem(homeStorageKey);
         location.reload();
       });
 
@@ -3402,6 +4064,11 @@
           syncAdminPerformanceFields();
           if(id==="adminPerformanceTitle") renderAdminPerformanceSelect();
         });
+      });
+      document.getElementById("adminPerformanceShowHome").addEventListener("change",syncAdminPerformanceFields);
+      document.getElementById("toggleScheduleButton").addEventListener("click",()=>{
+        scheduleExpanded = !scheduleExpanded;
+        renderUpcomingSchedule();
       });
     }
 
@@ -3493,11 +4160,182 @@
       return Math.round(values.reduce((a,b)=>a+b,0) / values.length);
     }
 
+    function formatHomePerformanceDate(performance){
+      if(!performance?.date) return "日程未設定";
+      const date = new Date(`${performance.date}T00:00:00`);
+      if(Number.isNaN(date.getTime())) return performance.date;
+      const label = new Intl.DateTimeFormat("ja-JP",{
+        year:"numeric",month:"long",day:"numeric",weekday:"short"
+      }).format(date);
+      const extra = [performance.time ? `開演 ${performance.time}` : "", performance.venue || ""]
+        .filter(Boolean).join("　｜　");
+      return extra ? `${label}　｜　${extra}` : label;
+    }
+
+    function daysUntilPerformance(performance){
+      if(!performance?.date) return null;
+      const time = performance.time || "00:00";
+      const target = new Date(`${performance.date}T${time}:00`);
+      if(Number.isNaN(target.getTime())) return null;
+      const today = new Date();
+      const todayStart = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+      const targetStart = new Date(target.getFullYear(),target.getMonth(),target.getDate());
+      return Math.ceil((targetStart - todayStart) / 86400000);
+    }
+
+    function getHomePerformances(){
+      return performanceCatalog
+        .filter(performance=>performance.showOnHome !== false && performance.date)
+        .map(performance=>({performance,days:daysUntilPerformance(performance)}))
+        .filter(entry=>entry.days === null || entry.days >= 0)
+        .sort((a,b)=>String(a.performance.date).localeCompare(String(b.performance.date)));
+    }
+
     function renderCountdown(){
+      const root = document.getElementById("countdownList");
+      if(!root) return;
+      const entries = getHomePerformances();
+      if(!entries.length){
+        root.innerHTML = `<div class="countdown-card"><div class="home-empty">本番日程はまだ登録されていません。</div></div>`;
+        return;
+      }
+      root.innerHTML = entries.map(({performance,days})=>{
+        const dayText = days === 0 ? "本日" : `${days}<small>日</small>`;
+        return `
+          <article class="countdown-card">
+            <h2 class="countdown-performance-title">${escapeHtml(performance.title)}</h2>
+            <div class="countdown-main-line">
+              <span class="countdown-prefix">本番まで残り</span>
+              <span class="countdown-days">${dayText}</span>
+            </div>
+            <div class="countdown-date">${escapeHtml(formatHomePerformanceDate(performance))}</div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function scheduleDateKey(item){
+      return item.date || "9999-12-31";
+    }
+
+    function getUpcomingScheduleGroups(){
       const now = new Date();
-      const diff = concertDate - now;
-      const days = Math.max(0, Math.ceil(diff / 86400000));
-      document.getElementById("countdownNumber").textContent = days;
+      const todayKey = [now.getFullYear(),String(now.getMonth()+1).padStart(2,"0"),String(now.getDate()).padStart(2,"0")].join("-");
+      const entries = normalizeHomeData(homeData).schedule
+        .filter(item=>item.date && item.date >= todayKey)
+        .sort((a,b)=>{
+          const dateCompare = scheduleDateKey(a).localeCompare(scheduleDateKey(b));
+          return dateCompare || String(a.time).localeCompare(String(b.time));
+        });
+      const groups = [];
+      entries.forEach(item=>{
+        let group = groups.find(entry=>entry.date===item.date);
+        if(!group){
+          group = {date:item.date,items:[]};
+          groups.push(group);
+        }
+        group.items.push(item);
+      });
+      return groups;
+    }
+
+    function formatScheduleDate(dateString){
+      const date = new Date(`${dateString}T00:00:00`);
+      if(Number.isNaN(date.getTime())) return dateString;
+      return new Intl.DateTimeFormat("ja-JP",{month:"numeric",day:"numeric",weekday:"short"}).format(date);
+    }
+
+    function renderUpcomingSchedule(){
+      const root = document.getElementById("upcomingScheduleList");
+      const button = document.getElementById("toggleScheduleButton");
+      if(!root || !button) return;
+      const groups = getUpcomingScheduleGroups();
+      const visible = scheduleExpanded ? groups : groups.slice(0,3);
+      root.innerHTML = visible.length ? visible.map(group=>`
+        <section class="schedule-day-group">
+          <div class="schedule-date-label">${escapeHtml(formatScheduleDate(group.date))}</div>
+          <div class="schedule-events">
+            ${group.items.map(item=>`
+              <div class="schedule-event">
+                <span class="schedule-time">${escapeHtml(item.time || "終日")}</span>
+                <span class="schedule-event-title">
+                  ${escapeHtml(item.title || "予定")}
+                  ${item.note ? `<small class="schedule-event-note">${escapeHtml(item.note)}</small>` : ""}
+                </span>
+              </div>
+            `).join("")}
+          </div>
+        </section>
+      `).join("") : `<div class="home-empty">今後の予定はまだ登録されていません。</div>`;
+
+      button.hidden = groups.length <= 3;
+      button.textContent = scheduleExpanded ? "3日分だけ表示" : "その先の予定を見る";
+    }
+
+    function renderPerformanceTimetables(){
+      const root = document.getElementById("performanceTimetableList");
+      if(!root) return;
+      const performances = getHomePerformances().map(entry=>entry.performance);
+      root.innerHTML = performances.length ? performances.map(performance=>`
+        <button class="timetable-link" type="button" data-open-timeline="${escapeHtml(performance.id)}">
+          <span>
+            <span class="timetable-link-title">${escapeHtml(performance.title)}</span>
+            <span class="timetable-link-date">${escapeHtml(formatHomePerformanceDate(performance))}</span>
+          </span>
+          <span class="timetable-link-arrow" aria-hidden="true">›</span>
+        </button>
+      `).join("") : `<div class="home-empty">本番が登録されると、ここから当日の時程を確認できます。</div>`;
+
+      root.querySelectorAll("[data-open-timeline]").forEach(button=>{
+        button.addEventListener("click",()=>openPerformanceTimeline(button.dataset.openTimeline));
+      });
+    }
+
+    function renderTodayPractice(){
+      const songsRoot = document.getElementById("todaySongList");
+      const tasksRoot = document.getElementById("todayTaskList");
+      if(!songsRoot || !tasksRoot) return;
+      const data = normalizeHomeData(homeData).practice;
+      songsRoot.innerHTML = data.songs.length
+        ? data.songs.map(song=>`<div class="today-song-item">「${escapeHtml(song)}」</div>`).join("")
+        : `<div class="home-empty">練習曲はまだ登録されていません。</div>`;
+      tasksRoot.innerHTML = data.tasks.length
+        ? data.tasks.map(task=>`<li>${escapeHtml(task)}</li>`).join("")
+        : `<li>練習内容はまだ登録されていません。</li>`;
+    }
+
+    function renderHomeDashboard(){
+      renderCountdown();
+      renderUpcomingSchedule();
+      renderPerformanceTimetables();
+      renderTodayPractice();
+    }
+
+    function openPerformanceTimeline(performanceId){
+      const performance = getPerformanceById(performanceId);
+      if(!performance) return;
+      const timeline = Array.isArray(performance.timeline) ? performance.timeline : [];
+      document.getElementById("detailHeading").textContent = performance.title;
+      document.getElementById("detailContent").innerHTML = `
+        <div class="card">
+          <span class="section-badge">本番当日のタイムスケジュール</span>
+          <p class="detail-copy">${escapeHtml(formatHomePerformanceDate(performance))}</p>
+        </div>
+        <div class="card">
+          ${timeline.length ? `<div class="timeline-view">
+            ${timeline.map(item=>`
+              <div class="timeline-view-row">
+                <div class="timeline-view-time">${escapeHtml(item.time || "--:--")}</div>
+                <div>
+                  <div class="timeline-view-title">${escapeHtml(item.title || "内容未設定")}</div>
+                  ${item.note ? `<div class="timeline-view-note">${escapeHtml(item.note)}</div>` : ""}
+                </div>
+              </div>
+            `).join("")}
+          </div>` : `<div class="home-empty">タイムスケジュールはまだ登録されていません。</div>`}
+        </div>
+      `;
+      openDetailPanel();
     }
 
     function renderProgressBars(targetId){
@@ -3891,8 +4729,9 @@
     async function initializeApp(){
       applyPosterBackground();
       await initializePerformanceCatalog();
+      initializeHomeData();
       normalizeProgress();
-      renderCountdown();
+      renderHomeDashboard();
       renderStories();
       renderPerformanceSelector();
       renderFilters();
@@ -3943,6 +4782,7 @@
     const db = getFirestore(firebaseApp);
     const googleProvider = new GoogleAuthProvider();
     const setlistsRef = doc(db, "publicData", "setlists");
+    const ADMIN_UID = "8MEdaHcdfpTpTLdEx0RSgVLzyKJ3";
 
     let currentFirebaseUser = null;
     let unsubscribeSetlists = null;
@@ -3967,23 +4807,34 @@
     function updateAuthUi(user){
       currentFirebaseUser = user || null;
       if(!authStatus) return;
+      const authorized = Boolean(user && user.uid === ADMIN_UID);
+      window.utopiaSetlistApp?.setAdminAuthorized(authorized);
 
-      if(user){
-        authStatus.textContent = `${user.displayName || "Googleアカウント"}でログイン中`;
+      if(user && authorized){
+        authStatus.textContent = `${user.displayName || "Googleアカウント"}で管理者ログイン中`;
         userDetail.textContent = `UID: ${user.uid}`;
         signInButton.hidden = true;
         signOutButton.hidden = false;
         copyUidButton.hidden = false;
         publishButton.disabled = false;
         statusDot.classList.add("online");
+      }else if(user){
+        authStatus.textContent = "このGoogleアカウントには編集権限がありません";
+        userDetail.textContent = `UID: ${user.uid}`;
+        signInButton.hidden = true;
+        signOutButton.hidden = false;
+        copyUidButton.hidden = false;
+        publishButton.disabled = true;
+        statusDot.classList.remove("online");
+        statusDot.classList.add("warning");
       }else{
         authStatus.textContent = "管理者はGoogleログインしてください";
-        userDetail.textContent = "ログイン後にUIDを確認できます。";
+        userDetail.textContent = "ログイン後に編集機能が有効になります。";
         signInButton.hidden = false;
         signOutButton.hidden = true;
         copyUidButton.hidden = true;
         publishButton.disabled = true;
-        statusDot.classList.remove("online");
+        statusDot.classList.remove("online","warning");
       }
     }
 
@@ -4019,8 +4870,8 @@
     }
 
     async function publishSetlists(){
-      if(!currentFirebaseUser){
-        alert("先にGoogleで管理者ログインしてください。");
+      if(!currentFirebaseUser || currentFirebaseUser.uid !== ADMIN_UID){
+        alert("管理者としてログインしてください。");
         return;
       }
       const bridge = window.utopiaSetlistApp;
@@ -4029,15 +4880,15 @@
         return;
       }
 
-      let catalog;
+      let portalData;
       try{
-        catalog = bridge.getCatalogForPublish();
+        portalData = bridge.getPortalDataForPublish();
       }catch(error){
         alert(error.message);
         return;
       }
 
-      if(!confirm("編集内容を全員の画面へ反映しますか？")) return;
+      if(!confirm("ホーム情報とセットリストを全員の画面へ反映しますか？")) return;
 
       publishButton.disabled = true;
       const originalText = publishButton.textContent;
@@ -4046,8 +4897,9 @@
 
       try{
         await setDoc(setlistsRef, {
-          version:1,
-          catalog,
+          version:2,
+          catalog:portalData.catalog,
+          home:portalData.home,
           updatedAt:serverTimestamp(),
           updatedBy:{
             uid:currentFirebaseUser.uid,
@@ -4055,16 +4907,16 @@
             email:currentFirebaseUser.email || ""
           }
         });
-        bridge.applyPublishedCatalog(catalog);
+        bridge.applyPublishedPortalData(portalData);
         setDataStatus("公開版は最新です。全員の端末へ反映されました。", "online");
-        alert("全員のセットリストへ反映しました。");
+        alert("ホーム情報とセットリストを全員へ反映しました。");
       }catch(error){
         console.error(error);
         setDataStatus(firebaseErrorMessage(error), "warning");
         alert(firebaseErrorMessage(error));
       }finally{
         publishButton.textContent = originalText;
-        publishButton.disabled = !currentFirebaseUser;
+        publishButton.disabled = !(currentFirebaseUser && currentFirebaseUser.uid === ADMIN_UID);
       }
     }
 
@@ -4077,10 +4929,11 @@
           setDataStatus("Firebaseにはまだ公開データがありません。管理者が最初に公開してください。", "warning");
           return;
         }
-        const catalog = snapshot.data()?.catalog;
+        const data = snapshot.data() || {};
+        const catalog = data.catalog;
         if(Array.isArray(catalog) && window.utopiaSetlistApp){
-          window.utopiaSetlistApp.applyPublishedCatalog(catalog);
-          setDataStatus("Firebaseの公開セットリストを表示しています。", "online");
+          window.utopiaSetlistApp.applyPublishedPortalData({catalog,home:data.home});
+          setDataStatus("Firebaseの公開情報を表示しています。", "online");
         }else{
           setDataStatus("Firebaseの公開データ形式を確認できませんでした。", "warning");
         }
