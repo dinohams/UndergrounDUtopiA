@@ -8,8 +8,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
-  <meta name="application-name" content="UndergrounD UtopiA Portal v20" />
-  <meta name="app-build" content="20260627-v20" />
+  <meta name="application-name" content="UndergrounD UtopiA Portal v21" />
+  <meta name="app-build" content="20260627-v21" />
   <style>
     :root{
       --bg:#0c1214;
@@ -2200,6 +2200,135 @@
       }
     }
 
+
+    /* =========================================
+       位置情報による利用制限
+       ========================================= */
+    .location-gate{
+      position:fixed;
+      inset:0;
+      z-index:80;
+      display:none;
+      place-items:center;
+      padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+      background:
+        linear-gradient(180deg,rgba(3,7,9,.88),rgba(3,7,9,.94)),
+        var(--home-poster-url) center top / cover no-repeat;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+
+    .location-gate.open{
+      display:grid;
+    }
+
+    .location-gate-card{
+      width:min(100%,520px);
+      border:1px solid rgba(217,179,122,.56);
+      border-radius:22px;
+      padding:22px;
+      background:linear-gradient(180deg,rgba(13,22,25,.96),rgba(7,13,15,.96));
+      box-shadow:0 24px 60px rgba(0,0,0,.48);
+      text-align:center;
+    }
+
+    .location-gate-icon{
+      width:66px;
+      height:66px;
+      display:grid;
+      place-items:center;
+      margin:0 auto 14px;
+      border:1px solid rgba(217,179,122,.44);
+      border-radius:50%;
+      color:var(--gold);
+      background:
+        radial-gradient(circle,rgba(196,139,90,.20) 0 20%,transparent 21%),
+        repeating-radial-gradient(circle,transparent 0 8px,rgba(217,179,122,.16) 9px 10px);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:24px;
+    }
+
+    .location-gate-title{
+      margin:0;
+      font-size:24px;
+      line-height:1.45;
+    }
+
+    .location-gate-copy{
+      margin:12px 0 0;
+      color:#c9d1d1;
+      font-size:14px;
+      line-height:1.85;
+    }
+
+    .location-gate-status{
+      min-height:1.8em;
+      margin:13px 0 0;
+      color:var(--gold);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .location-gate-actions{
+      display:grid;
+      gap:9px;
+      margin-top:18px;
+    }
+
+    .location-gate-actions .admin-btn{
+      width:100%;
+    }
+
+    .location-gate-admin{
+      margin-top:13px;
+      border:0;
+      background:transparent;
+      color:#879597;
+      font-size:11px;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+
+    .geo-admin-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:13px;
+    }
+
+    .geo-admin-grid .wide{
+      grid-column:1 / -1;
+    }
+
+    .geo-admin-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .geo-admin-status{
+      margin-top:10px;
+      min-height:1.6em;
+      color:#bfc9ca;
+      font-size:12px;
+      line-height:1.65;
+    }
+
+    @media (max-width:620px){
+      .geo-admin-grid{
+        grid-template-columns:1fr;
+      }
+
+      .geo-admin-grid .wide{
+        grid-column:auto;
+      }
+
+      .location-gate-card{
+        padding:20px 17px;
+      }
+    }
+
   </style>
 </head>
 <body class="home-active">
@@ -2317,6 +2446,24 @@
   </nav>
 
 
+
+  <aside id="locationGate" class="location-gate" aria-hidden="true">
+    <div class="location-gate-card">
+      <div class="location-gate-icon" aria-hidden="true">⌖</div>
+      <div class="eyebrow">LOCATION ACCESS CONTROL</div>
+      <h2 id="locationGateTitle" class="location-gate-title">利用場所を確認します</h2>
+      <p id="locationGateCopy" class="location-gate-copy">
+        この機能は、指定された場所の周辺でのみ利用できます。
+      </p>
+      <div id="locationGateStatus" class="location-gate-status"></div>
+      <div class="location-gate-actions">
+        <button id="locationCheckButton" class="admin-btn primary" type="button">位置情報を確認して利用する</button>
+        <button id="locationRetryButton" class="admin-btn secondary" type="button" hidden>もう一度確認する</button>
+      </div>
+      <button id="locationAdminButton" class="location-gate-admin" type="button">管理者ログイン・設定</button>
+    </div>
+  </aside>
+
   <aside id="adminPanel" class="admin-panel" aria-hidden="true">
     <div class="admin-inner">
       <div class="admin-head">
@@ -2388,6 +2535,57 @@
               </div>
               <div id="adminScheduleItems" class="admin-schedule-editor"></div>
             </section>
+
+            <section class="admin-dashboard-card wide">
+              <div class="admin-setlist-head">
+                <div>
+                  <div class="admin-field-label">位置情報による利用制限</div>
+                  <div class="admin-hint">指定地点から半径内にいる端末だけ、対象機能を利用できるようにします。</div>
+                </div>
+              </div>
+
+              <label class="admin-checkbox-field">
+                <input id="adminGeoEnabled" type="checkbox">
+                <span>位置情報による利用制限を有効にする</span>
+              </label>
+
+              <div class="geo-admin-grid">
+                <label class="admin-field">
+                  <span class="admin-field-label">制限する範囲</span>
+                  <select id="adminGeoMode" class="admin-select">
+                    <option value="all">アプリ全体</option>
+                    <option value="progress">進捗ページのみ</option>
+                  </select>
+                </label>
+
+                <label class="admin-field">
+                  <span class="admin-field-label">場所の名前</span>
+                  <input id="adminGeoPlaceName" class="admin-input" type="text" placeholder="例：学校">
+                </label>
+
+                <label class="admin-field">
+                  <span class="admin-field-label">緯度</span>
+                  <input id="adminGeoLatitude" class="admin-input" type="number" step="any" placeholder="例：36.123456">
+                </label>
+
+                <label class="admin-field">
+                  <span class="admin-field-label">経度</span>
+                  <input id="adminGeoLongitude" class="admin-input" type="number" step="any" placeholder="例：139.123456">
+                </label>
+
+                <label class="admin-field">
+                  <span class="admin-field-label">許可半径（m）</span>
+                  <input id="adminGeoRadius" class="admin-input" type="number" min="50" max="20000" step="10" value="500">
+                </label>
+              </div>
+
+              <div class="geo-admin-actions">
+                <button id="adminGeoUseCurrent" class="admin-btn compact" type="button">現在地を基準地点に設定</button>
+                <button id="adminGeoTest" class="admin-btn compact secondary" type="button">現在地との距離を確認</button>
+              </div>
+              <div id="adminGeoStatus" class="geo-admin-status"></div>
+            </section>
+
           </div>
         </section>
 
@@ -2491,7 +2689,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260627-v20";
+    const APP_BUILD_VERSION = "20260627-v21";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -3615,6 +3813,332 @@
     }
 
 
+    function normalizeGeoAccessConfig(value){
+      const source = value && typeof value === "object" ? value : {};
+      const hasLatitude = source.latitude !== "" && source.latitude !== null && source.latitude !== undefined;
+      const hasLongitude = source.longitude !== "" && source.longitude !== null && source.longitude !== undefined;
+      const latitude = hasLatitude ? Number(source.latitude) : NaN;
+      const longitude = hasLongitude ? Number(source.longitude) : NaN;
+      const radius = Number(source.radius);
+      return {
+        enabled:Boolean(source.enabled),
+        mode:source.mode === "all" ? "all" : "progress",
+        placeName:String(source.placeName || "指定場所").trim() || "指定場所",
+        latitude:Number.isFinite(latitude) ? latitude : "",
+        longitude:Number.isFinite(longitude) ? longitude : "",
+        radius:Number.isFinite(radius) ? Math.min(20000,Math.max(50,radius)) : 500
+      };
+    }
+
+    const geoSessionStorageKey = "underground-utopia-geo-access-v1";
+    let geoAccessState = {
+      checked:false,
+      allowed:false,
+      checking:false,
+      distance:null,
+      accuracy:null,
+      reason:""
+    };
+    let pendingGeoPage = null;
+
+    function getGeoConfig(){
+      return normalizeGeoAccessConfig(homeData?.geoAccess);
+    }
+
+    function geoConfigSignature(config=getGeoConfig()){
+      return [
+        config.enabled,
+        config.mode,
+        config.latitude,
+        config.longitude,
+        config.radius
+      ].join("|");
+    }
+
+    function hasUsableGeoConfig(config=getGeoConfig()){
+      return Boolean(
+        config.enabled &&
+        Number.isFinite(Number(config.latitude)) &&
+        Number.isFinite(Number(config.longitude))
+      );
+    }
+
+    function geoRestrictionApplies(pageName){
+      const config = getGeoConfig();
+      if(!hasUsableGeoConfig(config)) return false;
+      if(adminAuthorized) return false;
+      return config.mode === "all" || pageName === "progress";
+    }
+
+    function readGeoSession(){
+      try{
+        const saved = JSON.parse(sessionStorage.getItem(geoSessionStorageKey));
+        if(!saved || saved.signature !== geoConfigSignature()) return false;
+        if(Date.now() - Number(saved.checkedAt || 0) > 15 * 60 * 1000) return false;
+        return saved.allowed === true;
+      }catch{
+        return false;
+      }
+    }
+
+    function saveGeoSession(allowed){
+      try{
+        sessionStorage.setItem(geoSessionStorageKey,JSON.stringify({
+          signature:geoConfigSignature(),
+          checkedAt:Date.now(),
+          allowed:Boolean(allowed)
+        }));
+      }catch{}
+    }
+
+    function clearGeoSession(){
+      try{
+        sessionStorage.removeItem(geoSessionStorageKey);
+      }catch{}
+      geoAccessState.checked = false;
+      geoAccessState.allowed = false;
+    }
+
+    function distanceBetweenCoordinates(lat1,lon1,lat2,lon2){
+      const toRad = value=>value * Math.PI / 180;
+      const earthRadius = 6371000;
+      const dLat = toRad(lat2-lat1);
+      const dLon = toRad(lon2-lon1);
+      const a = Math.sin(dLat/2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon/2) ** 2;
+      return 2 * earthRadius * Math.asin(Math.sqrt(a));
+    }
+
+    function getCurrentCoordinates(options={}){
+      return new Promise((resolve,reject)=>{
+        if(!navigator.geolocation){
+          const error = new Error("この端末では位置情報を利用できません。");
+          error.code = 0;
+          reject(error);
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          position=>resolve(position.coords),
+          reject,
+          {
+            enableHighAccuracy:true,
+            timeout:options.timeout || 15000,
+            maximumAge:options.maximumAge ?? 30000
+          }
+        );
+      });
+    }
+
+    function locationErrorMessage(error){
+      if(error?.code === 1) return "位置情報の利用が許可されていません。ブラウザの設定から位置情報を許可してください。";
+      if(error?.code === 2) return "現在地を取得できませんでした。電波状況を確認してください。";
+      if(error?.code === 3) return "位置情報の取得が時間切れになりました。もう一度お試しください。";
+      return error?.message || "位置情報を確認できませんでした。";
+    }
+
+    function getCurrentPageName(){
+      const page = document.querySelector(".page.active");
+      return page?.id?.replace("page-","") || "home";
+    }
+
+    function openLocationGate(pageName=getCurrentPageName(),message=""){
+      const config = getGeoConfig();
+      pendingGeoPage = pageName;
+      const gate = document.getElementById("locationGate");
+      const title = document.getElementById("locationGateTitle");
+      const copy = document.getElementById("locationGateCopy");
+      const status = document.getElementById("locationGateStatus");
+      const checkButton = document.getElementById("locationCheckButton");
+      const retryButton = document.getElementById("locationRetryButton");
+
+      if(!gate) return;
+      title.textContent = config.mode === "progress"
+        ? "進捗ページの利用場所を確認します"
+        : "この端末の利用場所を確認します";
+      copy.textContent = `${config.placeName}から半径${config.radius}m以内で利用できます。位置情報は距離判定にのみ使用し、保存しません。`;
+      status.textContent = message;
+      checkButton.hidden = false;
+      checkButton.disabled = false;
+      retryButton.hidden = true;
+      gate.classList.add("open");
+      gate.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLocationGate(){
+      const gate = document.getElementById("locationGate");
+      if(!gate) return;
+      gate.classList.remove("open");
+      gate.setAttribute("aria-hidden","true");
+      if(!document.getElementById("adminPanel")?.classList.contains("open")){
+        document.body.style.overflow = "";
+      }
+    }
+
+    async function verifyCurrentLocation(){
+      const config = getGeoConfig();
+      const status = document.getElementById("locationGateStatus");
+      const checkButton = document.getElementById("locationCheckButton");
+      const retryButton = document.getElementById("locationRetryButton");
+
+      if(!hasUsableGeoConfig(config)){
+        geoAccessState = {checked:true,allowed:true,checking:false,distance:null,accuracy:null,reason:"設定なし"};
+        closeLocationGate();
+        return true;
+      }
+
+      geoAccessState.checking = true;
+      checkButton.disabled = true;
+      checkButton.textContent = "位置情報を確認中…";
+      retryButton.hidden = true;
+      status.textContent = "衛星・Wi-Fi・基地局から現在地を確認しています…";
+
+      try{
+        const coords = await getCurrentCoordinates({timeout:15000,maximumAge:15000});
+        const distance = distanceBetweenCoordinates(
+          Number(coords.latitude),
+          Number(coords.longitude),
+          Number(config.latitude),
+          Number(config.longitude)
+        );
+        const accuracy = Math.max(0,Number(coords.accuracy || 0));
+        const effectiveDistance = Math.max(0,distance - accuracy);
+        const allowed = effectiveDistance <= config.radius;
+
+        geoAccessState = {
+          checked:true,
+          allowed,
+          checking:false,
+          distance,
+          accuracy,
+          reason:allowed ? "範囲内" : "範囲外"
+        };
+        saveGeoSession(allowed);
+
+        if(allowed){
+          status.textContent = `利用範囲内です（基準地点まで約${Math.round(distance)}m／測位精度±${Math.round(accuracy)}m）。`;
+          window.setTimeout(()=>{
+            closeLocationGate();
+            if(pendingGeoPage && pendingGeoPage !== getCurrentPageName()){
+              const destination = pendingGeoPage;
+              pendingGeoPage = null;
+              switchPage(destination,{skipGeoCheck:true});
+            }else{
+              pendingGeoPage = null;
+            }
+          },500);
+          return true;
+        }
+
+        status.textContent = `利用範囲外です。基準地点まで約${Math.round(distance)}mです（許可半径${config.radius}m）。`;
+        retryButton.hidden = false;
+        return false;
+      }catch(error){
+        geoAccessState = {
+          checked:true,
+          allowed:false,
+          checking:false,
+          distance:null,
+          accuracy:null,
+          reason:locationErrorMessage(error)
+        };
+        status.textContent = locationErrorMessage(error);
+        retryButton.hidden = false;
+        return false;
+      }finally{
+        checkButton.disabled = false;
+        checkButton.textContent = "位置情報を確認して利用する";
+      }
+    }
+
+    function refreshGeoRestriction(){
+      const pageName = getCurrentPageName();
+      if(!geoRestrictionApplies(pageName)){
+        closeLocationGate();
+        return;
+      }
+
+      if(readGeoSession()){
+        geoAccessState.allowed = true;
+        geoAccessState.checked = true;
+        closeLocationGate();
+        return;
+      }
+
+      openLocationGate(pageName);
+    }
+
+    function renderAdminGeoAccess(){
+      const config = normalizeGeoAccessConfig(adminWorkingHome.geoAccess);
+      adminWorkingHome.geoAccess = config;
+
+      const enabled = document.getElementById("adminGeoEnabled");
+      if(!enabled) return;
+      enabled.checked = config.enabled;
+      document.getElementById("adminGeoMode").value = config.mode;
+      document.getElementById("adminGeoPlaceName").value = config.placeName;
+      document.getElementById("adminGeoLatitude").value = config.latitude;
+      document.getElementById("adminGeoLongitude").value = config.longitude;
+      document.getElementById("adminGeoRadius").value = config.radius;
+      document.getElementById("adminGeoStatus").textContent = config.enabled
+        ? "公開後、対象端末では位置情報の確認が必要になります。"
+        : "現在は位置情報制限を使用しません。";
+    }
+
+    function syncAdminGeoAccess(){
+      if(!adminWorkingHome.geoAccess) adminWorkingHome.geoAccess = normalizeGeoAccessConfig({});
+      adminWorkingHome.geoAccess = normalizeGeoAccessConfig({
+        enabled:document.getElementById("adminGeoEnabled")?.checked,
+        mode:document.getElementById("adminGeoMode")?.value,
+        placeName:document.getElementById("adminGeoPlaceName")?.value,
+        latitude:document.getElementById("adminGeoLatitude")?.value,
+        longitude:document.getElementById("adminGeoLongitude")?.value,
+        radius:document.getElementById("adminGeoRadius")?.value
+      });
+    }
+
+    async function setAdminGeoFromCurrentLocation(){
+      const status = document.getElementById("adminGeoStatus");
+      status.textContent = "現在地を取得しています…";
+      try{
+        const coords = await getCurrentCoordinates({timeout:15000,maximumAge:0});
+        document.getElementById("adminGeoLatitude").value = Number(coords.latitude).toFixed(7);
+        document.getElementById("adminGeoLongitude").value = Number(coords.longitude).toFixed(7);
+        syncAdminGeoAccess();
+        status.textContent = `現在地を設定しました（測位精度±${Math.round(coords.accuracy || 0)}m）。`;
+      }catch(error){
+        status.textContent = locationErrorMessage(error);
+      }
+    }
+
+    async function testAdminGeoDistance(){
+      syncAdminGeoAccess();
+      const config = normalizeGeoAccessConfig(adminWorkingHome.geoAccess);
+      const status = document.getElementById("adminGeoStatus");
+
+      if(!hasUsableGeoConfig({...config,enabled:true})){
+        status.textContent = "緯度・経度を設定してください。";
+        return;
+      }
+
+      status.textContent = "現在地との距離を確認しています…";
+      try{
+        const coords = await getCurrentCoordinates({timeout:15000,maximumAge:0});
+        const distance = distanceBetweenCoordinates(
+          Number(coords.latitude),
+          Number(coords.longitude),
+          Number(config.latitude),
+          Number(config.longitude)
+        );
+        status.textContent = `基準地点まで約${Math.round(distance)}mです（測位精度±${Math.round(coords.accuracy || 0)}m／許可半径${config.radius}m）。`;
+      }catch(error){
+        status.textContent = locationErrorMessage(error);
+      }
+    }
+
+
     function buildDefaultHomeData(){
       return {
         practice:{
@@ -3625,7 +4149,15 @@
             "演奏中の視線を下げすぎない"
           ]
         },
-        schedule:[]
+        schedule:[],
+        geoAccess:{
+          enabled:false,
+          mode:"progress",
+          placeName:"学校",
+          latitude:"",
+          longitude:"",
+          radius:500
+        }
       };
     }
 
@@ -3650,7 +4182,8 @@
               endTime:item.endTime || "",
               note:String(item.note || "").trim()
             }))
-          : []
+          : [],
+        geoAccess:normalizeGeoAccessConfig(source.geoAccess)
       };
     }
 
@@ -4089,6 +4622,7 @@
       renderAdminSimpleList("adminPracticeSongs",adminWorkingHome.practice.songs,"songs");
       renderAdminSimpleList("adminPracticeTasks",adminWorkingHome.practice.tasks,"tasks");
       renderAdminScheduleItems();
+      renderAdminGeoAccess();
     }
 
     function renderAdminScheduleItems(options = {}){
@@ -4215,6 +4749,7 @@
     function setAdminAuthorized(value){
       adminAuthorized = Boolean(value);
       document.getElementById("adminPanel")?.classList.toggle("admin-authorized",adminAuthorized);
+      refreshGeoRestriction();
     }
 
     function renderAdminItems(){
@@ -4373,6 +4908,11 @@
 
     function validateAdminData(){
       syncAdminPerformanceFields();
+      syncAdminGeoAccess();
+      const geoConfig = normalizeGeoAccessConfig(adminWorkingHome.geoAccess);
+      if(geoConfig.enabled && (!Number.isFinite(Number(geoConfig.latitude)) || !Number.isFinite(Number(geoConfig.longitude)))){
+        throw new Error("位置情報制限を有効にする場合は、緯度と経度を設定してください。");
+      }
       const invalid = adminWorkingCatalog.find(performance=>!performance.title.trim());
       if(invalid) throw new Error("本番名を入力してください。");
       return {
@@ -4409,6 +4949,7 @@
     }
 
     function applyPublishedPortalData(data){
+      const previousGeoSignature = geoConfigSignature();
       const catalog = Array.isArray(data) ? data : data?.catalog;
       const incomingHome = Array.isArray(data) ? null : data?.home;
       if(Array.isArray(catalog)) performanceCatalog = normalizeCatalog(catalog);
@@ -4423,6 +4964,10 @@
       renderFilters();
       renderSongs();
       renderHomeDashboard();
+      if(previousGeoSignature !== geoConfigSignature()){
+        clearGeoSession();
+      }
+      refreshGeoRestriction();
 
       const panel = document.getElementById("adminPanel");
       if(panel?.classList.contains("open")){
@@ -4443,6 +4988,7 @@
       applyPublishedPortalData,
       applyPublishedCatalog:catalog=>applyPublishedPortalData({catalog}),
       setAdminAuthorized,
+      refreshGeoRestriction,
       openAdmin,
       closeAdmin
     };
@@ -4524,6 +5070,21 @@
         });
       });
       document.getElementById("adminPerformanceShowHome").addEventListener("change",syncAdminPerformanceFields);
+
+      ["adminGeoEnabled","adminGeoMode","adminGeoPlaceName","adminGeoLatitude","adminGeoLongitude","adminGeoRadius"].forEach(id=>{
+        document.getElementById(id)?.addEventListener("input",syncAdminGeoAccess);
+        document.getElementById(id)?.addEventListener("change",syncAdminGeoAccess);
+      });
+      document.getElementById("adminGeoUseCurrent")?.addEventListener("click",setAdminGeoFromCurrentLocation);
+      document.getElementById("adminGeoTest")?.addEventListener("click",testAdminGeoDistance);
+
+      document.getElementById("locationCheckButton")?.addEventListener("click",verifyCurrentLocation);
+      document.getElementById("locationRetryButton")?.addEventListener("click",verifyCurrentLocation);
+      document.getElementById("locationAdminButton")?.addEventListener("click",()=>{
+        closeLocationGate();
+        openAdmin();
+      });
+
       document.getElementById("toggleScheduleButton").addEventListener("click",()=>{
         scheduleExpanded = !scheduleExpanded;
         renderUpcomingSchedule();
@@ -5202,7 +5763,12 @@
       depthAnimationFrame = window.requestAnimationFrame(tick);
     }
 
-    function switchPage(pageName){
+    function switchPage(pageName,options={}){
+      if(!options.skipGeoCheck && geoRestrictionApplies(pageName) && !readGeoSession()){
+        openLocationGate(pageName);
+        return;
+      }
+
       document.body.classList.add("home-active");
       document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.remove("active"));
@@ -5282,6 +5848,7 @@
       bindSetlistButtons();
       bindAdminControls();
       bindHiddenAdminCommand();
+      refreshGeoRestriction();
     }
 
     initializeApp();
@@ -5464,7 +6031,7 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:3,
+          version:4,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
