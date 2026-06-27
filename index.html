@@ -8,8 +8,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
-  <meta name="application-name" content="UndergrounD UtopiA Portal v21" />
-  <meta name="app-build" content="20260627-v21" />
+  <meta name="application-name" content="UndergrounD UtopiA Portal v22" />
+  <meta name="app-build" content="20260627-v22" />
   <style>
     :root{
       --bg:#0c1214;
@@ -1855,7 +1855,7 @@
       gap:12px;
       max-height:330px;
       overflow-y:auto;
-      overscroll-behavior:contain;
+      overscroll-behavior-y:auto;
       -webkit-overflow-scrolling:touch;
       padding-right:8px;
       scrollbar-gutter:stable;
@@ -2094,7 +2094,7 @@
     .admin-schedule-editor{
       max-height:min(52vh,560px);
       overflow-y:auto;
-      overscroll-behavior:contain;
+      overscroll-behavior-y:auto;
       -webkit-overflow-scrolling:touch;
       padding-right:8px;
       scrollbar-gutter:stable;
@@ -2329,6 +2329,173 @@
       }
     }
 
+
+    /* =========================================
+       位置制限プレビュー・スクロール引き継ぎ・明るさ調整
+       ========================================= */
+    .location-gate.preview-mode{
+      z-index:120;
+    }
+
+    .location-gate.preview-mode #locationCheckButton,
+    .location-gate.preview-mode #locationRetryButton,
+    .location-gate.preview-mode #locationAdminButton{
+      pointer-events:none;
+    }
+
+    .geo-preview-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      margin-top:22px;
+      padding-top:18px;
+      border-top:1px solid rgba(217,179,122,.24);
+    }
+
+    .geo-preview-actions{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      gap:7px;
+    }
+
+    .geo-message-editor{
+      margin-top:14px;
+      border:1px solid rgba(217,179,122,.24);
+      border-radius:13px;
+      background:rgba(12,21,24,.48);
+      overflow:hidden;
+    }
+
+    .geo-message-editor summary{
+      padding:13px 15px;
+      color:var(--gold);
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .geo-message-editor[open] summary{
+      border-bottom:1px solid rgba(217,179,122,.18);
+    }
+
+    .geo-token-hint{
+      margin:13px 15px 0;
+    }
+
+    .geo-token-hint code{
+      color:#e8c58d;
+      font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+      font-size:.92em;
+    }
+
+    .geo-message-section{
+      margin:15px;
+      padding:14px;
+      border:1px solid rgba(174,185,185,.15);
+      border-radius:12px;
+      background:rgba(8,15,18,.42);
+    }
+
+    .geo-message-textarea{
+      min-height:72px;
+    }
+
+    [data-scroll-handoff]{
+      overscroll-behavior-y:auto !important;
+      touch-action:pan-y;
+    }
+
+    /* 地下世界の色味は維持しつつ、黒い膜を一段だけ薄くする */
+    :root{
+      --ivory:#f4ede2;
+      --muted:#bdc7c7;
+      --gold:#e1bb7e;
+      --copper:#cf925f;
+    }
+
+    body{
+      background:
+        radial-gradient(circle at 10% 0%,rgba(132,158,166,.18),transparent 32%),
+        radial-gradient(circle at 90% 20%,rgba(176,111,65,.14),transparent 26%),
+        linear-gradient(180deg,#10191c 0%,#162226 100%);
+    }
+
+    body.home-active::after{
+      background:
+        linear-gradient(180deg,rgba(5,9,11,.24),rgba(5,9,11,.43)),
+        radial-gradient(circle at 50% 18%,transparent 0 28%,rgba(3,7,9,.18) 72%);
+    }
+
+    body.home-active .topbar{
+      background:linear-gradient(180deg,rgba(12,20,23,.76),rgba(11,19,22,.62));
+    }
+
+    body.home-active #page-home .hero,
+    body.home-active #page-home .card,
+    body.home-active .hero,
+    body.home-active .card,
+    body.home-active .song-card,
+    body.home-active .progress-song,
+    body.home-active .story-card{
+      background:linear-gradient(180deg,rgba(22,34,38,.72),rgba(13,23,26,.60));
+    }
+
+    body.home-active .filter-btn,
+    body.home-active .btn.ghost,
+    .timetable-link,
+    .home-expand-button{
+      background:rgba(14,24,27,.62);
+    }
+
+    body.home-active .bottom-nav{
+      background:rgba(11,19,22,.88);
+    }
+
+    .admin-inner{
+      background:
+        linear-gradient(180deg,rgba(15,25,28,.84),rgba(10,18,21,.80)),
+        var(--home-poster-url) center top / cover no-repeat fixed;
+    }
+
+    .admin-side,
+    .admin-main{
+      background:rgba(14,24,27,.76);
+    }
+
+    .admin-dashboard-card{
+      background:rgba(14,24,27,.52);
+    }
+
+    .admin-input,
+    .admin-select,
+    .admin-textarea,
+    .admin-item-type{
+      background:rgba(12,21,24,.88);
+    }
+
+    .location-gate{
+      background:
+        linear-gradient(180deg,rgba(5,10,12,.72),rgba(4,9,11,.82)),
+        var(--home-poster-url) center top / cover no-repeat;
+    }
+
+    .location-gate-card{
+      background:linear-gradient(180deg,rgba(22,34,38,.95),rgba(11,20,23,.95));
+    }
+
+    @media (max-width:620px){
+      .geo-preview-head{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .geo-preview-actions{
+        justify-content:flex-start;
+      }
+    }
+
   </style>
 </head>
 <body class="home-active">
@@ -2363,7 +2530,7 @@
 
         <div class="card home-information-card" id="upcomingScheduleCard">
           <h2 class="card-title today-heading">直近の予定</h2>
-          <div id="upcomingScheduleList" class="upcoming-schedule-list"></div>
+          <div id="upcomingScheduleList" class="upcoming-schedule-list" data-scroll-handoff></div>
           <button id="toggleScheduleButton" class="home-expand-button" type="button" hidden>その先の予定を見る</button>
         </div>
 
@@ -2459,6 +2626,7 @@
       <div class="location-gate-actions">
         <button id="locationCheckButton" class="admin-btn primary" type="button">位置情報を確認して利用する</button>
         <button id="locationRetryButton" class="admin-btn secondary" type="button" hidden>もう一度確認する</button>
+        <button id="locationPreviewCloseButton" class="admin-btn ghost" type="button" hidden>プレビューを終了して管理画面へ戻る</button>
       </div>
       <button id="locationAdminButton" class="location-gate-admin" type="button">管理者ログイン・設定</button>
     </div>
@@ -2533,7 +2701,7 @@
                 </div>
                 <button id="adminAddSchedule" class="admin-btn compact" type="button">＋ 予定を追加</button>
               </div>
-              <div id="adminScheduleItems" class="admin-schedule-editor"></div>
+              <div id="adminScheduleItems" class="admin-schedule-editor" data-scroll-handoff></div>
             </section>
 
             <section class="admin-dashboard-card wide">
@@ -2584,6 +2752,83 @@
                 <button id="adminGeoTest" class="admin-btn compact secondary" type="button">現在地との距離を確認</button>
               </div>
               <div id="adminGeoStatus" class="geo-admin-status"></div>
+
+              <div class="geo-preview-head">
+                <div>
+                  <div class="admin-field-label">制限画面のプレビュー</div>
+                  <div class="admin-hint">実際の位置判定や公開設定には影響せず、この端末だけで表示を確認します。</div>
+                </div>
+                <div class="geo-preview-actions">
+                  <button id="adminGeoPreviewPrompt" class="admin-btn compact secondary" type="button">確認画面</button>
+                  <button id="adminGeoPreviewOutside" class="admin-btn compact secondary" type="button">範囲外画面</button>
+                  <button id="adminGeoPreviewError" class="admin-btn compact secondary" type="button">取得不可画面</button>
+                </div>
+              </div>
+
+              <details class="geo-message-editor">
+                <summary>制限画面の表示内容を編集</summary>
+                <p class="admin-hint geo-token-hint">説明文では <code>{placeName}</code> <code>{radius}</code> <code>{distance}</code> <code>{accuracy}</code> <code>{error}</code> を使用できます。</p>
+
+                <div class="geo-message-section">
+                  <div class="admin-field-label">最初の確認画面</div>
+                  <div class="geo-admin-grid">
+                    <label class="admin-field">
+                      <span class="admin-field-label">見出し</span>
+                      <input id="adminGeoPromptTitle" class="admin-input" type="text">
+                    </label>
+                    <label class="admin-field wide">
+                      <span class="admin-field-label">説明文</span>
+                      <textarea id="adminGeoPromptText" class="admin-textarea geo-message-textarea"></textarea>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="geo-message-section">
+                  <div class="admin-field-label">利用範囲外の画面</div>
+                  <div class="geo-admin-grid">
+                    <label class="admin-field">
+                      <span class="admin-field-label">見出し</span>
+                      <input id="adminGeoOutsideTitle" class="admin-input" type="text">
+                    </label>
+                    <label class="admin-field wide">
+                      <span class="admin-field-label">説明文</span>
+                      <textarea id="adminGeoOutsideText" class="admin-textarea geo-message-textarea"></textarea>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="geo-message-section">
+                  <div class="admin-field-label">位置情報を取得できない画面</div>
+                  <div class="geo-admin-grid">
+                    <label class="admin-field">
+                      <span class="admin-field-label">見出し</span>
+                      <input id="adminGeoErrorTitle" class="admin-input" type="text">
+                    </label>
+                    <label class="admin-field wide">
+                      <span class="admin-field-label">説明文</span>
+                      <textarea id="adminGeoErrorText" class="admin-textarea geo-message-textarea"></textarea>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="geo-message-section">
+                  <div class="admin-field-label">ボタンの文言</div>
+                  <div class="geo-admin-grid">
+                    <label class="admin-field">
+                      <span class="admin-field-label">位置情報確認ボタン</span>
+                      <input id="adminGeoCheckLabel" class="admin-input" type="text">
+                    </label>
+                    <label class="admin-field">
+                      <span class="admin-field-label">再確認ボタン</span>
+                      <input id="adminGeoRetryLabel" class="admin-input" type="text">
+                    </label>
+                    <label class="admin-field wide">
+                      <span class="admin-field-label">管理者リンク</span>
+                      <input id="adminGeoAdminLabel" class="admin-input" type="text">
+                    </label>
+                  </div>
+                </div>
+              </details>
             </section>
 
           </div>
@@ -2689,7 +2934,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260627-v21";
+    const APP_BUILD_VERSION = "20260627-v22";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -3815,18 +4060,31 @@
 
     function normalizeGeoAccessConfig(value){
       const source = value && typeof value === "object" ? value : {};
+      const sourceMessages = source.messages && typeof source.messages === "object" ? source.messages : {};
       const hasLatitude = source.latitude !== "" && source.latitude !== null && source.latitude !== undefined;
       const hasLongitude = source.longitude !== "" && source.longitude !== null && source.longitude !== undefined;
       const latitude = hasLatitude ? Number(source.latitude) : NaN;
       const longitude = hasLongitude ? Number(source.longitude) : NaN;
       const radius = Number(source.radius);
+      const text = (value,fallback)=>String(value ?? fallback).trim() || fallback;
       return {
         enabled:Boolean(source.enabled),
         mode:source.mode === "all" ? "all" : "progress",
         placeName:String(source.placeName || "指定場所").trim() || "指定場所",
         latitude:Number.isFinite(latitude) ? latitude : "",
         longitude:Number.isFinite(longitude) ? longitude : "",
-        radius:Number.isFinite(radius) ? Math.min(20000,Math.max(50,radius)) : 500
+        radius:Number.isFinite(radius) ? Math.min(20000,Math.max(50,radius)) : 500,
+        messages:{
+          promptTitle:text(sourceMessages.promptTitle,"利用場所を確認します"),
+          promptText:text(sourceMessages.promptText,"{placeName}から半径{radius}m以内で利用できます。位置情報は距離判定にのみ使用し、保存しません。"),
+          outsideTitle:text(sourceMessages.outsideTitle,"利用範囲外です"),
+          outsideText:text(sourceMessages.outsideText,"この機能は{placeName}から半径{radius}m以内で利用できます。現在地を確認して、もう一度お試しください。"),
+          errorTitle:text(sourceMessages.errorTitle,"位置情報を確認できません"),
+          errorText:text(sourceMessages.errorText,"ブラウザの設定で位置情報を許可し、もう一度お試しください。"),
+          checkLabel:text(sourceMessages.checkLabel,"位置情報を確認して利用する"),
+          retryLabel:text(sourceMessages.retryLabel,"もう一度確認する"),
+          adminLabel:text(sourceMessages.adminLabel,"管理者ログイン・設定")
+        }
       };
     }
 
@@ -3840,6 +4098,7 @@
       reason:""
     };
     let pendingGeoPage = null;
+    let geoPreviewMode = null;
 
     function getGeoConfig(){
       return normalizeGeoAccessConfig(homeData?.geoAccess);
@@ -3943,28 +4202,87 @@
       return page?.id?.replace("page-","") || "home";
     }
 
-    function openLocationGate(pageName=getCurrentPageName(),message=""){
-      const config = getGeoConfig();
-      pendingGeoPage = pageName;
-      const gate = document.getElementById("locationGate");
+    function replaceGeoMessageTokens(value,config,extras={}){
+      const tokens = {
+        placeName:config.placeName,
+        radius:config.radius,
+        distance:extras.distance ?? "--",
+        accuracy:extras.accuracy ?? "--",
+        error:extras.error ?? ""
+      };
+      return String(value || "").replace(/\{(placeName|radius|distance|accuracy|error)\}/g,(_,key)=>String(tokens[key] ?? ""));
+    }
+
+    function renderLocationGateState(state="prompt",options={}){
+      const config = normalizeGeoAccessConfig(options.config || getGeoConfig());
+      const messages = config.messages;
       const title = document.getElementById("locationGateTitle");
       const copy = document.getElementById("locationGateCopy");
       const status = document.getElementById("locationGateStatus");
       const checkButton = document.getElementById("locationCheckButton");
       const retryButton = document.getElementById("locationRetryButton");
+      const adminButton = document.getElementById("locationAdminButton");
 
-      if(!gate) return;
-      title.textContent = config.mode === "progress"
-        ? "進捗ページの利用場所を確認します"
-        : "この端末の利用場所を確認します";
-      copy.textContent = `${config.placeName}から半径${config.radius}m以内で利用できます。位置情報は距離判定にのみ使用し、保存しません。`;
-      status.textContent = message;
-      checkButton.hidden = false;
+      const titleKey = state === "outside" ? "outsideTitle" : state === "error" ? "errorTitle" : "promptTitle";
+      const textKey = state === "outside" ? "outsideText" : state === "error" ? "errorText" : "promptText";
+      const extras = options.extras || {};
+
+      title.textContent = replaceGeoMessageTokens(messages[titleKey],config,extras);
+      copy.textContent = replaceGeoMessageTokens(messages[textKey],config,extras);
+      status.textContent = options.status || "";
+      checkButton.textContent = messages.checkLabel;
+      retryButton.textContent = messages.retryLabel;
+      adminButton.textContent = messages.adminLabel;
+      checkButton.hidden = state !== "prompt";
       checkButton.disabled = false;
-      retryButton.hidden = true;
+      retryButton.hidden = state === "prompt";
+    }
+
+    function openLocationGate(pageName=getCurrentPageName(),message=""){
+      pendingGeoPage = pageName;
+      geoPreviewMode = null;
+      const gate = document.getElementById("locationGate");
+      const previewCloseButton = document.getElementById("locationPreviewCloseButton");
+      if(!gate) return;
+      gate.classList.remove("preview-mode");
+      previewCloseButton.hidden = true;
+      renderLocationGateState("prompt",{status:message});
       gate.classList.add("open");
       gate.setAttribute("aria-hidden","false");
       document.body.style.overflow = "hidden";
+    }
+
+    function openGeoPreview(state){
+      syncAdminGeoAccess();
+      geoPreviewMode = state;
+      const config = normalizeGeoAccessConfig(adminWorkingHome.geoAccess);
+      const gate = document.getElementById("locationGate");
+      const previewCloseButton = document.getElementById("locationPreviewCloseButton");
+      const sampleDistance = Math.max(config.radius + 850,1200);
+      const extras = {
+        distance:sampleDistance,
+        accuracy:28,
+        error:"位置情報の利用が許可されていません。"
+      };
+      const status = state === "outside"
+        ? `基準地点まで約${sampleDistance}mです（許可半径${config.radius}m）。`
+        : state === "error"
+          ? extras.error
+          : "位置情報を確認すると利用判定を行います。";
+
+      renderLocationGateState(state,{config,extras,status});
+      previewCloseButton.hidden = false;
+      gate.classList.add("open","preview-mode");
+      gate.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeGeoPreview(){
+      geoPreviewMode = null;
+      const gate = document.getElementById("locationGate");
+      gate?.classList.remove("preview-mode");
+      document.getElementById("locationPreviewCloseButton").hidden = true;
+      closeLocationGate();
     }
 
     function closeLocationGate(){
@@ -3978,6 +4296,8 @@
     }
 
     async function verifyCurrentLocation(){
+      if(geoPreviewMode) return false;
+
       const config = getGeoConfig();
       const status = document.getElementById("locationGateStatus");
       const checkButton = document.getElementById("locationCheckButton");
@@ -3990,10 +4310,11 @@
       }
 
       geoAccessState.checking = true;
+      renderLocationGateState("prompt",{status:"衛星・Wi-Fi・基地局から現在地を確認しています…"});
+      checkButton.hidden = false;
       checkButton.disabled = true;
       checkButton.textContent = "位置情報を確認中…";
       retryButton.hidden = true;
-      status.textContent = "衛星・Wi-Fi・基地局から現在地を確認しています…";
 
       try{
         const coords = await getCurrentCoordinates({timeout:15000,maximumAge:15000});
@@ -4032,24 +4353,29 @@
           return true;
         }
 
-        status.textContent = `利用範囲外です。基準地点まで約${Math.round(distance)}mです（許可半径${config.radius}m）。`;
-        retryButton.hidden = false;
+        renderLocationGateState("outside",{
+          extras:{distance:Math.round(distance),accuracy:Math.round(accuracy)},
+          status:`基準地点まで約${Math.round(distance)}mです（許可半径${config.radius}m）。`
+        });
         return false;
       }catch(error){
+        const errorMessage = locationErrorMessage(error);
         geoAccessState = {
           checked:true,
           allowed:false,
           checking:false,
           distance:null,
           accuracy:null,
-          reason:locationErrorMessage(error)
+          reason:errorMessage
         };
-        status.textContent = locationErrorMessage(error);
-        retryButton.hidden = false;
+        renderLocationGateState("error",{
+          extras:{error:errorMessage},
+          status:errorMessage
+        });
         return false;
       }finally{
         checkButton.disabled = false;
-        checkButton.textContent = "位置情報を確認して利用する";
+        if(!checkButton.hidden) checkButton.textContent = config.messages.checkLabel;
       }
     }
 
@@ -4082,6 +4408,15 @@
       document.getElementById("adminGeoLatitude").value = config.latitude;
       document.getElementById("adminGeoLongitude").value = config.longitude;
       document.getElementById("adminGeoRadius").value = config.radius;
+      document.getElementById("adminGeoPromptTitle").value = config.messages.promptTitle;
+      document.getElementById("adminGeoPromptText").value = config.messages.promptText;
+      document.getElementById("adminGeoOutsideTitle").value = config.messages.outsideTitle;
+      document.getElementById("adminGeoOutsideText").value = config.messages.outsideText;
+      document.getElementById("adminGeoErrorTitle").value = config.messages.errorTitle;
+      document.getElementById("adminGeoErrorText").value = config.messages.errorText;
+      document.getElementById("adminGeoCheckLabel").value = config.messages.checkLabel;
+      document.getElementById("adminGeoRetryLabel").value = config.messages.retryLabel;
+      document.getElementById("adminGeoAdminLabel").value = config.messages.adminLabel;
       document.getElementById("adminGeoStatus").textContent = config.enabled
         ? "公開後、対象端末では位置情報の確認が必要になります。"
         : "現在は位置情報制限を使用しません。";
@@ -4095,7 +4430,18 @@
         placeName:document.getElementById("adminGeoPlaceName")?.value,
         latitude:document.getElementById("adminGeoLatitude")?.value,
         longitude:document.getElementById("adminGeoLongitude")?.value,
-        radius:document.getElementById("adminGeoRadius")?.value
+        radius:document.getElementById("adminGeoRadius")?.value,
+        messages:{
+          promptTitle:document.getElementById("adminGeoPromptTitle")?.value,
+          promptText:document.getElementById("adminGeoPromptText")?.value,
+          outsideTitle:document.getElementById("adminGeoOutsideTitle")?.value,
+          outsideText:document.getElementById("adminGeoOutsideText")?.value,
+          errorTitle:document.getElementById("adminGeoErrorTitle")?.value,
+          errorText:document.getElementById("adminGeoErrorText")?.value,
+          checkLabel:document.getElementById("adminGeoCheckLabel")?.value,
+          retryLabel:document.getElementById("adminGeoRetryLabel")?.value,
+          adminLabel:document.getElementById("adminGeoAdminLabel")?.value
+        }
       });
     }
 
@@ -4156,7 +4502,18 @@
           placeName:"学校",
           latitude:"",
           longitude:"",
-          radius:500
+          radius:500,
+          messages:{
+            promptTitle:"利用場所を確認します",
+            promptText:"{placeName}から半径{radius}m以内で利用できます。位置情報は距離判定にのみ使用し、保存しません。",
+            outsideTitle:"利用範囲外です",
+            outsideText:"この機能は{placeName}から半径{radius}m以内で利用できます。現在地を確認して、もう一度お試しください。",
+            errorTitle:"位置情報を確認できません",
+            errorText:"ブラウザの設定で位置情報を許可し、もう一度お試しください。",
+            checkLabel:"位置情報を確認して利用する",
+            retryLabel:"もう一度確認する",
+            adminLabel:"管理者ログイン・設定"
+          }
         }
       };
     }
@@ -5071,15 +5428,23 @@
       });
       document.getElementById("adminPerformanceShowHome").addEventListener("change",syncAdminPerformanceFields);
 
-      ["adminGeoEnabled","adminGeoMode","adminGeoPlaceName","adminGeoLatitude","adminGeoLongitude","adminGeoRadius"].forEach(id=>{
+      [
+        "adminGeoEnabled","adminGeoMode","adminGeoPlaceName","adminGeoLatitude","adminGeoLongitude","adminGeoRadius",
+        "adminGeoPromptTitle","adminGeoPromptText","adminGeoOutsideTitle","adminGeoOutsideText",
+        "adminGeoErrorTitle","adminGeoErrorText","adminGeoCheckLabel","adminGeoRetryLabel","adminGeoAdminLabel"
+      ].forEach(id=>{
         document.getElementById(id)?.addEventListener("input",syncAdminGeoAccess);
         document.getElementById(id)?.addEventListener("change",syncAdminGeoAccess);
       });
       document.getElementById("adminGeoUseCurrent")?.addEventListener("click",setAdminGeoFromCurrentLocation);
       document.getElementById("adminGeoTest")?.addEventListener("click",testAdminGeoDistance);
+      document.getElementById("adminGeoPreviewPrompt")?.addEventListener("click",()=>openGeoPreview("prompt"));
+      document.getElementById("adminGeoPreviewOutside")?.addEventListener("click",()=>openGeoPreview("outside"));
+      document.getElementById("adminGeoPreviewError")?.addEventListener("click",()=>openGeoPreview("error"));
 
       document.getElementById("locationCheckButton")?.addEventListener("click",verifyCurrentLocation);
       document.getElementById("locationRetryButton")?.addEventListener("click",verifyCurrentLocation);
+      document.getElementById("locationPreviewCloseButton")?.addEventListener("click",closeGeoPreview);
       document.getElementById("locationAdminButton")?.addEventListener("click",()=>{
         closeLocationGate();
         openAdmin();
@@ -5088,6 +5453,79 @@
       document.getElementById("toggleScheduleButton").addEventListener("click",()=>{
         scheduleExpanded = !scheduleExpanded;
         renderUpcomingSchedule();
+      });
+    }
+
+    function getOuterScrollHost(element){
+      let parent = element.parentElement;
+      while(parent && parent !== document.body && parent !== document.documentElement){
+        const style = window.getComputedStyle(parent);
+        if(/auto|scroll|overlay/.test(style.overflowY)) return parent;
+        parent = parent.parentElement;
+      }
+      return window;
+    }
+
+    function moveOuterScroll(element,delta){
+      let host = getOuterScrollHost(element);
+      while(host){
+        if(host === window){
+          const before = window.scrollY;
+          window.scrollBy(0,delta);
+          return Math.abs(window.scrollY - before) > .5;
+        }
+
+        const before = host.scrollTop;
+        host.scrollTop += delta;
+        if(Math.abs(host.scrollTop - before) > .5) return true;
+
+        if(host.classList.contains("admin-inner") || host.classList.contains("detail-inner")){
+          return false;
+        }
+        host = getOuterScrollHost(host);
+      }
+      return false;
+    }
+
+    function bindNestedScrollHandoff(){
+      document.querySelectorAll("[data-scroll-handoff]").forEach(element=>{
+        if(element.dataset.scrollHandoffBound === "true") return;
+        element.dataset.scrollHandoffBound = "true";
+        let lastTouchY = null;
+
+        element.addEventListener("wheel",event=>{
+          if(!event.deltaY) return;
+          const atTop = element.scrollTop <= 1;
+          const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
+          const leavingTop = event.deltaY < 0 && atTop;
+          const leavingBottom = event.deltaY > 0 && atBottom;
+          if((leavingTop || leavingBottom) && moveOuterScroll(element,event.deltaY)){
+            event.preventDefault();
+          }
+        },{passive:false});
+
+        element.addEventListener("touchstart",event=>{
+          lastTouchY = event.touches[0]?.clientY ?? null;
+        },{passive:true});
+
+        element.addEventListener("touchmove",event=>{
+          const currentY = event.touches[0]?.clientY;
+          if(currentY == null || lastTouchY == null) return;
+          const delta = lastTouchY - currentY;
+          lastTouchY = currentY;
+          if(Math.abs(delta) < .5) return;
+
+          const atTop = element.scrollTop <= 1;
+          const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
+          const leavingTop = delta < 0 && atTop;
+          const leavingBottom = delta > 0 && atBottom;
+          if((leavingTop || leavingBottom) && moveOuterScroll(element,delta)){
+            if(event.cancelable) event.preventDefault();
+          }
+        },{passive:false});
+
+        element.addEventListener("touchend",()=>{lastTouchY = null;},{passive:true});
+        element.addEventListener("touchcancel",()=>{lastTouchY = null;},{passive:true});
       });
     }
 
@@ -5847,6 +6285,7 @@
       renderAllProgress();
       bindSetlistButtons();
       bindAdminControls();
+      bindNestedScrollHandoff();
       bindHiddenAdminCommand();
       refreshGeoRestriction();
     }
