@@ -8,8 +8,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
-  <meta name="application-name" content="UndergrounD UtopiA Portal v22" />
-  <meta name="app-build" content="20260627-v22" />
+  <meta name="application-name" content="UndergrounD UtopiA Portal v23" />
+  <meta name="app-build" content="20260627-v23" />
   <style>
     :root{
       --bg:#0c1214;
@@ -864,6 +864,11 @@
       color:var(--muted);
       font-size:12px;
       line-height:1.75;
+    }
+
+    .medley-list li{
+      font-size:.9em;
+      opacity:.94;
     }
     .medley-list li::before{
       content:"～ ";
@@ -2132,6 +2137,23 @@
     .admin-schedule-row{grid-template-columns:135px minmax(180px,1fr) 105px 105px minmax(180px,1fr) auto}
     .admin-timeline-row{grid-template-columns:105px minmax(180px,1fr) minmax(180px,1fr) auto}
 
+    .admin-timeline-textarea{
+      min-height:74px;
+      resize:vertical;
+      line-height:1.55;
+    }
+
+    .admin-item.medley{
+      border-color:rgba(217,179,122,.44);
+      background:rgba(65,47,32,.34);
+    }
+
+    .admin-medley-textarea{
+      min-height:128px;
+      resize:vertical;
+      line-height:1.7;
+    }
+
     .admin-row-actions{display:flex;gap:6px;align-items:center}
 
     .admin-schedule-field{
@@ -2894,11 +2916,12 @@
           <div class="admin-setlist-head">
             <div>
               <div class="admin-field-label">セットリスト</div>
-              <div class="admin-hint">曲番号は曲の並び順から自動でM-1、M-2…になります。</div>
+              <div class="admin-hint">曲とメドレーは、並び順から自動でM-1、M-2…になります。</div>
             </div>
             <div class="admin-add-actions">
               <button class="admin-btn compact" type="button" data-add-item="section">＋ セクション</button>
               <button class="admin-btn compact" type="button" data-add-item="song">＋ 曲</button>
+              <button class="admin-btn compact" type="button" data-add-item="medley">＋ メドレー</button>
               <button class="admin-btn compact" type="button" data-add-item="mc">＋ MC</button>
             </div>
           </div>
@@ -2934,7 +2957,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260627-v22";
+    const APP_BUILD_VERSION = "20260627-v23";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -4584,11 +4607,13 @@
         if(entry.type === "song"){
           const song = songs.find(item=>item.id===entry.id);
           if(song){
+            const isMedley = Array.isArray(song.medley) && song.medley.length > 0;
             items.push({
               id:`song-${song.id}`,
-              type:"song",
+              type:isMedley ? "medley" : "song",
               title:song.title,
-              detailId:song.id
+              detailId:song.id,
+              medley:isMedley ? [...song.medley] : []
             });
           }
         }
@@ -4638,15 +4663,34 @@
         note:String(item.note || "").trim()
       }));
 
-      normalized.items = normalized.items.map(item=>({
-        id:item.id || makeLocalId(item.type || "item"),
-        type:["section","song","mc"].includes(item.type) ? item.type : "song",
-        label:item.label || "",
-        title:item.title || "",
-        body:item.body || "",
-        detailId:item.detailId || "",
-        sourceSectionId:item.sourceSectionId || ""
-      }));
+      normalized.items = normalized.items.map(item=>{
+        const detailId = item.detailId || "";
+        const detailSong = detailId ? songs.find(song=>song.id===detailId) : null;
+        const hasMedleyField = Object.prototype.hasOwnProperty.call(item,"medley");
+        let medley = [];
+
+        if(Array.isArray(item.medley)){
+          medley = item.medley.map(title=>String(title || "").trim()).filter(Boolean);
+        }else if(typeof item.medley === "string"){
+          medley = item.medley.split(/\r?\n/).map(title=>title.trim()).filter(Boolean);
+        }else if(!hasMedleyField && detailSong && Array.isArray(detailSong.medley)){
+          medley = detailSong.medley.map(title=>String(title || "").trim()).filter(Boolean);
+        }
+
+        let type = ["section","song","medley","mc"].includes(item.type) ? item.type : "song";
+        if(type === "song" && !hasMedleyField && medley.length) type = "medley";
+
+        return {
+          id:item.id || makeLocalId(type || "item"),
+          type,
+          label:item.label || "",
+          title:item.title || "",
+          body:item.body || "",
+          detailId,
+          sourceSectionId:item.sourceSectionId || "",
+          medley
+        };
+      });
 
       return normalized;
     }
@@ -4768,7 +4812,7 @@
           continue;
         }
 
-        if(item.type==="song") songNumber += 1;
+        if(item.type==="song" || item.type==="medley") songNumber += 1;
         if(item.id===itemId) return {item,section:currentSection,songNumber};
       }
 
@@ -4790,6 +4834,14 @@
 
     function renderGenericSongDetail(item, performance, context){
       document.getElementById("detailHeading").textContent = item.title || "曲名未設定";
+      const medleyContents = item.type === "medley" && Array.isArray(item.medley) && item.medley.length
+        ? `
+          <span class="label">メドレー構成</span>
+          <ul class="clean-list">
+            ${item.medley.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}
+          </ul>
+        `
+        : "";
       document.getElementById("detailContent").innerHTML = `
         <div class="card">
           <span class="section-badge">M-${context.songNumber}${context.section ? `｜${escapeHtml(context.section.label)} ${escapeHtml(context.section.title)}` : ""}</span>
@@ -4797,6 +4849,7 @@
           <p class="detail-copy">${escapeHtml(performance.title)}</p>
           <span class="label">日程</span>
           <p class="detail-copy">${escapeHtml(formatPerformanceDate(performance))}</p>
+          ${medleyContents}
         </div>
       `;
       openDetailPanel();
@@ -4830,7 +4883,7 @@
       const context = getItemContext(performance,itemId);
       if(!context) return;
 
-      if(context.item.type==="song"){
+      if(context.item.type==="song" || context.item.type==="medley"){
         const detailSong = context.item.detailId
           ? songs.find(song=>song.id===context.item.detailId)
           : null;
@@ -5050,8 +5103,8 @@
       root.innerHTML = performance.timeline.length ? performance.timeline.map((item,index)=>`
         <div class="admin-timeline-row">
           <input class="admin-input" type="time" value="${escapeHtml(item.time)}" data-timeline-field="time" data-timeline-index="${index}">
-          <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="内容" data-timeline-field="title" data-timeline-index="${index}">
-          <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="補足" data-timeline-field="note" data-timeline-index="${index}">
+          <textarea class="admin-textarea admin-timeline-textarea" placeholder="内容（改行可）" data-timeline-field="title" data-timeline-index="${index}">${escapeHtml(item.title)}</textarea>
+          <textarea class="admin-textarea admin-timeline-textarea" placeholder="補足（改行可）" data-timeline-field="note" data-timeline-index="${index}">${escapeHtml(item.note)}</textarea>
           <div class="admin-row-actions">
             <button class="admin-icon-btn" type="button" data-move-timeline="${index}" data-direction="-1" ${index===0?"disabled":""}>↑</button>
             <button class="admin-icon-btn" type="button" data-move-timeline="${index}" data-direction="1" ${index===performance.timeline.length-1?"disabled":""}>↓</button>
@@ -5118,8 +5171,6 @@
       }
 
       root.innerHTML = performance.items.map((item,index)=>{
-        const typeLabel = item.type==="section" ? "区切り" : item.type==="mc" ? "MC" : "曲";
-
         let fields = "";
         if(item.type==="section"){
           fields = `
@@ -5135,6 +5186,14 @@
               <textarea class="admin-textarea" data-item-field="body" data-item-id="${escapeHtml(item.id)}" placeholder="MC本文">${escapeHtml(item.body)}</textarea>
             </div>
           `;
+        }else if(item.type==="medley"){
+          fields = `
+            <div class="admin-item-fields single">
+              <input class="admin-input" data-item-field="title" data-item-id="${escapeHtml(item.id)}" value="${escapeHtml(item.title)}" placeholder="メドレー名">
+              <textarea class="admin-textarea admin-medley-textarea" data-medley-lines="${escapeHtml(item.id)}" placeholder="メドレー内の曲を1行につき1曲入力">${escapeHtml((item.medley || []).join("\n"))}</textarea>
+              <div class="admin-hint">上の欄は1行につき1曲です。表示時はメドレー名より小さく表示されます。</div>
+            </div>
+          `;
         }else{
           fields = `
             <div class="admin-item-fields single">
@@ -5148,6 +5207,7 @@
             <select class="admin-item-type" data-change-type="${escapeHtml(item.id)}" aria-label="項目種別">
               <option value="section" ${item.type==="section"?"selected":""}>セクション</option>
               <option value="song" ${item.type==="song"?"selected":""}>曲</option>
+              <option value="medley" ${item.type==="medley"?"selected":""}>メドレー</option>
               <option value="mc" ${item.type==="mc"?"selected":""}>MC</option>
             </select>
             ${fields}
@@ -5167,6 +5227,14 @@
         });
       });
 
+      root.querySelectorAll("[data-medley-lines]").forEach(textarea=>{
+        textarea.addEventListener("input",()=>{
+          const item = performance.items.find(entry=>entry.id===textarea.dataset.medleyLines);
+          if(!item) return;
+          item.medley = textarea.value.split(/\r?\n/).map(title=>title.trim()).filter(Boolean);
+        });
+      });
+
       root.querySelectorAll("[data-change-type]").forEach(select=>{
         select.addEventListener("change",()=>{
           const item = performance.items.find(entry=>entry.id===select.dataset.changeType);
@@ -5178,8 +5246,12 @@
           }else if(item.type==="mc"){
             item.title = item.title || "MC";
             item.body = item.body || "";
+          }else if(item.type==="medley"){
+            item.title = item.title || "新しいメドレー";
+            item.medley = Array.isArray(item.medley) ? item.medley : [];
           }else{
             item.title = item.title || "新しい曲";
+            item.medley = [];
           }
           renderAdminItems();
         });
@@ -5213,10 +5285,11 @@
         id:makeLocalId(type),
         type,
         label:type==="section" ? "" : "",
-        title:type==="section" ? "新しいセクション" : type==="mc" ? "MC" : "新しい曲",
+        title:type==="section" ? "新しいセクション" : type==="mc" ? "MC" : type==="medley" ? "新しいメドレー" : "新しい曲",
         body:"",
         detailId:"",
-        sourceSectionId:""
+        sourceSectionId:"",
+        medley:[]
       };
       performance.items.push(item);
       renderAdminItems();
@@ -5243,7 +5316,8 @@
             title:"セクション1",
             body:"",
             detailId:"",
-            sourceSectionId:""
+            sourceSectionId:"",
+            medley:[]
           }
         ]
       };
@@ -5456,77 +5530,168 @@
       });
     }
 
+    function isScrollableY(element){
+      if(!(element instanceof Element)) return false;
+      const style = window.getComputedStyle(element);
+      return /auto|scroll|overlay/.test(style.overflowY)
+        && element.scrollHeight > element.clientHeight + 2;
+    }
+
+    function findScrollableFromTarget(target){
+      let element = target instanceof Element ? target : target?.parentElement;
+      while(element && element !== document.body && element !== document.documentElement){
+        if(isScrollableY(element)) return element;
+        element = element.parentElement;
+      }
+      return null;
+    }
+
     function getOuterScrollHost(element){
-      let parent = element.parentElement;
+      let parent = element?.parentElement;
       while(parent && parent !== document.body && parent !== document.documentElement){
-        const style = window.getComputedStyle(parent);
-        if(/auto|scroll|overlay/.test(style.overflowY)) return parent;
+        if(isScrollableY(parent)) return parent;
         parent = parent.parentElement;
       }
       return window;
     }
 
+    function scrollHostBy(host,delta){
+      if(!host || !Number.isFinite(delta) || Math.abs(delta) < .01) return false;
+
+      if(host === window){
+        const before = window.scrollY;
+        window.scrollBy(0,delta);
+        return Math.abs(window.scrollY - before) > .5;
+      }
+
+      const before = host.scrollTop;
+      host.scrollTop += delta;
+      return Math.abs(host.scrollTop - before) > .5;
+    }
+
     function moveOuterScroll(element,delta){
       let host = getOuterScrollHost(element);
       while(host){
-        if(host === window){
-          const before = window.scrollY;
-          window.scrollBy(0,delta);
-          return Math.abs(window.scrollY - before) > .5;
-        }
-
-        const before = host.scrollTop;
-        host.scrollTop += delta;
-        if(Math.abs(host.scrollTop - before) > .5) return true;
-
-        if(host.classList.contains("admin-inner") || host.classList.contains("detail-inner")){
-          return false;
-        }
+        if(scrollHostBy(host,delta)) return host;
+        if(host === window) break;
         host = getOuterScrollHost(host);
       }
-      return false;
+      return null;
     }
 
     function bindNestedScrollHandoff(){
-      document.querySelectorAll("[data-scroll-handoff]").forEach(element=>{
-        if(element.dataset.scrollHandoffBound === "true") return;
-        element.dataset.scrollHandoffBound = "true";
-        let lastTouchY = null;
+      if(document.documentElement.dataset.globalScrollHandoffBound === "true") return;
+      document.documentElement.dataset.globalScrollHandoffBound = "true";
 
-        element.addEventListener("wheel",event=>{
-          if(!event.deltaY) return;
-          const atTop = element.scrollTop <= 1;
-          const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
-          const leavingTop = event.deltaY < 0 && atTop;
-          const leavingBottom = event.deltaY > 0 && atBottom;
-          if((leavingTop || leavingBottom) && moveOuterScroll(element,event.deltaY)){
-            event.preventDefault();
+      let touchState = null;
+      let inertiaFrame = 0;
+
+      const stopInertia = ()=>{
+        window.cancelAnimationFrame(inertiaFrame);
+        inertiaFrame = 0;
+      };
+
+      const startInertia = (host,velocity)=>{
+        stopInertia();
+        if(!host || Math.abs(velocity) < .06) return;
+
+        let currentVelocity = Math.max(-2.6,Math.min(2.6,velocity));
+        let previousTime = performance.now();
+
+        const step = now=>{
+          const elapsed = Math.min(32,Math.max(8,now - previousTime));
+          previousTime = now;
+          const delta = currentVelocity * elapsed;
+          const moved = scrollHostBy(host,delta);
+          currentVelocity *= Math.pow(.935,elapsed / 16.67);
+
+          if(moved && Math.abs(currentVelocity) >= .025){
+            inertiaFrame = window.requestAnimationFrame(step);
+          }else{
+            inertiaFrame = 0;
           }
-        },{passive:false});
+        };
 
-        element.addEventListener("touchstart",event=>{
-          lastTouchY = event.touches[0]?.clientY ?? null;
-        },{passive:true});
+        inertiaFrame = window.requestAnimationFrame(step);
+      };
 
-        element.addEventListener("touchmove",event=>{
-          const currentY = event.touches[0]?.clientY;
-          if(currentY == null || lastTouchY == null) return;
-          const delta = lastTouchY - currentY;
-          lastTouchY = currentY;
-          if(Math.abs(delta) < .5) return;
+      document.addEventListener("wheel",event=>{
+        if(!event.deltaY) return;
+        const inner = findScrollableFromTarget(event.target);
+        if(!inner) return;
+        const maxScroll = Math.max(0,inner.scrollHeight - inner.clientHeight);
+        const atTop = inner.scrollTop <= 1;
+        const atBottom = inner.scrollTop >= maxScroll - 1;
+        const leavingTop = event.deltaY < 0 && atTop;
+        const leavingBottom = event.deltaY > 0 && atBottom;
+        if(!leavingTop && !leavingBottom) return;
 
-          const atTop = element.scrollTop <= 1;
-          const atBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
-          const leavingTop = delta < 0 && atTop;
-          const leavingBottom = delta > 0 && atBottom;
-          if((leavingTop || leavingBottom) && moveOuterScroll(element,delta)){
-            if(event.cancelable) event.preventDefault();
-          }
-        },{passive:false});
+        const movedHost = moveOuterScroll(inner,event.deltaY);
+        if(movedHost) event.preventDefault();
+      },{passive:false,capture:true});
 
-        element.addEventListener("touchend",()=>{lastTouchY = null;},{passive:true});
-        element.addEventListener("touchcancel",()=>{lastTouchY = null;},{passive:true});
-      });
+      document.addEventListener("touchstart",event=>{
+        stopInertia();
+        const touch = event.touches[0];
+        const inner = findScrollableFromTarget(event.target);
+        if(!touch || !inner){
+          touchState = null;
+          return;
+        }
+
+        touchState = {
+          inner,
+          outer:getOuterScrollHost(inner),
+          lastY:touch.clientY,
+          lastTime:performance.now(),
+          velocity:0,
+          handingOff:false
+        };
+      },{passive:true,capture:true});
+
+      document.addEventListener("touchmove",event=>{
+        if(!touchState) return;
+        const touch = event.touches[0];
+        if(!touch) return;
+
+        const now = performance.now();
+        const delta = touchState.lastY - touch.clientY;
+        const elapsed = Math.max(8,now - touchState.lastTime);
+        touchState.lastY = touch.clientY;
+        touchState.lastTime = now;
+        if(Math.abs(delta) < .2) return;
+
+        const inner = touchState.inner;
+        const maxScroll = Math.max(0,inner.scrollHeight - inner.clientHeight);
+        const atTop = inner.scrollTop <= 1;
+        const atBottom = inner.scrollTop >= maxScroll - 1;
+        const leavingTop = delta < 0 && atTop;
+        const leavingBottom = delta > 0 && atBottom;
+
+        if(!touchState.handingOff && !leavingTop && !leavingBottom) return;
+        touchState.handingOff = true;
+
+        const transferredDelta = delta * 1.18;
+        let host = touchState.outer;
+        if(!scrollHostBy(host,transferredDelta)){
+          host = moveOuterScroll(inner,transferredDelta);
+          if(host) touchState.outer = host;
+        }
+
+        const instantVelocity = transferredDelta / elapsed;
+        touchState.velocity = touchState.velocity * .62 + instantVelocity * .38;
+        if(event.cancelable) event.preventDefault();
+      },{passive:false,capture:true});
+
+      const finishTouch = ()=>{
+        if(touchState?.handingOff){
+          startInertia(touchState.outer,touchState.velocity);
+        }
+        touchState = null;
+      };
+
+      document.addEventListener("touchend",finishTouch,{passive:true,capture:true});
+      document.addEventListener("touchcancel",finishTouch,{passive:true,capture:true});
     }
 
     function bindHiddenAdminCommand(){
@@ -5801,8 +5966,8 @@
               <div class="timeline-view-row">
                 <div class="timeline-view-time">${escapeHtml(item.time || "--:--")}</div>
                 <div>
-                  <div class="timeline-view-title">${escapeHtml(item.title || "内容未設定")}</div>
-                  ${item.note ? `<div class="timeline-view-note">${escapeHtml(item.note)}</div>` : ""}
+                  <div class="timeline-view-title">${nl2br(item.title || "内容未設定")}</div>
+                  ${item.note ? `<div class="timeline-view-note">${nl2br(item.note)}</div>` : ""}
                 </div>
               </div>
             `).join("")}
@@ -5908,8 +6073,11 @@
 
     function renderSongCard(item,performance,songNumber){
       const detailSong = item.detailId ? songs.find(song=>song.id===item.detailId) : null;
-      const medley = detailSong && Array.isArray(detailSong.medley) && detailSong.medley.length
-        ? `<ul class="medley-list">${detailSong.medley.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
+      const medleyTitles = item.type === "medley" && Array.isArray(item.medley)
+        ? item.medley
+        : [];
+      const medley = medleyTitles.length
+        ? `<ul class="medley-list">${medleyTitles.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
         : "";
       const score = detailSong ? `<div class="song-score">${songScore(detailSong.id)}%</div>` : "";
 
@@ -5919,7 +6087,7 @@
             <div class="song-main">
               <div class="song-title-line">
                 <span class="song-number">M-${songNumber}</span>
-                <h3 class="song-title">${escapeHtml(item.title || "曲名未設定")}</h3>
+                <h3 class="song-title">${escapeHtml(item.title || (item.type === "medley" ? "メドレー名未設定" : "曲名未設定"))}</h3>
               </div>
               ${medley}
             </div>
@@ -5957,7 +6125,7 @@
           return;
         }
 
-        if(item.type==="song"){
+        if(item.type==="song" || item.type==="medley"){
           songNumber += 1;
           output.push(renderSongCard(item,performance,songNumber));
         }else if(item.type==="mc"){
@@ -6470,7 +6638,7 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:4,
+          version:5,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
