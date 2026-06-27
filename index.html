@@ -167,11 +167,245 @@
       font-family:Georgia,"Times New Roman","Yu Mincho",serif;
     }
 
-    .depth{
-      font-size:11px;
-      color:var(--muted);
-      text-align:right;
+    .depth-panel{
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:190px;
+      padding:8px 10px 7px;
+      border:1px solid rgba(217,179,122,.34);
+      border-radius:14px;
+      background:
+        linear-gradient(180deg,rgba(20,30,33,.70),rgba(7,13,15,.66));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 8px 20px rgba(0,0,0,.20);
+      backdrop-filter:blur(8px) saturate(.85);
+      -webkit-backdrop-filter:blur(8px) saturate(.85);
+    }
+
+    .depth-gauge{
+      position:relative;
+      width:68px;
+      height:43px;
+      flex:0 0 68px;
+      overflow:hidden;
+    }
+
+    .depth-arc{
+      position:absolute;
+      left:4px;
+      top:5px;
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      background:
+        repeating-conic-gradient(
+          from 222deg,
+          rgba(217,179,122,.64) 0deg 2deg,
+          transparent 2deg 13deg
+        );
+      -webkit-mask:
+        radial-gradient(circle at center,transparent 0 47%,#000 48% 56%,transparent 57%),
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite:source-in;
+      mask:
+        radial-gradient(circle at center,transparent 0 47%,#000 48% 56%,transparent 57%),
+        linear-gradient(#000 0 0);
+      mask-composite:intersect;
+      opacity:.75;
+      clip-path:inset(0 0 28px 0);
+    }
+
+    .depth-gauge::after{
+      content:"";
+      position:absolute;
+      left:10px;
+      bottom:1px;
+      width:48px;
+      height:24px;
+      border:1px solid rgba(217,179,122,.20);
+      border-bottom:0;
+      border-radius:48px 48px 0 0;
+      box-shadow:inset 0 0 14px rgba(217,179,122,.035);
+    }
+
+    .depth-needle{
+      position:absolute;
+      left:50%;
+      bottom:2px;
+      width:1px;
+      height:1px;
+      transform:rotate(-35deg);
+      transform-origin:center center;
+      transition:transform .78s cubic-bezier(.22,.8,.22,1);
+      z-index:2;
+    }
+
+    .depth-needle-arm{
+      position:absolute;
+      left:-1px;
+      bottom:0;
+      width:2px;
+      height:28px;
+      border-radius:999px;
+      background:linear-gradient(180deg,#f0c58b,#a9663e);
+      box-shadow:0 0 7px rgba(217,179,122,.30);
+      transform-origin:50% 100%;
+      animation:depthNeedleIdle 3.2s ease-in-out infinite;
+    }
+
+    @keyframes depthNeedleIdle{
+      0%,100%{transform:rotate(-.6deg)}
+      50%{transform:rotate(.8deg)}
+    }
+
+    .depth-hub{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:9px;
+      height:9px;
+      transform:translate(-50%,50%);
+      border:1px solid rgba(239,232,219,.58);
+      border-radius:50%;
+      background:#8b5c3d;
+      box-shadow:0 0 0 3px rgba(8,14,16,.86);
+      z-index:3;
+    }
+
+    .depth-readout{
+      min-width:0;
+      display:grid;
+      grid-template-columns:auto;
+      justify-items:end;
+      line-height:1.08;
       white-space:nowrap;
+    }
+
+    .depth-label{
+      color:var(--muted);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:9px;
+      letter-spacing:.18em;
+    }
+
+    .depth-readout strong{
+      margin-top:2px;
+      color:var(--ivory);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:18px;
+      font-weight:600;
+      font-variant-numeric:tabular-nums;
+      letter-spacing:.02em;
+    }
+
+    .depth-sector{
+      margin-top:3px;
+      color:var(--copper);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:8px;
+      letter-spacing:.10em;
+    }
+
+    .depth-signal{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      margin-top:4px;
+      color:#9daa9f;
+      font-family:Arial,sans-serif;
+      font-size:7px;
+      letter-spacing:.10em;
+    }
+
+    .depth-signal i{
+      width:5px;
+      height:5px;
+      border-radius:50%;
+      background:#7fa37f;
+      box-shadow:0 0 7px rgba(127,163,127,.55);
+      animation:depthSignalPulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes depthSignalPulse{
+      0%,100%{opacity:.45;transform:scale(.88)}
+      50%{opacity:1;transform:scale(1)}
+    }
+
+    @media (max-width:560px){
+      .brand{
+        gap:8px;
+      }
+
+      .depth-panel{
+        min-width:128px;
+        gap:6px;
+        padding:6px 7px;
+        border-radius:12px;
+      }
+
+      .depth-gauge{
+        width:48px;
+        height:32px;
+        flex-basis:48px;
+      }
+
+      .depth-arc{
+        left:3px;
+        top:3px;
+        width:42px;
+        height:42px;
+        clip-path:inset(0 0 19px 0);
+      }
+
+      .depth-gauge::after{
+        left:6px;
+        width:36px;
+        height:18px;
+        border-radius:36px 36px 0 0;
+      }
+
+      .depth-needle-arm{
+        height:20px;
+      }
+
+      .depth-hub{
+        width:7px;
+        height:7px;
+      }
+
+      .depth-readout strong{
+        font-size:14px;
+      }
+
+      .depth-label{
+        font-size:7px;
+      }
+
+      .depth-sector{
+        font-size:6.5px;
+      }
+
+      .depth-signal{
+        display:none;
+      }
+    }
+
+    @media (max-width:390px){
+      .depth-sector{
+        display:none;
+      }
+
+      .depth-panel{
+        min-width:104px;
+      }
+
+      .depth-gauge{
+        width:42px;
+        flex-basis:42px;
+      }
     }
 
     main{display:block}
@@ -1885,7 +2119,21 @@
           <h1 class="brand-title">UndergrounD UtopiA</h1>
           <p class="brand-sub">地下住人専用端末</p>
         </div>
-        <div class="depth">DEPTH<br><strong>-135m</strong></div>
+        <div class="depth-panel" aria-label="現在の深度">
+          <div class="depth-gauge" aria-hidden="true">
+            <div class="depth-arc"></div>
+            <div id="depthNeedle" class="depth-needle">
+              <span class="depth-needle-arm"></span>
+            </div>
+            <span class="depth-hub"></span>
+          </div>
+          <div class="depth-readout">
+            <span class="depth-label">DEPTH</span>
+            <strong id="depthValue">-135 m</strong>
+            <span id="depthSector" class="depth-sector">SECTOR U-13</span>
+            <span class="depth-signal"><i></i>SIGNAL ONLINE</span>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -4715,12 +4963,64 @@
       });
     }
 
+    const depthProfiles = {
+      home:{depth:-135,sector:"SECTOR U-13",angle:-35},
+      songs:{depth:-240,sector:"SECTOR S-24",angle:-6},
+      story:{depth:-480,sector:"SECTOR A-48",angle:52},
+      progress:{depth:-310,sector:"SECTOR P-31",angle:18}
+    };
+
+    let currentDepthValue = -135;
+    let depthAnimationFrame = 0;
+
+    function updateDepthPanel(pageName,animate=true){
+      const profile = depthProfiles[pageName] || depthProfiles.home;
+      const valueElement = document.getElementById("depthValue");
+      const sectorElement = document.getElementById("depthSector");
+      const needleElement = document.getElementById("depthNeedle");
+
+      if(!valueElement || !sectorElement || !needleElement) return;
+
+      needleElement.style.transform = `rotate(${profile.angle}deg)`;
+      sectorElement.textContent = profile.sector;
+
+      window.cancelAnimationFrame(depthAnimationFrame);
+
+      if(!animate){
+        currentDepthValue = profile.depth;
+        valueElement.textContent = `${profile.depth} m`;
+        return;
+      }
+
+      const startValue = currentDepthValue;
+      const targetValue = profile.depth;
+      const startTime = performance.now();
+      const duration = 680;
+
+      const tick = (now)=>{
+        const progressValue = Math.min(1,(now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - progressValue,3);
+        const displayed = Math.round(startValue + (targetValue - startValue) * eased);
+        valueElement.textContent = `${displayed} m`;
+
+        if(progressValue < 1){
+          depthAnimationFrame = window.requestAnimationFrame(tick);
+        }else{
+          currentDepthValue = targetValue;
+          valueElement.textContent = `${targetValue} m`;
+        }
+      };
+
+      depthAnimationFrame = window.requestAnimationFrame(tick);
+    }
+
     function switchPage(pageName){
       document.body.classList.add("home-active");
       document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.remove("active"));
       document.getElementById(`page-${pageName}`).classList.add("active");
       document.querySelector(`.nav-btn[data-page="${pageName}"]`).classList.add("active");
+      updateDepthPanel(pageName,true);
       window.scrollTo({top:0,behavior:"smooth"});
       if(pageName==="progress"){
         renderProgressEditor();
@@ -4780,6 +5080,7 @@
 
     async function initializeApp(){
       applyPosterBackground();
+      updateDepthPanel("home",false);
       await initializePerformanceCatalog();
       initializeHomeData();
       normalizeProgress();
