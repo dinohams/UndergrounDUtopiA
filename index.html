@@ -1539,14 +1539,8 @@
     }
 
     .countdown-card::after{
-      content:"";
-      position:absolute;
-      width:96px;
-      height:96px;
-      border:12px dotted rgba(217,179,122,.10);
-      border-radius:50%;
-      right:-36px;
-      top:-34px;
+      display:none;
+      content:none;
     }
 
     .countdown-performance-title{
@@ -1851,7 +1845,22 @@
     }
 
     .admin-timeline-head{margin-top:18px}
-    .admin-global-footer{position:sticky;bottom:0;margin-top:16px;padding:12px 0;background:linear-gradient(180deg,transparent,rgba(8,14,16,.96) 24%)}
+    .admin-global-footer{
+      position:sticky;
+      bottom:0;
+      z-index:50;
+      margin-top:16px;
+      padding:18px 0 12px;
+      background:linear-gradient(180deg,transparent,rgba(8,14,16,.98) 24%);
+      pointer-events:auto !important;
+    }
+
+    #firebasePublish{
+      position:relative;
+      z-index:60;
+      pointer-events:auto !important;
+      touch-action:manipulation;
+    }
 
     @media (max-width:780px){
       .admin-dashboard-grid{grid-template-columns:1fr}
@@ -2119,7 +2128,12 @@
         <div class="admin-footer-actions admin-global-footer">
           <button id="adminCancel" class="admin-btn ghost" type="button">変更を破棄</button>
           <button id="adminSave" class="admin-btn secondary" type="button">この端末に下書き保存</button>
-          <button id="firebasePublish" class="admin-btn primary" type="button">全員へ反映</button>
+          <button
+            id="firebasePublish"
+            class="admin-btn primary"
+            type="button"
+            onclick="if(typeof window.utopiaPublishNow==='function'){window.utopiaPublishNow();}else{alert('Firebase接続を準備中です。数秒待ってからもう一度押してください。');}"
+          >全員へ反映</button>
         </div>
       </div>
     </div>
@@ -4911,6 +4925,8 @@
     }
 
     async function publishSetlists(){
+      setDataStatus("「全員へ反映」を受け付けました。確認しています…", "warning");
+
       if(!currentFirebaseUser){
         setDataStatus("先にGoogleで管理者ログインしてください。", "warning");
         alert("先にGoogleで管理者ログインしてください。");
@@ -4923,7 +4939,8 @@
       }
       const bridge = window.utopiaSetlistApp;
       if(!bridge){
-        alert("アプリの準備が終わっていません。少し待ってから再度お試しください。");
+        setDataStatus("アプリ本体の準備が終わっていません。", "warning");
+        alert("アプリの準備が終わっていません。ページを再読み込みしてから再度お試しください。");
         return;
       }
 
@@ -5003,7 +5020,9 @@
         prompt("このUIDをコピーしてください。", currentFirebaseUser.uid);
       }
     });
-    publishButton?.addEventListener("click", publishSetlists);
+    // HTMLボタンのonclickから直接呼び出す。
+    // addEventListenerとの二重実行を避けるため、公開関数だけをwindowへ登録する。
+    window.utopiaPublishNow = publishSetlists;
 
     try{
       await setPersistence(auth, browserLocalPersistence);
