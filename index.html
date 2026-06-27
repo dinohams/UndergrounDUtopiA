@@ -2055,10 +2055,20 @@
     }
 
     .admin-simple-row{grid-template-columns:1fr auto}
-    .admin-schedule-row{grid-template-columns:135px 105px minmax(180px,1fr) minmax(180px,1fr) auto}
+    .admin-schedule-row{grid-template-columns:135px minmax(180px,1fr) 105px 105px minmax(180px,1fr) auto}
     .admin-timeline-row{grid-template-columns:105px minmax(180px,1fr) minmax(180px,1fr) auto}
 
     .admin-row-actions{display:flex;gap:6px;align-items:center}
+
+    .admin-schedule-field{
+      min-width:0;
+    }
+
+    .admin-schedule-field .admin-field-label{
+      margin-bottom:5px;
+      font-size:10px;
+      letter-spacing:.05em;
+    }
 
     .admin-checkbox-field{
       display:flex;
@@ -3512,8 +3522,9 @@
           ? source.schedule.map(item=>({
               id:item.id || makeLocalId("schedule"),
               date:item.date || "",
-              time:item.time || "",
               title:String(item.title || "").trim(),
+              startTime:item.startTime ?? item.time ?? "",
+              endTime:item.endTime || "",
               note:String(item.note || "").trim()
             }))
           : []
@@ -3957,10 +3968,26 @@
       const items = adminWorkingHome.schedule;
       root.innerHTML = items.length ? items.map((item,index)=>`
         <div class="admin-schedule-row" data-admin-schedule-id="${escapeHtml(item.id)}">
-          <input class="admin-input" type="date" value="${escapeHtml(item.date)}" data-schedule-field="date" data-schedule-index="${index}">
-          <input class="admin-input" type="time" value="${escapeHtml(item.time)}" data-schedule-field="time" data-schedule-index="${index}">
-          <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="予定名" data-schedule-field="title" data-schedule-index="${index}">
-          <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="補足" data-schedule-field="note" data-schedule-index="${index}">
+          <label class="admin-schedule-field">
+            <span class="admin-field-label">日時</span>
+            <input class="admin-input" type="date" value="${escapeHtml(item.date)}" data-schedule-field="date" data-schedule-index="${index}">
+          </label>
+          <label class="admin-schedule-field">
+            <span class="admin-field-label">予定名</span>
+            <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="例：通常練習" data-schedule-field="title" data-schedule-index="${index}">
+          </label>
+          <label class="admin-schedule-field">
+            <span class="admin-field-label">開始時間</span>
+            <input class="admin-input" type="time" value="${escapeHtml(item.startTime || "")}" data-schedule-field="startTime" data-schedule-index="${index}">
+          </label>
+          <label class="admin-schedule-field">
+            <span class="admin-field-label">終了時間</span>
+            <input class="admin-input" type="time" value="${escapeHtml(item.endTime || "")}" data-schedule-field="endTime" data-schedule-index="${index}">
+          </label>
+          <label class="admin-schedule-field">
+            <span class="admin-field-label">補足</span>
+            <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="任意" data-schedule-field="note" data-schedule-index="${index}">
+          </label>
           <div class="admin-row-actions">
             <button class="admin-icon-btn" type="button" data-delete-schedule="${index}" title="削除">×</button>
           </div>
@@ -4034,7 +4061,7 @@
     }
 
     function addAdminScheduleItem(){
-      adminWorkingHome.schedule.push({id:makeLocalId("schedule"),date:"",time:"",title:"",note:""});
+      adminWorkingHome.schedule.push({id:makeLocalId("schedule"),date:"",title:"",startTime:"",endTime:"",note:""});
       renderAdminScheduleItems();
     }
 
@@ -4525,7 +4552,7 @@
         .filter(item=>item.date && item.date >= todayKey)
         .sort((a,b)=>{
           const dateCompare = scheduleDateKey(a).localeCompare(scheduleDateKey(b));
-          return dateCompare || String(a.time).localeCompare(String(b.time));
+          return dateCompare || String(a.startTime || "").localeCompare(String(b.startTime || ""));
         });
       const groups = [];
       entries.forEach(item=>{
@@ -4545,6 +4572,16 @@
       return new Intl.DateTimeFormat("ja-JP",{month:"numeric",day:"numeric",weekday:"short"}).format(date);
     }
 
+    function formatScheduleTimeRange(item){
+      const start = String(item?.startTime || "").trim();
+      const end = String(item?.endTime || "").trim();
+
+      if(start && end) return `${start}～${end}`;
+      if(start) return `${start}～`;
+      if(end) return `～${end}`;
+      return "～";
+    }
+
     function renderUpcomingSchedule(){
       const root = document.getElementById("upcomingScheduleList");
       const button = document.getElementById("toggleScheduleButton");
@@ -4557,7 +4594,7 @@
           <div class="schedule-events">
             ${group.items.map(item=>`
               <div class="schedule-event">
-                <span class="schedule-time">${escapeHtml(item.time || "終日")}</span>
+                <span class="schedule-time">${escapeHtml(formatScheduleTimeRange(item))}</span>
                 <span class="schedule-event-title">
                   ${escapeHtml(item.title || "予定")}
                   ${item.note ? `<small class="schedule-event-note">${escapeHtml(item.note)}</small>` : ""}
