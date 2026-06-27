@@ -1497,14 +1497,32 @@
        ホーム情報ダッシュボード
        ========================================= */
     .countdown-list{
-      display:grid;
+      display:flex;
+      flex-wrap:nowrap;
       gap:14px;
       margin-bottom:14px;
+      overflow-x:auto;
+      padding-bottom:4px;
+      scroll-snap-type:x proximity;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(217,179,122,.42) transparent;
+    }
+
+    .countdown-list::-webkit-scrollbar{
+      height:6px;
+    }
+
+    .countdown-list::-webkit-scrollbar-thumb{
+      background:rgba(217,179,122,.42);
+      border-radius:999px;
     }
 
     .countdown-card{
       position:relative;
       overflow:hidden;
+      flex:1 0 300px;
+      min-width:0;
+      scroll-snap-align:start;
       border:1px solid rgba(217,179,122,.48);
       border-radius:22px;
       padding:18px 20px;
@@ -1512,6 +1530,12 @@
       box-shadow:0 14px 32px rgba(0,0,0,.28);
       backdrop-filter:blur(8px) saturate(.9);
       -webkit-backdrop-filter:blur(8px) saturate(.9);
+    }
+
+    @media (max-width:680px){
+      .countdown-card{
+        flex-basis:84vw;
+      }
     }
 
     .countdown-card::after{
@@ -4172,6 +4196,15 @@
       return extra ? `${label}　｜　${extra}` : label;
     }
 
+    function formatCountdownDate(performance){
+      if(!performance?.date) return "日程未設定";
+      const date = new Date(`${performance.date}T00:00:00`);
+      if(Number.isNaN(date.getTime())) return performance.date;
+      return new Intl.DateTimeFormat("ja-JP",{
+        year:"numeric",month:"long",day:"numeric",weekday:"short"
+      }).format(date);
+    }
+
     function daysUntilPerformance(performance){
       if(!performance?.date) return null;
       const time = performance.time || "00:00";
@@ -4208,7 +4241,7 @@
               <span class="countdown-prefix">本番まで残り</span>
               <span class="countdown-days">${dayText}</span>
             </div>
-            <div class="countdown-date">${escapeHtml(formatHomePerformanceDate(performance))}</div>
+            <div class="countdown-date">${escapeHtml(formatCountdownDate(performance))}</div>
           </article>
         `;
       }).join("");
