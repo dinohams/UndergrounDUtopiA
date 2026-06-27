@@ -1255,12 +1255,9 @@
        複数本番・隠し管理画面
        ========================================= */
     .performance-toolbar{
-      display:grid;
-      grid-template-columns:auto minmax(220px,1fr);
-      align-items:center;
-      gap:8px 14px;
+      display:block;
       margin:0 0 14px;
-      padding:15px 16px;
+      padding:18px 20px;
       border:1px solid rgba(217,179,122,.44);
       border-radius:16px;
       background:linear-gradient(180deg,rgba(10,17,20,.58),rgba(9,15,17,.46));
@@ -1269,30 +1266,36 @@
       -webkit-backdrop-filter:blur(8px) saturate(.9);
     }
 
-    .performance-label{
-      color:var(--copper);
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.08em;
-    }
-
-    .performance-select{
-      width:100%;
-      min-width:0;
-      border:1px solid rgba(217,179,122,.40);
-      border-radius:11px;
-      padding:11px 38px 11px 12px;
+    .performance-title{
+      margin:0;
       color:var(--ivory);
-      background:rgba(8,14,16,.76);
-      font-family:inherit;
-      font-size:16px;
+      font-size:22px;
+      line-height:1.35;
+      font-weight:700;
+      letter-spacing:.02em;
     }
 
-    .performance-date{
-      grid-column:1 / -1;
+    .performance-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px 18px;
+      margin-top:10px;
       color:#ddd6ca;
       font-size:13px;
       line-height:1.65;
+    }
+
+    .performance-date,
+    .performance-venue{
+      color:#ddd6ca;
+    }
+
+    .performance-venue:empty{
+      display:none;
+    }
+
+    .performance-tabs{
+      margin-bottom:2px;
     }
 
     .admin-panel{
@@ -1568,11 +1571,16 @@
 
     @media (max-width:760px){
       .performance-toolbar{
-        grid-template-columns:1fr;
+        padding:16px;
       }
 
-      .performance-date{
-        grid-column:auto;
+      .performance-title{
+        font-size:20px;
+      }
+
+      .performance-meta{
+        display:grid;
+        gap:3px;
       }
 
       .admin-inner{
@@ -2246,12 +2254,14 @@
         <h2 class="page-title">セットリスト</h2>
 
         <div class="performance-toolbar">
-          <label class="performance-label" for="performanceSelect">本番を選ぶ</label>
-          <select id="performanceSelect" class="performance-select" aria-label="表示する本番を選択"></select>
-          <div id="performanceDate" class="performance-date"></div>
+          <h3 id="performanceTitle" class="performance-title"></h3>
+          <div class="performance-meta">
+            <span id="performanceDate" class="performance-date"></span>
+            <span id="performanceVenue" class="performance-venue"></span>
+          </div>
         </div>
 
-        <div id="songFilters" class="filters"></div>
+        <div id="songFilters" class="filters performance-tabs" aria-label="本番を切り替える"></div>
         <div id="songList" class="song-list"></div>
       </section>
 
@@ -3765,28 +3775,34 @@
       return parts.join("　｜　") || "日程未設定";
     }
 
+    function formatPerformanceHeaderDate(performance){
+      if(!performance) return "";
+      const parts = [];
+      if(performance.date){
+        const date = new Date(`${performance.date}T00:00:00`);
+        parts.push(Number.isNaN(date.getTime())
+          ? performance.date
+          : new Intl.DateTimeFormat("ja-JP",{
+              year:"numeric",
+              month:"long",
+              day:"numeric",
+              weekday:"short"
+            }).format(date)
+        );
+      }
+      if(performance.time) parts.push(`開演 ${performance.time}`);
+      return parts.join("　｜　") || "日程未設定";
+    }
+
     function renderPerformanceSelector(){
-      const select = document.getElementById("performanceSelect");
-      if(!select) return;
-
-      select.innerHTML = performanceCatalog.map(performance=>`
-        <option value="${escapeHtml(performance.id)}" ${performance.id===activePerformanceId?"selected":""}>
-          ${escapeHtml(performance.title)}
-        </option>
-      `).join("");
-
       const performance = getActivePerformance();
-      document.getElementById("performanceDate").textContent = performance ? formatPerformanceDate(performance) : "";
+      const title = document.getElementById("performanceTitle");
+      const date = document.getElementById("performanceDate");
+      const venue = document.getElementById("performanceVenue");
 
-      select.onchange = ()=>{
-        activePerformanceId = select.value;
-        activeFilter = "all";
-        localStorage.setItem(activePerformanceStorageKey, activePerformanceId);
-        renderPerformanceSelector();
-        renderFilters();
-        renderSongs();
-        renderHomeDashboard();
-      };
+      if(title) title.textContent = performance?.title || "本番未登録";
+      if(date) date.textContent = performance ? formatPerformanceHeaderDate(performance) : "";
+      if(venue) venue.textContent = performance?.venue || "";
     }
 
     function getPerformanceSections(performance){
@@ -4780,24 +4796,27 @@
     }
 
     function renderFilters(){
-      const performance = getActivePerformance();
-      const filters = [{id:"all",title:"すべて"},...getPerformanceSections(performance).map(section=>({
-        id:section.id,
-        title:[section.label,section.title].filter(Boolean).join(" ")
-      }))];
-
       const root = document.getElementById("songFilters");
-      root.innerHTML = filters.map(item=>`
-        <button class="filter-btn ${activeFilter===item.id?"active":""}" data-filter="${escapeHtml(item.id)}">
-          ${escapeHtml(item.title)}
+      if(!root) return;
+
+      root.innerHTML = performanceCatalog.map(performance=>`
+        <button
+          class="filter-btn ${performance.id===activePerformanceId?"active":""}"
+          data-performance-tab="${escapeHtml(performance.id)}"
+        >
+          ${escapeHtml(performance.title)}
         </button>
       `).join("");
 
-      root.querySelectorAll("[data-filter]").forEach(btn=>{
-        btn.addEventListener("click",()=>{
-          activeFilter = btn.dataset.filter;
+      root.querySelectorAll("[data-performance-tab]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          activePerformanceId = button.dataset.performanceTab;
+          activeFilter = "all";
+          localStorage.setItem(activePerformanceStorageKey, activePerformanceId);
+          renderPerformanceSelector();
           renderFilters();
           renderSongs();
+          renderHomeDashboard();
         });
       });
     }
@@ -4853,37 +4872,23 @@
         return;
       }
 
-      const html = [];
-      let currentSection = null;
+      const output = [];
       let songNumber = 0;
-      let visibleCount = 0;
 
       performance.items.forEach(item=>{
-        if(item.type==="section"){
-          currentSection = item;
-          if(activeFilter==="all" || activeFilter===item.id){
-            html.push(renderSectionHeader(item));
-            visibleCount += 1;
-          }
-          return;
-        }
-
-        if(item.type==="song") songNumber += 1;
-        const isVisible = activeFilter==="all" || (currentSection && activeFilter===currentSection.id);
-        if(!isVisible) return;
+        if(item.type==="section") return;
 
         if(item.type==="song"){
-          html.push(renderSongCard(item,performance,songNumber));
-          visibleCount += 1;
+          songNumber += 1;
+          output.push(renderSongCard(item,performance,songNumber));
         }else if(item.type==="mc"){
-          html.push(renderMcCard(item));
-          visibleCount += 1;
+          output.push(renderMcCard(item));
         }
       });
 
-      root.innerHTML = visibleCount
-        ? html.join("")
-        : `<div class="empty">このセクションには、まだ項目が登録されていません。</div>`;
+      root.innerHTML = output.length
+        ? output.join("")
+        : `<div class="empty">この本番には、まだセットリストが登録されていません。</div>`;
 
       bindSetlistButtons();
     }
