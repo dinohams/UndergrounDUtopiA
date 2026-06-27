@@ -8,8 +8,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
-  <meta name="application-name" content="UndergrounD UtopiA Portal v23" />
-  <meta name="app-build" content="20260627-v23" />
+  <meta name="application-name" content="UndergrounD UtopiA Portal v24" />
+  <meta name="app-build" content="20260627-v24" />
   <style>
     :root{
       --bg:#0c1214;
@@ -2518,6 +2518,323 @@
       }
     }
 
+
+    /* =========================================
+       v24：スマホ管理画面・単独時程・楽曲詳細編集
+       ========================================= */
+    .admin-title-mobile,
+    .admin-head-action{
+      display:none;
+    }
+
+    .admin-head-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex:0 0 auto;
+    }
+
+    .admin-standalone-timelines{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .admin-standalone-card{
+      border:1px solid rgba(217,179,122,.28);
+      border-radius:13px;
+      background:rgba(12,20,23,.62);
+      overflow:hidden;
+    }
+
+    .admin-standalone-card > summary{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 14px;
+      cursor:pointer;
+      color:var(--ivory);
+      list-style:none;
+    }
+
+    .admin-standalone-card > summary::-webkit-details-marker{display:none}
+    .admin-standalone-card > summary::after{
+      content:"＋";
+      color:var(--copper);
+      font-size:18px;
+    }
+    .admin-standalone-card[open] > summary::after{content:"−"}
+
+    .admin-standalone-summary-title{
+      display:block;
+      font-weight:800;
+      line-height:1.45;
+    }
+
+    .admin-standalone-summary-date{
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .admin-standalone-body{
+      padding:0 12px 13px;
+      border-top:1px solid rgba(217,179,122,.16);
+    }
+
+    .admin-standalone-meta{
+      display:grid;
+      grid-template-columns:minmax(0,1.4fr) 150px minmax(0,1fr);
+      gap:9px;
+      padding-top:12px;
+    }
+
+    .admin-standalone-actions{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .admin-detail-editor .admin-textarea{
+      min-height:110px;
+    }
+
+    .song-detail-edit-note{
+      margin:0 0 12px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.65;
+    }
+
+    .song-detail-edit-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin-top:12px;
+    }
+
+    .song-detail-edit-actions .btn{margin-top:0}
+
+    @media (max-width:780px){
+      .admin-inner{
+        padding:8px 10px 18px;
+      }
+
+      .admin-head{
+        gap:7px;
+        padding:7px 0 9px;
+        background:rgba(8,14,16,.97);
+      }
+
+      .admin-head-copy{
+        min-width:74px;
+        flex:1 1 auto;
+      }
+
+      .admin-head-copy .eyebrow,
+      .admin-title-desktop{
+        display:none;
+      }
+
+      .admin-title-mobile{
+        display:inline;
+      }
+
+      .admin-title{
+        font-size:18px;
+        line-height:1.2;
+        white-space:nowrap;
+      }
+
+      .admin-head-actions{
+        gap:5px;
+      }
+
+      .admin-head-action,
+      .admin-close-btn{
+        display:grid;
+        place-items:center;
+        width:44px;
+        height:44px;
+        padding:0;
+        border:1px solid rgba(111,135,145,.48);
+        border-radius:10px;
+        background:rgba(20,37,43,.86);
+        color:var(--ivory);
+        font-family:inherit;
+        font-size:10px;
+        font-weight:800;
+        line-height:1;
+      }
+
+      .admin-head-action.publish{
+        border-color:rgba(217,179,122,.68);
+        background:linear-gradient(180deg,#b97e50,#845437);
+      }
+
+      .admin-note{
+        margin-bottom:10px;
+        padding:9px 11px;
+        font-size:11px;
+        line-height:1.6;
+      }
+
+      .firebase-admin-box{
+        margin-bottom:10px;
+        padding:10px 11px;
+        gap:8px;
+      }
+
+      .admin-tabs{
+        margin:10px 0;
+      }
+
+      .admin-dashboard-grid{
+        gap:10px;
+      }
+
+      .admin-dashboard-card{
+        padding:9px;
+        border-radius:13px;
+      }
+
+      .admin-dashboard-card > .admin-setlist-head{
+        flex-direction:row;
+        align-items:center;
+        gap:8px;
+        margin:0 0 7px;
+        padding-top:0;
+        border-top:0;
+      }
+
+      .admin-dashboard-card > .admin-setlist-head .admin-hint{
+        display:none;
+      }
+
+      .admin-dashboard-card > .admin-setlist-head .admin-field-label{
+        margin-bottom:0;
+        font-size:12px;
+      }
+
+      .admin-simple-list,
+      .admin-schedule-editor,
+      .admin-timeline-editor{
+        gap:6px;
+        margin-top:6px;
+      }
+
+      .admin-simple-row{
+        grid-template-columns:minmax(0,1fr) 36px;
+        gap:6px;
+        padding:6px;
+      }
+
+      .admin-simple-row .admin-input{
+        min-height:38px;
+        padding:7px 9px;
+      }
+
+      .admin-icon-btn{
+        width:36px;
+        height:36px;
+      }
+
+      .admin-schedule-row{
+        grid-template-columns:minmax(98px,.9fr) minmax(76px,.8fr) minmax(0,1fr) 36px;
+        grid-template-areas:
+          "date title title delete"
+          "start end note note";
+        gap:6px;
+        padding:7px;
+      }
+
+      .admin-schedule-row .schedule-date{grid-area:date}
+      .admin-schedule-row .schedule-title{grid-area:title}
+      .admin-schedule-row .schedule-start{grid-area:start}
+      .admin-schedule-row .schedule-end{grid-area:end}
+      .admin-schedule-row .schedule-note{grid-area:note}
+      .admin-schedule-row .admin-row-actions{grid-area:delete}
+
+      .admin-schedule-row .admin-input{
+        min-height:36px;
+        padding:6px 7px;
+        font-size:12px;
+      }
+
+      .admin-schedule-row .admin-field-label{
+        margin-bottom:3px;
+        font-size:8px;
+      }
+
+      .admin-schedule-row .admin-row-actions{
+        justify-content:flex-end;
+      }
+
+      .admin-global-footer{
+        display:none;
+      }
+
+      .admin-standalone-meta{
+        grid-template-columns:1fr 130px;
+      }
+
+      .admin-standalone-meta .standalone-venue{
+        grid-column:1/-1;
+      }
+
+      .admin-standalone-card > summary{
+        padding:9px 11px;
+      }
+
+      .admin-standalone-body{
+        padding:0 8px 9px;
+      }
+
+      .admin-standalone-card .admin-timeline-row{
+        grid-template-columns:72px minmax(0,1fr) 36px;
+        grid-template-areas:
+          "time title actions"
+          "note note note";
+        gap:6px;
+        padding:7px;
+      }
+
+      .admin-standalone-card .standalone-item-time{grid-area:time}
+      .admin-standalone-card .standalone-item-title{grid-area:title}
+      .admin-standalone-card .standalone-item-note{grid-area:note}
+      .admin-standalone-card .admin-row-actions{grid-area:actions}
+
+      .admin-standalone-card .admin-timeline-textarea{
+        min-height:42px;
+        padding:7px 8px;
+        font-size:12px;
+      }
+    }
+
+    @media (max-width:420px){
+      .admin-title{font-size:16px}
+      .admin-head-action,
+      .admin-close-btn{
+        width:41px;
+        height:41px;
+        font-size:9px;
+      }
+      .admin-head-actions{gap:4px}
+      .admin-schedule-row{
+        grid-template-columns:minmax(88px,.9fr) minmax(70px,.75fr) minmax(0,1fr) 34px;
+      }
+      .admin-standalone-meta{
+        grid-template-columns:1fr;
+      }
+      .admin-standalone-meta .standalone-venue{
+        grid-column:auto;
+      }
+    }
+
   </style>
 </head>
 <body class="home-active">
@@ -2557,7 +2874,7 @@
         </div>
 
         <div class="card home-information-card" id="performanceTimetableCard">
-          <h2 class="card-title today-heading">本番のタイムスケジュール</h2>
+          <h2 class="card-title today-heading">タイムスケジュール</h2>
           <div id="performanceTimetableList" class="performance-timetable-list"></div>
         </div>
 
@@ -2657,16 +2974,24 @@
   <aside id="adminPanel" class="admin-panel" aria-hidden="true">
     <div class="admin-inner">
       <div class="admin-head">
-        <div>
+        <div class="admin-head-copy">
           <div class="eyebrow">HIDDEN ADMIN MODE</div>
-          <h2 class="admin-title">地下住人専用端末 管理画面</h2>
+          <h2 class="admin-title">
+            <span class="admin-title-desktop">地下住人専用端末 管理画面</span>
+            <span class="admin-title-mobile">管理画面</span>
+          </h2>
         </div>
-        <button id="closeAdmin" class="back-btn" type="button">閉じる</button>
+        <div class="admin-head-actions">
+          <button id="adminHeaderPublish" class="admin-head-action publish" type="button" aria-label="全員へ反映">反映</button>
+          <button id="adminHeaderSave" class="admin-head-action" type="button" aria-label="この端末に下書き保存">保存</button>
+          <button id="adminHeaderCancel" class="admin-head-action" type="button" aria-label="変更を破棄">破棄</button>
+          <button id="closeAdmin" class="back-btn admin-close-btn" type="button">閉じる</button>
+        </div>
       </div>
 
       <div class="admin-note">
         <strong>この端末に下書き保存</strong>は、操作中の端末だけに反映されます。
-        Google管理者ログイン後に<strong>全員へ反映</strong>を押すと、ホーム情報とセットリストをまとめて全端末へ公開します。
+        Google管理者ログイン後に<strong>全員へ反映</strong>を押すと、ホーム情報・タイムスケジュール・セットリスト・楽曲詳細をまとめて全端末へ公開します。
       </div>
 
       <div class="firebase-admin-box" aria-live="polite">
@@ -2724,6 +3049,17 @@
                 <button id="adminAddSchedule" class="admin-btn compact" type="button">＋ 予定を追加</button>
               </div>
               <div id="adminScheduleItems" class="admin-schedule-editor" data-scroll-handoff></div>
+            </section>
+
+            <section class="admin-dashboard-card wide">
+              <div class="admin-setlist-head">
+                <div>
+                  <div class="admin-field-label">単独タイムスケジュール</div>
+                  <div class="admin-hint">本番を作らず、練習・リハーサル・準備日の時程だけを登録できます。</div>
+                </div>
+                <button id="adminAddStandaloneTimeline" class="admin-btn compact" type="button">＋ タイムスケジュール</button>
+              </div>
+              <div id="adminStandaloneTimelines" class="admin-standalone-timelines"></div>
             </section>
 
             <section class="admin-dashboard-card wide">
@@ -2899,8 +3235,13 @@
             </div>
 
             <label class="admin-checkbox-field wide">
-              <input id="adminPerformanceShowHome" type="checkbox">
-              <span>ホームのカウントダウンとタイムスケジュール一覧に表示する</span>
+              <input id="adminPerformanceShowCountdown" type="checkbox">
+              <span>ホームのカウントダウンに表示する</span>
+            </label>
+
+            <label class="admin-checkbox-field wide">
+              <input id="adminPerformanceShowTimeline" type="checkbox">
+              <span>ホームのタイムスケジュールに表示する</span>
             </label>
           </div>
 
@@ -2957,7 +3298,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260627-v23";
+    const APP_BUILD_VERSION = "20260627-v24";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -4057,10 +4398,13 @@
     // ============================
     const performanceStorageKey = "underground-utopia-performances-v1";
     const activePerformanceStorageKey = "underground-utopia-active-performance-v1";
+    const songDetailsStorageKey = "underground-utopia-song-details-v1";
     const defaultPerformanceId = "underground-utopia-2026";
     let performanceCatalog = [];
     let activePerformanceId = localStorage.getItem(activePerformanceStorageKey) || defaultPerformanceId;
+    let songDetailsCatalog = [];
     let adminWorkingCatalog = [];
+    let adminWorkingSongDetails = [];
     let adminSelectedPerformanceId = defaultPerformanceId;
 
     const homeStorageKey = "underground-utopia-home-dashboard-v1";
@@ -4079,6 +4423,164 @@
     function cloneData(value){
       return JSON.parse(JSON.stringify(value));
     }
+
+    function normalizeSongTitleKey(value){
+      return String(value || "")
+        .normalize("NFKC")
+        .trim()
+        .replace(/\s+/g," ")
+        .toLocaleLowerCase("ja-JP");
+    }
+
+    function normalizeStringList(value){
+      if(Array.isArray(value)){
+        return value.map(item=>String(item || "").trim()).filter(Boolean);
+      }
+      if(typeof value === "string"){
+        return value.split(/\r?\n/).map(item=>item.trim()).filter(Boolean);
+      }
+      return [];
+    }
+
+    function normalizeParts(value){
+      if(!value || typeof value !== "object" || Array.isArray(value)) return {};
+      return Object.fromEntries(
+        Object.entries(value)
+          .map(([part,text])=>[String(part || "").trim(),String(text || "").trim()])
+          .filter(([part,text])=>part && text)
+      );
+    }
+
+    function buildDefaultSongDetails(){
+      return songs.map(song=>({
+        id:song.id || makeLocalId("song-detail"),
+        title:String(song.title || "").trim(),
+        role:String(song.role || "").trim(),
+        keywords:normalizeStringList(song.keywords),
+        points:normalizeStringList(song.points),
+        parts:normalizeParts(song.parts),
+        stage:normalizeStringList(song.stage)
+      }));
+    }
+
+    function normalizeSongDetails(value){
+      const byTitle = new Map();
+      buildDefaultSongDetails().forEach(detail=>{
+        byTitle.set(normalizeSongTitleKey(detail.title),detail);
+      });
+
+      if(Array.isArray(value)){
+        value.forEach(raw=>{
+          if(!raw || typeof raw !== "object") return;
+          const title = String(raw.title || "").trim();
+          const key = normalizeSongTitleKey(title);
+          if(!key) return;
+          const existing = byTitle.get(key) || {};
+          byTitle.set(key,{
+            id:raw.id || existing.id || makeLocalId("song-detail"),
+            title,
+            role:String(raw.role ?? existing.role ?? "").trim(),
+            keywords:normalizeStringList(raw.keywords ?? existing.keywords),
+            points:normalizeStringList(raw.points ?? existing.points),
+            parts:normalizeParts(raw.parts ?? existing.parts),
+            stage:normalizeStringList(raw.stage ?? existing.stage)
+          });
+        });
+      }
+
+      return [...byTitle.values()];
+    }
+
+    function initializeSongDetails(){
+      const local = localStorage.getItem(songDetailsStorageKey);
+      if(local){
+        try{
+          songDetailsCatalog = normalizeSongDetails(JSON.parse(local));
+          return;
+        }catch(error){
+          console.warn("端末内の楽曲詳細を読み込めませんでした",error);
+        }
+      }
+      songDetailsCatalog = normalizeSongDetails([]);
+    }
+
+    function saveSongDetails(){
+      songDetailsCatalog = normalizeSongDetails(songDetailsCatalog);
+      localStorage.setItem(songDetailsStorageKey,JSON.stringify(songDetailsCatalog));
+    }
+
+    function findSharedSongDetail(title){
+      const key = normalizeSongTitleKey(title);
+      return songDetailsCatalog.find(detail=>normalizeSongTitleKey(detail.title)===key) || null;
+    }
+
+    function ensureSharedSongDetail(title){
+      const cleanTitle = String(title || "曲名未設定").trim() || "曲名未設定";
+      const existing = findSharedSongDetail(cleanTitle);
+      if(existing) return existing;
+      const detail = {
+        id:makeLocalId("song-detail"),
+        title:cleanTitle,
+        role:"",
+        keywords:[],
+        points:[],
+        parts:{},
+        stage:[]
+      };
+      songDetailsCatalog.push(detail);
+      return detail;
+    }
+
+    function upsertSharedSongDetail(title,patch){
+      const cleanTitle = String(title || "曲名未設定").trim() || "曲名未設定";
+      const key = normalizeSongTitleKey(cleanTitle);
+      const existing = songDetailsCatalog.find(detail=>normalizeSongTitleKey(detail.title)===key);
+      const next = {
+        id:existing?.id || makeLocalId("song-detail"),
+        title:cleanTitle,
+        role:String(patch.role || "").trim(),
+        keywords:normalizeStringList(patch.keywords),
+        points:normalizeStringList(patch.points),
+        parts:normalizeParts(patch.parts),
+        stage:normalizeStringList(patch.stage)
+      };
+      songDetailsCatalog = songDetailsCatalog.filter(detail=>normalizeSongTitleKey(detail.title)!==key);
+      songDetailsCatalog.push(next);
+      adminWorkingSongDetails = cloneData(songDetailsCatalog);
+      saveSongDetails();
+      return next;
+    }
+
+    function getProgressSongForItem(item){
+      const titleKey = normalizeSongTitleKey(item?.title);
+      return songs.find(song=>normalizeSongTitleKey(song.title)===titleKey)
+        || songs.find(song=>song.id===item?.detailId)
+        || null;
+    }
+
+    function partsToEditorText(parts){
+      return Object.entries(normalizeParts(parts))
+        .map(([part,text])=>`${part}：${text}`)
+        .join("\n");
+    }
+
+    function parsePartsEditorText(value){
+      const parts = {};
+      String(value || "").split(/\r?\n/).forEach(line=>{
+        const clean = line.trim();
+        if(!clean) return;
+        const separator = clean.search(/[：:]/);
+        if(separator < 0){
+          parts[clean] = "";
+          return;
+        }
+        const part = clean.slice(0,separator).trim();
+        const text = clean.slice(separator + 1).trim();
+        if(part && text) parts[part] = text;
+      });
+      return parts;
+    }
+
 
 
     function normalizeGeoAccessConfig(value){
@@ -4508,6 +5010,26 @@
     }
 
 
+    function normalizeTimelineItems(value){
+      return Array.isArray(value) ? value.map(item=>({
+        id:item.id || makeLocalId("timeline"),
+        time:item.time || "",
+        title:String(item.title || "").trim(),
+        note:String(item.note || "").trim()
+      })) : [];
+    }
+
+    function normalizeStandaloneTimelines(value){
+      return Array.isArray(value) ? value.map(item=>({
+        id:item.id || makeLocalId("standalone-timeline"),
+        title:String(item.title || "タイムスケジュール").trim() || "タイムスケジュール",
+        date:item.date || "",
+        venue:String(item.venue || "").trim(),
+        showOnHome:item.showOnHome !== false,
+        timeline:normalizeTimelineItems(item.timeline || item.items)
+      })) : [];
+    }
+
     function buildDefaultHomeData(){
       return {
         practice:{
@@ -4519,6 +5041,7 @@
           ]
         },
         schedule:[],
+        timelines:[],
         geoAccess:{
           enabled:false,
           mode:"progress",
@@ -4563,6 +5086,7 @@
               note:String(item.note || "").trim()
             }))
           : [],
+        timelines:normalizeStandaloneTimelines(source.timelines || source.standaloneTimelines),
         geoAccess:normalizeGeoAccessConfig(source.geoAccess)
       };
     }
@@ -4638,30 +5162,30 @@
         date:"2026-11-08",
         time:"14:00",
         venue:"栃木県立益子芳星高等学校 体育館／開場13:30",
-        showOnHome:true,
+        showCountdownOnHome:true,
+        showTimelineOnHome:true,
         timeline:[],
         items
       };
     }
 
     function normalizePerformance(performance){
+      const legacyShow = performance.showOnHome !== false;
       const normalized = {
         id:performance.id || makeLocalId("performance"),
         title:(performance.title || "名称未設定の本番").trim(),
         date:performance.date || "",
         time:performance.time || "",
         venue:performance.venue || "",
-        showOnHome:performance.showOnHome !== false,
-        timeline:Array.isArray(performance.timeline) ? performance.timeline : [],
+        showCountdownOnHome:Object.prototype.hasOwnProperty.call(performance,"showCountdownOnHome")
+          ? performance.showCountdownOnHome !== false
+          : legacyShow,
+        showTimelineOnHome:Object.prototype.hasOwnProperty.call(performance,"showTimelineOnHome")
+          ? performance.showTimelineOnHome !== false
+          : legacyShow,
+        timeline:normalizeTimelineItems(performance.timeline),
         items:Array.isArray(performance.items) ? performance.items : []
       };
-
-      normalized.timeline = normalized.timeline.map(item=>({
-        id:item.id || makeLocalId("timeline"),
-        time:item.time || "",
-        title:String(item.title || "").trim(),
-        note:String(item.note || "").trim()
-      }));
 
       normalized.items = normalized.items.map(item=>{
         const detailId = item.detailId || "";
@@ -4884,14 +5408,7 @@
       if(!context) return;
 
       if(context.item.type==="song" || context.item.type==="medley"){
-        const detailSong = context.item.detailId
-          ? songs.find(song=>song.id===context.item.detailId)
-          : null;
-        if(detailSong){
-          renderDetail(detailSong.id);
-        }else{
-          renderGenericSongDetail(context.item,performance,context);
-        }
+        renderSharedSongDetail(context.item,performance,context);
       }
 
       if(context.item.type==="mc"){
@@ -4905,6 +5422,7 @@
     function openAdmin(){
       adminWorkingCatalog = cloneData(performanceCatalog);
       adminWorkingHome = cloneData(homeData);
+      adminWorkingSongDetails = cloneData(songDetailsCatalog);
       adminSelectedPerformanceId = activePerformanceId;
       if(!adminWorkingCatalog.some(item=>item.id===adminSelectedPerformanceId)){
         adminSelectedPerformanceId = adminWorkingCatalog[0]?.id || "";
@@ -4954,7 +5472,8 @@
       document.getElementById("adminPerformanceDate").disabled = disabled;
       document.getElementById("adminPerformanceTime").disabled = disabled;
       document.getElementById("adminPerformanceVenue").disabled = disabled;
-      document.getElementById("adminPerformanceShowHome").disabled = disabled;
+      document.getElementById("adminPerformanceShowCountdown").disabled = disabled;
+      document.getElementById("adminPerformanceShowTimeline").disabled = disabled;
       document.getElementById("adminDeletePerformance").disabled = disabled || adminWorkingCatalog.length<=1;
       document.getElementById("adminAddTimelineItem").disabled = disabled;
 
@@ -4963,7 +5482,8 @@
         document.getElementById("adminPerformanceDate").value = "";
         document.getElementById("adminPerformanceTime").value = "";
         document.getElementById("adminPerformanceVenue").value = "";
-        document.getElementById("adminPerformanceShowHome").checked = false;
+        document.getElementById("adminPerformanceShowCountdown").checked = false;
+        document.getElementById("adminPerformanceShowTimeline").checked = false;
         document.getElementById("adminTimelineItems").innerHTML = `<div class="admin-empty">本番を追加してください。</div>`;
         document.getElementById("adminItems").innerHTML = `<div class="admin-empty">本番を追加してください。</div>`;
         return;
@@ -4973,7 +5493,8 @@
       document.getElementById("adminPerformanceDate").value = performance.date || "";
       document.getElementById("adminPerformanceTime").value = performance.time || "";
       document.getElementById("adminPerformanceVenue").value = performance.venue || "";
-      document.getElementById("adminPerformanceShowHome").checked = performance.showOnHome !== false;
+      document.getElementById("adminPerformanceShowCountdown").checked = performance.showCountdownOnHome !== false;
+      document.getElementById("adminPerformanceShowTimeline").checked = performance.showTimelineOnHome !== false;
 
       renderAdminTimelineItems();
       renderAdminItems();
@@ -4986,7 +5507,8 @@
       performance.date = document.getElementById("adminPerformanceDate").value;
       performance.time = document.getElementById("adminPerformanceTime").value;
       performance.venue = document.getElementById("adminPerformanceVenue").value.trim();
-      performance.showOnHome = document.getElementById("adminPerformanceShowHome").checked;
+      performance.showCountdownOnHome = document.getElementById("adminPerformanceShowCountdown").checked;
+      performance.showTimelineOnHome = document.getElementById("adminPerformanceShowTimeline").checked;
     }
 
     function switchAdminTab(tabName){
@@ -5029,9 +5551,11 @@
       if(!Array.isArray(adminWorkingHome.practice.songs)) adminWorkingHome.practice.songs = [];
       if(!Array.isArray(adminWorkingHome.practice.tasks)) adminWorkingHome.practice.tasks = [];
       if(!Array.isArray(adminWorkingHome.schedule)) adminWorkingHome.schedule = [];
+      if(!Array.isArray(adminWorkingHome.timelines)) adminWorkingHome.timelines = [];
       renderAdminSimpleList("adminPracticeSongs",adminWorkingHome.practice.songs,"songs");
       renderAdminSimpleList("adminPracticeTasks",adminWorkingHome.practice.tasks,"tasks");
       renderAdminScheduleItems();
+      renderAdminStandaloneTimelines();
       renderAdminGeoAccess();
     }
 
@@ -5042,23 +5566,23 @@
       const items = adminWorkingHome.schedule;
       root.innerHTML = items.length ? items.map((item,index)=>`
         <div class="admin-schedule-row" data-admin-schedule-id="${escapeHtml(item.id)}">
-          <label class="admin-schedule-field">
+          <label class="admin-schedule-field schedule-date">
             <span class="admin-field-label">日時</span>
             <input class="admin-input" type="date" value="${escapeHtml(item.date)}" data-schedule-field="date" data-schedule-index="${index}">
           </label>
-          <label class="admin-schedule-field">
+          <label class="admin-schedule-field schedule-title">
             <span class="admin-field-label">予定名</span>
             <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="例：通常練習" data-schedule-field="title" data-schedule-index="${index}">
           </label>
-          <label class="admin-schedule-field">
+          <label class="admin-schedule-field schedule-start">
             <span class="admin-field-label">開始時間</span>
             <input class="admin-input" type="time" value="${escapeHtml(item.startTime || "")}" data-schedule-field="startTime" data-schedule-index="${index}">
           </label>
-          <label class="admin-schedule-field">
+          <label class="admin-schedule-field schedule-end">
             <span class="admin-field-label">終了時間</span>
             <input class="admin-input" type="time" value="${escapeHtml(item.endTime || "")}" data-schedule-field="endTime" data-schedule-index="${index}">
           </label>
-          <label class="admin-schedule-field">
+          <label class="admin-schedule-field schedule-note">
             <span class="admin-field-label">補足</span>
             <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="任意" data-schedule-field="note" data-schedule-index="${index}">
           </label>
@@ -5090,6 +5614,145 @@
         }
       });
     }
+
+    function renderAdminStandaloneTimelines(options = {}){
+      const root = document.getElementById("adminStandaloneTimelines");
+      if(!root) return;
+      const openIds = new Set(
+        [...root.querySelectorAll("details[open][data-standalone-id]")]
+          .map(details=>details.dataset.standaloneId)
+      );
+      const timelines = normalizeStandaloneTimelines(adminWorkingHome.timelines);
+      adminWorkingHome.timelines = timelines;
+
+      root.innerHTML = timelines.length ? timelines.map((schedule,scheduleIndex)=>`
+        <details class="admin-standalone-card" data-standalone-id="${escapeHtml(schedule.id)}" ${(openIds.has(schedule.id) || options.openId===schedule.id)?"open":""}>
+          <summary>
+            <span>
+              <span class="admin-standalone-summary-title">${escapeHtml(schedule.title || "タイムスケジュール")}</span>
+              <span class="admin-standalone-summary-date">${escapeHtml(schedule.date || "日付未設定")}${schedule.showOnHome ? "｜ホーム表示" : "｜非表示"}</span>
+            </span>
+          </summary>
+          <div class="admin-standalone-body">
+            <div class="admin-standalone-meta">
+              <label class="admin-field">
+                <span class="admin-field-label">名称</span>
+                <input class="admin-input" value="${escapeHtml(schedule.title)}" data-standalone-field="title" data-standalone-index="${scheduleIndex}">
+              </label>
+              <label class="admin-field">
+                <span class="admin-field-label">日付</span>
+                <input class="admin-input" type="date" value="${escapeHtml(schedule.date)}" data-standalone-field="date" data-standalone-index="${scheduleIndex}">
+              </label>
+              <label class="admin-field standalone-venue">
+                <span class="admin-field-label">場所・補足</span>
+                <input class="admin-input" value="${escapeHtml(schedule.venue)}" data-standalone-field="venue" data-standalone-index="${scheduleIndex}">
+              </label>
+            </div>
+
+            <label class="admin-checkbox-field" style="margin-top:9px">
+              <input type="checkbox" data-standalone-show="${scheduleIndex}" ${schedule.showOnHome?"checked":""}>
+              <span>ホームのタイムスケジュールに表示する</span>
+            </label>
+
+            <div class="admin-standalone-actions">
+              <button class="admin-btn compact" type="button" data-add-standalone-item="${scheduleIndex}">＋ 時程を追加</button>
+              <button class="admin-btn compact danger" type="button" data-delete-standalone="${scheduleIndex}">このタイムスケジュールを削除</button>
+            </div>
+
+            <div class="admin-timeline-editor">
+              ${schedule.timeline.length ? schedule.timeline.map((item,itemIndex)=>`
+                <div class="admin-timeline-row">
+                  <input class="admin-input standalone-item-time" type="time" value="${escapeHtml(item.time)}" data-standalone-item-field="time" data-standalone-index="${scheduleIndex}" data-standalone-item-index="${itemIndex}">
+                  <textarea class="admin-textarea admin-timeline-textarea standalone-item-title" placeholder="内容（改行可）" data-standalone-item-field="title" data-standalone-index="${scheduleIndex}" data-standalone-item-index="${itemIndex}">${escapeHtml(item.title)}</textarea>
+                  <textarea class="admin-textarea admin-timeline-textarea standalone-item-note" placeholder="補足（改行可）" data-standalone-item-field="note" data-standalone-index="${scheduleIndex}" data-standalone-item-index="${itemIndex}">${escapeHtml(item.note)}</textarea>
+                  <div class="admin-row-actions">
+                    <button class="admin-icon-btn" type="button" data-move-standalone-item="${scheduleIndex}" data-standalone-item-index="${itemIndex}" data-direction="-1" ${itemIndex===0?"disabled":""}>↑</button>
+                    <button class="admin-icon-btn" type="button" data-move-standalone-item="${scheduleIndex}" data-standalone-item-index="${itemIndex}" data-direction="1" ${itemIndex===schedule.timeline.length-1?"disabled":""}>↓</button>
+                    <button class="admin-icon-btn" type="button" data-delete-standalone-item="${scheduleIndex}" data-standalone-item-index="${itemIndex}">×</button>
+                  </div>
+                </div>
+              `).join("") : `<div class="admin-empty">時程はまだ登録されていません。</div>`}
+            </div>
+          </div>
+        </details>
+      `).join("") : `<div class="admin-empty">単独タイムスケジュールはまだ登録されていません。</div>`;
+
+      root.querySelectorAll("[data-standalone-field]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          const schedule = adminWorkingHome.timelines[Number(input.dataset.standaloneIndex)];
+          if(schedule) schedule[input.dataset.standaloneField] = input.value;
+        });
+      });
+      root.querySelectorAll("[data-standalone-show]").forEach(input=>{
+        input.addEventListener("change",()=>{
+          const schedule = adminWorkingHome.timelines[Number(input.dataset.standaloneShow)];
+          if(schedule) schedule.showOnHome = input.checked;
+        });
+      });
+      root.querySelectorAll("[data-standalone-item-field]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          const schedule = adminWorkingHome.timelines[Number(input.dataset.standaloneIndex)];
+          const item = schedule?.timeline?.[Number(input.dataset.standaloneItemIndex)];
+          if(item) item[input.dataset.standaloneItemField] = input.value;
+        });
+      });
+      root.querySelectorAll("[data-add-standalone-item]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const scheduleIndex = Number(button.dataset.addStandaloneItem);
+          const schedule = adminWorkingHome.timelines[scheduleIndex];
+          if(!schedule) return;
+          schedule.timeline.push({id:makeLocalId("timeline"),time:"",title:"",note:""});
+          renderAdminStandaloneTimelines({openId:schedule.id});
+        });
+      });
+      root.querySelectorAll("[data-move-standalone-item]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const scheduleIndex = Number(button.dataset.moveStandaloneItem);
+          const itemIndex = Number(button.dataset.standaloneItemIndex);
+          const next = itemIndex + Number(button.dataset.direction);
+          const schedule = adminWorkingHome.timelines[scheduleIndex];
+          if(!schedule || next<0 || next>=schedule.timeline.length) return;
+          [schedule.timeline[itemIndex],schedule.timeline[next]] = [schedule.timeline[next],schedule.timeline[itemIndex]];
+          renderAdminStandaloneTimelines({openId:schedule.id});
+        });
+      });
+      root.querySelectorAll("[data-delete-standalone-item]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const scheduleIndex = Number(button.dataset.deleteStandaloneItem);
+          const itemIndex = Number(button.dataset.standaloneItemIndex);
+          const schedule = adminWorkingHome.timelines[scheduleIndex];
+          if(!schedule) return;
+          schedule.timeline.splice(itemIndex,1);
+          renderAdminStandaloneTimelines({openId:schedule.id});
+        });
+      });
+      root.querySelectorAll("[data-delete-standalone]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const index = Number(button.dataset.deleteStandalone);
+          const schedule = adminWorkingHome.timelines[index];
+          if(!schedule || !confirm(`「${schedule.title}」を削除しますか？`)) return;
+          adminWorkingHome.timelines.splice(index,1);
+          renderAdminStandaloneTimelines();
+        });
+      });
+    }
+
+    function addAdminStandaloneTimeline(){
+      const schedule = {
+        id:makeLocalId("standalone-timeline"),
+        title:"新しいタイムスケジュール",
+        date:"",
+        venue:"",
+        showOnHome:true,
+        timeline:[]
+      };
+      adminWorkingHome.timelines.push(schedule);
+      renderAdminStandaloneTimelines({openId:schedule.id});
+      requestAnimationFrame(()=>{
+        document.querySelector(`[data-standalone-id="${schedule.id}"]`)?.scrollIntoView({behavior:"smooth",block:"center"});
+      });
+    }
+
 
     function renderAdminTimelineItems(){
       const root = document.getElementById("adminTimelineItems");
@@ -5306,7 +5969,8 @@
         date:"",
         time:"",
         venue:"",
-        showOnHome:true,
+        showCountdownOnHome:true,
+        showTimelineOnHome:true,
         timeline:[],
         items:[
           {
@@ -5348,7 +6012,8 @@
       if(invalid) throw new Error("本番名を入力してください。");
       return {
         catalog:cloneData(normalizeCatalog(adminWorkingCatalog)),
-        home:cloneData(normalizeHomeData(adminWorkingHome))
+        home:cloneData(normalizeHomeData(adminWorkingHome)),
+        songDetails:cloneData(normalizeSongDetails(adminWorkingSongDetails.length ? adminWorkingSongDetails : songDetailsCatalog))
       };
     }
 
@@ -5363,9 +6028,11 @@
 
       performanceCatalog = data.catalog;
       homeData = data.home;
+      songDetailsCatalog = data.songDetails;
       activePerformanceId = adminSelectedPerformanceId || performanceCatalog[0].id;
       savePerformanceCatalog();
       saveHomeData();
+      saveSongDetails();
 
       activeFilter = "all";
       renderPerformanceSelector();
@@ -5383,13 +6050,16 @@
       const previousGeoSignature = geoConfigSignature();
       const catalog = Array.isArray(data) ? data : data?.catalog;
       const incomingHome = Array.isArray(data) ? null : data?.home;
+      const incomingSongDetails = Array.isArray(data) ? null : data?.songDetails;
       if(Array.isArray(catalog)) performanceCatalog = normalizeCatalog(catalog);
       if(incomingHome) homeData = normalizeHomeData(incomingHome);
+      if(Array.isArray(incomingSongDetails)) songDetailsCatalog = normalizeSongDetails(incomingSongDetails);
       if(!performanceCatalog.some(item=>item.id===activePerformanceId)){
         activePerformanceId = performanceCatalog[0]?.id || defaultPerformanceId;
       }
       savePerformanceCatalog();
       saveHomeData();
+      saveSongDetails();
       activeFilter = "all";
       renderPerformanceSelector();
       renderFilters();
@@ -5404,6 +6074,7 @@
       if(panel?.classList.contains("open")){
         adminWorkingCatalog = cloneData(performanceCatalog);
         adminWorkingHome = cloneData(homeData);
+        adminWorkingSongDetails = cloneData(songDetailsCatalog);
         adminSelectedPerformanceId = activePerformanceId;
         renderAdminPerformanceSelect();
         renderAdminEditor();
@@ -5416,6 +6087,7 @@
       getCatalogForPublish:()=>getPortalDataForPublish().catalog,
       getCurrentCatalog:()=>cloneData(performanceCatalog),
       getCurrentHome:()=>cloneData(homeData),
+      getCurrentSongDetails:()=>cloneData(songDetailsCatalog),
       applyPublishedPortalData,
       applyPublishedCatalog:catalog=>applyPublishedPortalData({catalog}),
       setAdminAuthorized,
@@ -5457,6 +6129,9 @@
     function bindAdminControls(){
       document.getElementById("closeAdmin").addEventListener("click",closeAdmin);
       document.getElementById("adminCancel").addEventListener("click",closeAdmin);
+      document.getElementById("adminHeaderCancel")?.addEventListener("click",()=>document.getElementById("adminCancel").click());
+      document.getElementById("adminHeaderSave")?.addEventListener("click",()=>document.getElementById("adminSave").click());
+      document.getElementById("adminHeaderPublish")?.addEventListener("click",()=>document.getElementById("firebasePublish").click());
       document.getElementById("adminAddPerformance").addEventListener("click",addAdminPerformance);
       document.getElementById("adminDeletePerformance").addEventListener("click",deleteAdminPerformance);
       document.getElementById("adminSave").addEventListener("click",saveAdminChanges);
@@ -5464,6 +6139,7 @@
       document.getElementById("adminAddPracticeSong").addEventListener("click",()=>addAdminPracticeEntry("songs"));
       document.getElementById("adminAddPracticeTask").addEventListener("click",()=>addAdminPracticeEntry("tasks"));
       document.getElementById("adminAddSchedule").addEventListener("click",addAdminScheduleItem);
+      document.getElementById("adminAddStandaloneTimeline")?.addEventListener("click",addAdminStandaloneTimeline);
       document.getElementById("adminAddTimelineItem").addEventListener("click",addAdminTimelineItem);
 
       document.querySelectorAll("[data-admin-tab]").forEach(button=>{
@@ -5487,6 +6163,7 @@
         localStorage.removeItem(performanceStorageKey);
         localStorage.removeItem(activePerformanceStorageKey);
         localStorage.removeItem(homeStorageKey);
+        localStorage.removeItem(songDetailsStorageKey);
         location.reload();
       });
 
@@ -5500,7 +6177,8 @@
           if(id==="adminPerformanceTitle") renderAdminPerformanceSelect();
         });
       });
-      document.getElementById("adminPerformanceShowHome").addEventListener("change",syncAdminPerformanceFields);
+      document.getElementById("adminPerformanceShowCountdown").addEventListener("change",syncAdminPerformanceFields);
+      document.getElementById("adminPerformanceShowTimeline").addEventListener("change",syncAdminPerformanceFields);
 
       [
         "adminGeoEnabled","adminGeoMode","adminGeoPlaceName","adminGeoLatitude","adminGeoLongitude","adminGeoRadius",
@@ -5816,7 +6494,7 @@
 
     function getHomePerformances(){
       return performanceCatalog
-        .filter(performance=>performance.showOnHome !== false && performance.date)
+        .filter(performance=>performance.showCountdownOnHome !== false && performance.date)
         .map(performance=>({performance,days:daysUntilPerformance(performance)}))
         .filter(entry=>entry.days === null || entry.days >= 0)
         .sort((a,b)=>String(a.performance.date).localeCompare(String(b.performance.date)));
@@ -5911,22 +6589,68 @@
       button.textContent = scheduleExpanded ? "3日分だけ表示" : "その先の予定を見る";
     }
 
+    function todayDateKey(){
+      const now = new Date();
+      return [now.getFullYear(),String(now.getMonth()+1).padStart(2,"0"),String(now.getDate()).padStart(2,"0")].join("-");
+    }
+
+    function formatStandaloneTimelineDate(schedule){
+      if(!schedule?.date) return schedule?.venue || "日程未設定";
+      const date = new Date(`${schedule.date}T00:00:00`);
+      const label = Number.isNaN(date.getTime())
+        ? schedule.date
+        : new Intl.DateTimeFormat("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"}).format(date);
+      return schedule.venue ? `${label}　｜　${schedule.venue}` : label;
+    }
+
+    function getHomeTimelineEntries(){
+      const today = todayDateKey();
+      const performances = performanceCatalog
+        .filter(performance=>performance.showTimelineOnHome !== false && performance.date && performance.date >= today)
+        .map(performance=>({
+          kind:"performance",
+          id:performance.id,
+          title:performance.title,
+          date:performance.date,
+          subtitle:formatHomePerformanceDate(performance),
+          timeline:normalizeTimelineItems(performance.timeline),
+          badge:"本番当日のタイムスケジュール"
+        }));
+
+      const standalone = normalizeHomeData(homeData).timelines
+        .filter(schedule=>schedule.showOnHome !== false && schedule.date && schedule.date >= today)
+        .map(schedule=>({
+          kind:"standalone",
+          id:schedule.id,
+          title:schedule.title,
+          date:schedule.date,
+          subtitle:formatStandaloneTimelineDate(schedule),
+          timeline:normalizeTimelineItems(schedule.timeline),
+          badge:"タイムスケジュール"
+        }));
+
+      return [...performances,...standalone].sort((a,b)=>{
+        const dateCompare = String(a.date).localeCompare(String(b.date));
+        return dateCompare || String(a.title).localeCompare(String(b.title),"ja");
+      });
+    }
+
     function renderPerformanceTimetables(){
       const root = document.getElementById("performanceTimetableList");
       if(!root) return;
-      const performances = getHomePerformances().map(entry=>entry.performance);
-      root.innerHTML = performances.length ? performances.map(performance=>`
-        <button class="timetable-link" type="button" data-open-timeline="${escapeHtml(performance.id)}">
+      const entries = getHomeTimelineEntries();
+      root.innerHTML = entries.length ? entries.map(entry=>`
+        <button class="timetable-link" type="button" data-open-timeline-kind="${escapeHtml(entry.kind)}" data-open-timeline-id="${escapeHtml(entry.id)}">
           <span>
-            <span class="timetable-link-title">${escapeHtml(performance.title)}</span>
-            <span class="timetable-link-date">${escapeHtml(formatHomePerformanceDate(performance))}</span>
+            <span class="timetable-link-title">${escapeHtml(entry.title)}</span>
+            <span class="timetable-link-date">${escapeHtml(entry.subtitle)}</span>
           </span>
           <span class="timetable-link-arrow" aria-hidden="true">›</span>
         </button>
-      `).join("") : `<div class="home-empty">本番が登録されると、ここから当日の時程を確認できます。</div>`;
+      `).join("") : `<div class="home-empty">表示するタイムスケジュールはまだ登録されていません。</div>`;
 
-      root.querySelectorAll("[data-open-timeline]").forEach(button=>{
-        button.addEventListener("click",()=>openPerformanceTimeline(button.dataset.openTimeline));
+      root.querySelectorAll("[data-open-timeline-id]").forEach(button=>{
+        button.addEventListener("click",()=>openTimelineEntry(button.dataset.openTimelineKind,button.dataset.openTimelineId));
       });
     }
 
@@ -5951,18 +6675,43 @@
     }
 
     function openPerformanceTimeline(performanceId){
-      const performance = getPerformanceById(performanceId);
-      if(!performance) return;
-      const timeline = Array.isArray(performance.timeline) ? performance.timeline : [];
-      document.getElementById("detailHeading").textContent = performance.title;
+      openTimelineEntry("performance",performanceId);
+    }
+
+    function openTimelineEntry(kind,id){
+      let entry = null;
+      if(kind === "performance"){
+        const performance = getPerformanceById(id);
+        if(performance){
+          entry = {
+            title:performance.title,
+            subtitle:formatHomePerformanceDate(performance),
+            timeline:normalizeTimelineItems(performance.timeline),
+            badge:"本番当日のタイムスケジュール"
+          };
+        }
+      }else{
+        const schedule = normalizeHomeData(homeData).timelines.find(item=>item.id===id);
+        if(schedule){
+          entry = {
+            title:schedule.title,
+            subtitle:formatStandaloneTimelineDate(schedule),
+            timeline:normalizeTimelineItems(schedule.timeline),
+            badge:"タイムスケジュール"
+          };
+        }
+      }
+      if(!entry) return;
+
+      document.getElementById("detailHeading").textContent = entry.title;
       document.getElementById("detailContent").innerHTML = `
         <div class="card">
-          <span class="section-badge">本番当日のタイムスケジュール</span>
-          <p class="detail-copy">${escapeHtml(formatHomePerformanceDate(performance))}</p>
+          <span class="section-badge">${escapeHtml(entry.badge)}</span>
+          <p class="detail-copy">${escapeHtml(entry.subtitle)}</p>
         </div>
         <div class="card">
-          ${timeline.length ? `<div class="timeline-view">
-            ${timeline.map(item=>`
+          ${entry.timeline.length ? `<div class="timeline-view">
+            ${entry.timeline.map(item=>`
               <div class="timeline-view-row">
                 <div class="timeline-view-time">${escapeHtml(item.time || "--:--")}</div>
                 <div>
@@ -5976,6 +6725,7 @@
       `;
       openDetailPanel();
     }
+
 
     function renderProgressBars(targetId){
       const target = document.getElementById(targetId);
@@ -6072,14 +6822,14 @@
     }
 
     function renderSongCard(item,performance,songNumber){
-      const detailSong = item.detailId ? songs.find(song=>song.id===item.detailId) : null;
+      const progressSong = getProgressSongForItem(item);
       const medleyTitles = item.type === "medley" && Array.isArray(item.medley)
         ? item.medley
         : [];
       const medley = medleyTitles.length
         ? `<ul class="medley-list">${medleyTitles.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
         : "";
-      const score = detailSong ? `<div class="song-score">${songScore(detailSong.id)}%</div>` : "";
+      const score = progressSong ? `<div class="song-score">${songScore(progressSong.id)}%</div>` : "";
 
       return `
         <button class="song-card" data-open-performance-item="${escapeHtml(item.id)}">
@@ -6144,75 +6894,149 @@
       const song = songs.find(item=>item.id===songId);
       if(!song) return;
       const section = sectionById(song.section);
-      const checks = progress[song.id].checks || {};
-      document.getElementById("detailHeading").textContent = song.title;
+      const item = {id:`song-${song.id}`,type:Array.isArray(song.medley)&&song.medley.length?"medley":"song",title:song.title,detailId:song.id,medley:song.medley||[]};
+      const performance = getActivePerformance() || buildDefaultPerformance();
+      const context = {item,section:{label:section?.no||"",title:section?.title||""},songNumber:song.order};
+      renderSharedSongDetail(item,performance,context);
+    }
+
+    function renderSharedSongDetail(item,performance,context){
+      const detail = ensureSharedSongDetail(item.title);
+      const progressSong = getProgressSongForItem(item);
+      const checks = progressSong ? (progress[progressSong.id]?.checks || {}) : {};
+      const medleyContents = item.type === "medley" && Array.isArray(item.medley) && item.medley.length
+        ? `<span class="label">メドレー構成</span><ul class="clean-list">${item.medley.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
+        : "";
+      const keywordContents = detail.keywords.length
+        ? `<div class="keywords">${detail.keywords.map(word=>`<span class="keyword">${escapeHtml(word)}</span>`).join("")}</div>`
+        : `<p class="detail-copy">未登録です。</p>`;
+      const pointContents = detail.points.length
+        ? (progressSong
+          ? detail.points.map((point,index)=>`
+              <label class="check-item">
+                <input type="checkbox" data-song="${escapeHtml(progressSong.id)}" data-check="${index}" ${checks[index]?"checked":""}>
+                <span>${escapeHtml(point)}</span>
+              </label>
+            `).join("")
+          : `<ul class="clean-list">${detail.points.map(point=>`<li>${escapeHtml(point)}</li>`).join("")}</ul>`)
+        : `<div class="home-empty">練習ポイントは未登録です。</div>`;
+      const partContents = Object.keys(detail.parts).length
+        ? `<div class="part-grid">${Object.entries(detail.parts).map(([part,text])=>`<div class="part"><strong>${escapeHtml(part)}</strong><span>${escapeHtml(text)}</span></div>`).join("")}</div>`
+        : `<div class="home-empty">パート別メモは未登録です。</div>`;
+      const stageContents = detail.stage.length
+        ? `<ul class="clean-list">${detail.stage.map(text=>`<li>${escapeHtml(text)}</li>`).join("")}</ul>`
+        : `<div class="home-empty">ステージ演出は未登録です。</div>`;
+
+      document.getElementById("detailHeading").textContent = item.title || "曲名未設定";
       document.getElementById("detailContent").innerHTML = `
         <div class="card">
-          <span class="section-badge">M-${song.order}｜${section.no} ${section.title}</span>
+          <span class="section-badge">M-${context.songNumber}${context.section ? `｜${escapeHtml(context.section.label)} ${escapeHtml(context.section.title)}` : ""}</span>
+          <span class="label">本番</span>
+          <p class="detail-copy">${escapeHtml(performance.title)}</p>
           <span class="label">この曲の役割</span>
-          <p class="detail-copy">${song.role}</p>
+          <p class="detail-copy">${detail.role ? nl2br(detail.role) : "未登録です。"}</p>
           <span class="label">演奏キーワード</span>
-          <div class="keywords">
-            ${song.keywords.map(word=>`<span class="keyword">${word}</span>`).join("")}
-          </div>
-          ${Array.isArray(song.medley) && song.medley.length ? `
-            <span class="label">メドレー構成</span>
-            <ul class="clean-list">
-              ${song.medley.map(title=>`<li>${title}</li>`).join("")}
-            </ul>
-          ` : ""}
+          ${keywordContents}
+          ${medleyContents}
         </div>
 
         <div class="card">
           <h3 class="card-title">練習ポイント</h3>
-          ${song.points.map((point,index)=>`
-            <label class="check-item">
-              <input type="checkbox" data-song="${song.id}" data-check="${index}" ${checks[index]?"checked":""}>
-              <span>${point}</span>
-            </label>
-          `).join("")}
+          ${pointContents}
         </div>
 
         <div class="card">
           <h3 class="card-title">パート別メモ</h3>
-          <div class="part-grid">
-            ${Object.entries(song.parts).map(([part,text])=>`
-              <div class="part"><strong>${part}</strong><span>${text}</span></div>
-            `).join("")}
-          </div>
+          ${partContents}
         </div>
 
         <div class="card">
           <h3 class="card-title">ステージ演出</h3>
-          <ul class="clean-list">
-            ${song.stage.map(item=>`<li>${item}</li>`).join("")}
-          </ul>
+          ${stageContents}
         </div>
 
-        <button class="btn secondary" data-go-progress="${song.id}">この曲の進捗を記録する</button>
+        ${adminAuthorized ? `<button id="editSharedSongDetail" class="btn secondary" type="button">共通楽曲詳細を編集</button>` : ""}
+        ${progressSong ? `<button class="btn secondary" data-go-progress="${escapeHtml(progressSong.id)}">この曲の進捗を記録する</button>` : ""}
       `;
 
       document.querySelectorAll("[data-check]").forEach(box=>{
         box.addEventListener("change",()=>{
           const sid = box.dataset.song;
+          if(!progress[sid]) return;
           progress[sid].checks[box.dataset.check] = box.checked;
           saveProgress();
         });
       });
 
-      document.querySelector("[data-go-progress]").addEventListener("click",()=>{
+      document.querySelector("[data-go-progress]")?.addEventListener("click",event=>{
+        const songId = event.currentTarget.dataset.goProgress;
         closeDetail();
         switchPage("progress");
         setTimeout(()=>{
-          document.getElementById(`progress-${song.id}`)?.scrollIntoView({behavior:"smooth",block:"start"});
+          document.getElementById(`progress-${songId}`)?.scrollIntoView({behavior:"smooth",block:"start"});
         },120);
       });
 
-      const panel = document.getElementById("detailPanel");
-      panel.classList.add("open");
-      panel.setAttribute("aria-hidden","false");
-      document.body.style.overflow = "hidden";
+      document.getElementById("editSharedSongDetail")?.addEventListener("click",()=>{
+        renderSharedSongDetailEditor(item,performance,context,detail);
+      });
+      openDetailPanel();
     }
+
+    function renderSharedSongDetailEditor(item,performance,context,detail){
+      document.getElementById("detailHeading").textContent = `${item.title}｜詳細編集`;
+      document.getElementById("detailContent").innerHTML = `
+        <div class="card admin-detail-editor">
+          <p class="song-detail-edit-note">同じ曲名の楽曲は、すべての本番でこの内容を共有します。この端末へ保存後、管理画面の「全員へ反映」で全端末へ公開できます。</p>
+
+          <label class="admin-field">
+            <span class="admin-field-label">この曲の役割</span>
+            <textarea id="sharedSongRole" class="admin-textarea">${escapeHtml(detail.role)}</textarea>
+          </label>
+
+          <label class="admin-field" style="display:block;margin-top:12px">
+            <span class="admin-field-label">演奏キーワード（1行につき1つ）</span>
+            <textarea id="sharedSongKeywords" class="admin-textarea">${escapeHtml(detail.keywords.join("\n"))}</textarea>
+          </label>
+
+          <label class="admin-field" style="display:block;margin-top:12px">
+            <span class="admin-field-label">練習ポイント（1行につき1つ）</span>
+            <textarea id="sharedSongPoints" class="admin-textarea">${escapeHtml(detail.points.join("\n"))}</textarea>
+          </label>
+
+          <label class="admin-field" style="display:block;margin-top:12px">
+            <span class="admin-field-label">パート別メモ（「パート名：内容」で1行につき1項目）</span>
+            <textarea id="sharedSongParts" class="admin-textarea">${escapeHtml(partsToEditorText(detail.parts))}</textarea>
+          </label>
+
+          <label class="admin-field" style="display:block;margin-top:12px">
+            <span class="admin-field-label">ステージ演出（1行につき1つ）</span>
+            <textarea id="sharedSongStage" class="admin-textarea">${escapeHtml(detail.stage.join("\n"))}</textarea>
+          </label>
+
+          <div class="song-detail-edit-actions">
+            <button id="cancelSharedSongDetail" class="btn ghost" type="button">編集をやめる</button>
+            <button id="saveSharedSongDetail" class="btn secondary" type="button">この端末に保存</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("cancelSharedSongDetail")?.addEventListener("click",()=>{
+        renderSharedSongDetail(item,performance,context);
+      });
+      document.getElementById("saveSharedSongDetail")?.addEventListener("click",()=>{
+        upsertSharedSongDetail(item.title,{
+          role:document.getElementById("sharedSongRole").value,
+          keywords:document.getElementById("sharedSongKeywords").value,
+          points:document.getElementById("sharedSongPoints").value,
+          parts:parsePartsEditorText(document.getElementById("sharedSongParts").value),
+          stage:document.getElementById("sharedSongStage").value
+        });
+        alert("共通楽曲詳細をこの端末に保存しました。全員へ公開する場合は、管理画面から「全員へ反映」を押してください。");
+        renderSharedSongDetail(item,performance,context);
+      });
+    }
+
 
     function renderMcDetail(mcId){
       const mc = mcs.find(item=>item.id===mcId);
@@ -6441,8 +7265,9 @@
     async function initializeApp(){
       applyPosterBackground();
       updateDepthPanel("home",false);
-      await initializePerformanceCatalog();
       initializeHomeData();
+      initializeSongDetails();
+      await initializePerformanceCatalog();
       normalizeProgress();
       renderHomeDashboard();
       renderStories();
@@ -6532,7 +7357,7 @@
         signOutButton.hidden = false;
         copyUidButton.hidden = false;
         publishButton.disabled = false;
-        publishButton.title = "ホーム情報とセットリストを全員へ反映";
+        publishButton.title = "ホーム情報・タイムスケジュール・セットリスト・楽曲詳細を全員へ反映";
         statusDot.classList.add("online");
       }else if(user){
         authStatus.textContent = "このGoogleアカウントには編集権限がありません";
@@ -6638,10 +7463,11 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:5,
+          version:6,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
+          songDetails:portalData.songDetails,
           updatedAt:serverTimestamp(),
           updatedBy:{
             uid:currentFirebaseUser.uid,
@@ -6679,7 +7505,7 @@
 
         bridge.applyPublishedPortalData(portalData);
         setDataStatus("全員への反映が完了しました。", "online");
-        alert("ホーム情報とセットリストを全員へ反映しました。");
+        alert("ホーム情報・タイムスケジュール・セットリスト・楽曲詳細を全員へ反映しました。");
       }catch(error){
         console.error("Firebase publish error",error);
         const message = firebaseErrorMessage(error);
@@ -6704,7 +7530,7 @@
         const data = snapshot.data() || {};
         const catalog = data.catalog;
         if(Array.isArray(catalog) && window.utopiaSetlistApp){
-          window.utopiaSetlistApp.applyPublishedPortalData({catalog,home:data.home});
+          window.utopiaSetlistApp.applyPublishedPortalData({catalog,home:data.home,songDetails:data.songDetails});
           setDataStatus("Firebaseの公開情報を表示しています。", "online");
         }else{
           setDataStatus("Firebaseの公開データ形式を確認できませんでした。", "warning");
