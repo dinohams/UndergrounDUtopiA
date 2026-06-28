@@ -13,10 +13,15 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v30" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v30" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v30" />
-  <meta name="app-build" content="20260629-v30" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v31" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v31" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v31" />
+  <meta name="app-build" content="20260629-v31" />
+  <script>
+    if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
+      document.documentElement.classList.add("standalone-shell");
+    }
+  </script>
   <style>
     :root{
       --bg:#0c1214;
@@ -40,10 +45,6 @@
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
 
-    html.standalone-no-bounce,
-    html.standalone-no-bounce body{
-      overscroll-behavior-y:none;
-    }
 
     body{
       margin:0;
@@ -94,6 +95,26 @@
       width:min(100%,760px);
       margin:0 auto;
       padding:0 14px 26px;
+    }
+
+
+    .topbar{
+        position:relative;
+        top:auto;
+        flex:0 0 auto;
+        margin-bottom:0;
+      }
+
+      .app-shell > main{
+        flex:1 1 auto;
+        min-height:0;
+        overflow-y:auto;
+        overflow-x:hidden;
+        -webkit-overflow-scrolling:touch;
+        overscroll-behavior-y:auto;
+        padding-top:18px;
+        padding-bottom:calc(104px + env(safe-area-inset-bottom));
+      }
     }
 
     .topbar{
@@ -1083,14 +1104,12 @@
       }
     }
     .detail-head{
-      position:sticky;
-      top:0;
-      z-index:2;
+      position:relative;
       display:flex;
       align-items:center;
       gap:12px;
       padding:4px 0 13px;
-      background:linear-gradient(180deg,#10191c 72%,transparent);
+      background:transparent;
     }
     .back-btn{
       border:1px solid rgba(174,185,185,.25);
@@ -1340,9 +1359,6 @@
         var(--home-poster-url) center top / cover no-repeat fixed;
     }
 
-    body.home-active .detail-head{
-      background:linear-gradient(180deg,rgba(8,14,16,.94) 72%,transparent);
-    }
 
     body.home-active .part,
     body.home-active select{
@@ -1899,10 +1915,10 @@
     .countdown-list{
       display:flex;
       flex-wrap:nowrap;
-      gap:14px;
-      margin-bottom:14px;
+      gap:10px;
+      margin-bottom:10px;
       overflow-x:auto;
-      padding-bottom:4px;
+      padding-bottom:3px;
       scroll-snap-type:x proximity;
       scrollbar-width:thin;
       scrollbar-color:rgba(217,179,122,.42) transparent;
@@ -1922,12 +1938,12 @@
       overflow:hidden;
       flex:0 0 auto;
       width:fit-content;
-      min-width:230px;
-      max-width:340px;
+      min-width:184px;
+      max-width:272px;
       scroll-snap-align:start;
       border:1px solid rgba(217,179,122,.48);
-      border-radius:22px;
-      padding:16px 18px;
+      border-radius:18px;
+      padding:13px 14px;
       background:linear-gradient(180deg,rgba(10,17,20,.65),rgba(9,15,17,.50));
       box-shadow:0 14px 32px rgba(0,0,0,.28);
       backdrop-filter:blur(8px) saturate(.9);
@@ -1936,8 +1952,8 @@
 
     @media (max-width:680px){
       .countdown-card{
-        min-width:220px;
-        max-width:min(82vw,310px);
+        min-width:176px;
+        max-width:min(66vw,248px);
       }
     }
 
@@ -1945,10 +1961,10 @@
     .countdown-performance-title{
       position:relative;
       z-index:1;
-      margin:0 0 8px;
+      margin:0 0 6px;
       color:var(--ivory);
-      font-size:18px;
-      line-height:1.45;
+      font-size:15px;
+      line-height:1.38;
     }
 
     .countdown-main-line{
@@ -1957,18 +1973,18 @@
       display:flex;
       align-items:baseline;
       flex-wrap:wrap;
-      gap:8px;
+      gap:6px;
     }
 
     .countdown-prefix{
       color:#d7dede;
-      font-size:14px;
+      font-size:12px;
     }
 
     .countdown-days{
       color:var(--gold);
       font-family:Georgia,"Times New Roman",serif;
-      font-size:38px;
+      font-size:31px;
       font-weight:600;
       line-height:1;
       font-variant-numeric:tabular-nums lining-nums;
@@ -1978,17 +1994,17 @@
     .countdown-days small{
       margin-left:4px;
       font-family:inherit;
-      font-size:17px;
+      font-size:14px;
       font-weight:600;
     }
 
     .countdown-date{
       position:relative;
       z-index:1;
-      margin-top:9px;
+      margin-top:7px;
       color:var(--muted);
-      font-size:12px;
-      line-height:1.65;
+      font-size:10.5px;
+      line-height:1.5;
     }
 
     .home-information-card{margin-top:14px}
@@ -2000,11 +2016,27 @@
       line-height:1.7;
     }
 
-    .schedule-month-tabs{
+    .schedule-card-heading{
       display:flex;
-      gap:8px;
-      margin:0 0 10px;
-      padding:1px 1px 4px;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      margin-bottom:10px;
+    }
+
+    .schedule-card-heading .card-title{
+      flex:0 0 auto;
+      margin:0;
+      white-space:nowrap;
+    }
+
+    .schedule-month-tabs{
+      flex:1 1 auto;
+      min-width:0;
+      display:flex;
+      gap:7px;
+      margin:0;
+      padding:1px 1px 3px;
       overflow-x:auto;
       overscroll-behavior-x:contain;
       -webkit-overflow-scrolling:touch;
@@ -2017,13 +2049,13 @@
     .schedule-month-tab{
       flex:0 0 auto;
       scroll-snap-align:start;
-      min-width:62px;
+      min-width:54px;
       border:1px solid rgba(217,179,122,.28);
       border-radius:999px;
-      padding:7px 13px;
+      padding:6px 11px;
       background:rgba(9,15,17,.42);
       color:var(--muted);
-      font-size:13px;
+      font-size:12px;
       font-weight:800;
       line-height:1.2;
       white-space:nowrap;
@@ -3228,6 +3260,47 @@
       }
     }
 
+
+    /* ホーム画面版：通常ヘッダーは固定領域、本文だけが自然にバウンドする */
+    html.standalone-shell,
+    html.standalone-shell body{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+    }
+
+    html.standalone-shell body{
+      min-height:100%;
+      padding-bottom:0;
+    }
+
+    html.standalone-shell .app-shell{
+      height:100dvh;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      padding-bottom:0;
+    }
+
+    html.standalone-shell .topbar{
+      position:relative;
+      top:auto;
+      flex:0 0 auto;
+      margin-bottom:0;
+    }
+
+    html.standalone-shell .app-shell > main{
+      display:block;
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-y:auto;
+      padding-top:18px;
+      padding-bottom:calc(104px + env(safe-area-inset-bottom));
+    }
   </style>
 </head>
 <body class="home-active">
@@ -3275,21 +3348,23 @@
       <section id="page-home" class="page active">
         <div id="countdownList" class="countdown-list" aria-live="polite"></div>
 
+        <div class="card" id="todayRehearsalCard">
+          <h2 class="card-title today-heading">今日の練習内容</h2>
+          <div id="todaySongList" class="today-song-list"></div>
+          <ul id="todayTaskList" class="clean-list"></ul>
+        </div>
+
         <div class="card home-information-card" id="upcomingScheduleCard">
-          <h2 class="card-title today-heading">直近の予定</h2>
-          <div id="upcomingScheduleMonths" class="schedule-month-tabs" role="tablist" aria-label="予定を月別に表示"></div>
+          <div class="schedule-card-heading">
+            <h2 class="card-title today-heading">直近の予定</h2>
+            <div id="upcomingScheduleMonths" class="schedule-month-tabs" role="tablist" aria-label="予定を月別に表示"></div>
+          </div>
           <div id="upcomingScheduleList" class="upcoming-schedule-list" data-scroll-handoff></div>
         </div>
 
         <div class="card home-information-card" id="performanceTimetableCard">
           <h2 class="card-title today-heading">タイムスケジュール</h2>
           <div id="performanceTimetableList" class="performance-timetable-list"></div>
-        </div>
-
-        <div class="card" id="todayRehearsalCard">
-          <h2 class="card-title today-heading">今日の練習内容</h2>
-          <div id="todaySongList" class="today-song-list"></div>
-          <ul id="todayTaskList" class="clean-list"></ul>
         </div>
 
       </section>
@@ -3722,7 +3797,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260629-v30";
+    const APP_BUILD_VERSION = "20260629-v31";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7210,66 +7285,6 @@
     }
 
 
-    function bindStandaloneTopBounceGuard(){
-      const isStandalone = window.matchMedia("(display-mode: standalone)").matches
-        || window.navigator.standalone === true;
-
-      if(!isStandalone) return;
-      if(document.documentElement.dataset.standaloneTopBounceGuard === "true") return;
-
-      document.documentElement.dataset.standaloneTopBounceGuard = "true";
-      document.documentElement.classList.add("standalone-no-bounce");
-
-      let touchStartX = 0;
-      let touchStartY = 0;
-      let trackingSingleTouch = false;
-
-      document.addEventListener("touchstart",event=>{
-        if(event.touches.length !== 1){
-          trackingSingleTouch = false;
-          return;
-        }
-
-        const touch = event.touches[0];
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-        trackingSingleTouch = true;
-      },{passive:true,capture:true});
-
-      document.addEventListener("touchmove",event=>{
-        if(!trackingSingleTouch || event.touches.length !== 1) return;
-
-        const touch = event.touches[0];
-        const deltaX = touch.clientX - touchStartX;
-        const deltaY = touch.clientY - touchStartY;
-
-        // 横スワイプや上方向のスクロールは従来どおり許可する。
-        if(deltaY <= 4 || Math.abs(deltaY) <= Math.abs(deltaX) * 1.12) return;
-
-        // 内部スクロール領域が上へ戻れる状態なら、その領域の操作を優先する。
-        const inner = findScrollableFromTarget(event.target);
-        if(inner && inner.scrollTop > 1) return;
-
-        const rootScrollTop = Math.max(
-          window.scrollY || 0,
-          document.documentElement.scrollTop || 0,
-          document.body.scrollTop || 0
-        );
-
-        // ページ最上部で下方向へ引く動きだけを止め、ヘッダーごとのゴム状移動を防ぐ。
-        if(rootScrollTop <= 1 && event.cancelable){
-          event.preventDefault();
-        }
-      },{passive:false,capture:true});
-
-      const finishTouch = ()=>{
-        trackingSingleTouch = false;
-      };
-
-      document.addEventListener("touchend",finishTouch,{passive:true,capture:true});
-      document.addEventListener("touchcancel",finishTouch,{passive:true,capture:true});
-    }
-
     function bindHiddenAdminCommand(){
       document.addEventListener("keydown",event=>{
         const modifier = event.ctrlKey || event.metaKey;
@@ -8216,6 +8231,22 @@
       depthAnimationFrame = window.requestAnimationFrame(tick);
     }
 
+    function getPrimaryScrollHost(){
+      const main = document.querySelector(".app-shell > main");
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+        || window.navigator.standalone === true;
+      return isStandalone && main ? main : window;
+    }
+
+    function scrollPrimaryToTop(behavior="smooth"){
+      const host = getPrimaryScrollHost();
+      if(host === window){
+        window.scrollTo({top:0,behavior});
+      }else{
+        host.scrollTo({top:0,behavior});
+      }
+    }
+
     function switchPage(pageName,options={}){
       if(pageName === "story" && !options.allowLockedStory) return;
       if(!options.skipGeoCheck && geoRestrictionApplies(pageName) && !readGeoSession()){
@@ -8229,7 +8260,7 @@
       document.getElementById(`page-${pageName}`).classList.add("active");
       document.querySelector(`.nav-btn[data-page="${pageName}"]`).classList.add("active");
       updateDepthPanel(pageName,true);
-      window.scrollTo({top:0,behavior:"smooth"});
+      scrollPrimaryToTop("smooth");
       if(pageName==="progress"){
         renderAllProgress();
       }
@@ -8308,7 +8339,6 @@
       bindSetlistButtons();
       bindAdminControls();
       bindNestedScrollHandoff();
-      bindStandaloneTopBounceGuard();
       bindHiddenAdminCommand();
       refreshGeoRestriction();
     }
