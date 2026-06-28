@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v29" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v29" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v29" />
-  <meta name="app-build" content="20260629-v29" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v30" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v30" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v30" />
+  <meta name="app-build" content="20260629-v30" />
   <style>
     :root{
       --bg:#0c1214;
@@ -39,6 +39,12 @@
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
+
+    html.standalone-no-bounce,
+    html.standalone-no-bounce body{
+      overscroll-behavior-y:none;
+    }
+
     body{
       margin:0;
       font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
@@ -3716,7 +3722,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260629-v29";
+    const APP_BUILD_VERSION = "20260629-v30";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7203,6 +7209,67 @@
       document.addEventListener("touchcancel",finishTouch,{passive:true,capture:true});
     }
 
+
+    function bindStandaloneTopBounceGuard(){
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+        || window.navigator.standalone === true;
+
+      if(!isStandalone) return;
+      if(document.documentElement.dataset.standaloneTopBounceGuard === "true") return;
+
+      document.documentElement.dataset.standaloneTopBounceGuard = "true";
+      document.documentElement.classList.add("standalone-no-bounce");
+
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let trackingSingleTouch = false;
+
+      document.addEventListener("touchstart",event=>{
+        if(event.touches.length !== 1){
+          trackingSingleTouch = false;
+          return;
+        }
+
+        const touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        trackingSingleTouch = true;
+      },{passive:true,capture:true});
+
+      document.addEventListener("touchmove",event=>{
+        if(!trackingSingleTouch || event.touches.length !== 1) return;
+
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+
+        // 横スワイプや上方向のスクロールは従来どおり許可する。
+        if(deltaY <= 4 || Math.abs(deltaY) <= Math.abs(deltaX) * 1.12) return;
+
+        // 内部スクロール領域が上へ戻れる状態なら、その領域の操作を優先する。
+        const inner = findScrollableFromTarget(event.target);
+        if(inner && inner.scrollTop > 1) return;
+
+        const rootScrollTop = Math.max(
+          window.scrollY || 0,
+          document.documentElement.scrollTop || 0,
+          document.body.scrollTop || 0
+        );
+
+        // ページ最上部で下方向へ引く動きだけを止め、ヘッダーごとのゴム状移動を防ぐ。
+        if(rootScrollTop <= 1 && event.cancelable){
+          event.preventDefault();
+        }
+      },{passive:false,capture:true});
+
+      const finishTouch = ()=>{
+        trackingSingleTouch = false;
+      };
+
+      document.addEventListener("touchend",finishTouch,{passive:true,capture:true});
+      document.addEventListener("touchcancel",finishTouch,{passive:true,capture:true});
+    }
+
     function bindHiddenAdminCommand(){
       document.addEventListener("keydown",event=>{
         const modifier = event.ctrlKey || event.metaKey;
@@ -8241,6 +8308,7 @@
       bindSetlistButtons();
       bindAdminControls();
       bindNestedScrollHandoff();
+      bindStandaloneTopBounceGuard();
       bindHiddenAdminCommand();
       refreshGeoRestriction();
     }
