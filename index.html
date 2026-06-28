@@ -9,7 +9,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>UndergrounD UtopiA｜地下住人専用端末</title>
   <meta name="application-name" content="UndergrounD UtopiA Portal v26" />
-  <meta name="app-build" content="20260627-v26" />
+  <meta name="app-build" content="20260628-v27" />
   <style>
     :root{
       --bg:#0c1214;
@@ -3065,6 +3065,98 @@
       }
     }
 
+
+    /* =========================================
+       v27：コンパクト認証ヘッダー／物語編集
+       ========================================= */
+    .topbar{
+      margin-bottom:10px;
+      padding-top:calc(10px + env(safe-area-inset-top));
+      padding-bottom:7px;
+    }
+
+    .brand-sub{margin-top:3px}
+
+    .terminal-auth-bar{
+      margin-top:5px;
+      padding:5px 9px;
+      gap:3px 14px;
+    }
+
+    .terminal-auth-field{line-height:1.15}
+    .terminal-auth-order .terminal-auth-value{line-height:1.28}
+
+    .nav-btn.locked,
+    .nav-btn:disabled{
+      cursor:not-allowed;
+      opacity:.46;
+      filter:saturate(.45);
+    }
+
+    .admin-story-list{
+      display:grid;
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .admin-story-item{
+      padding:13px;
+      border:1px solid rgba(111,135,145,.34);
+      border-radius:14px;
+      background:rgba(12,20,23,.56);
+    }
+
+    .admin-story-item-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .admin-story-item-title{
+      color:var(--gold);
+      font-weight:800;
+    }
+
+    .admin-story-fields{
+      display:grid;
+      grid-template-columns:130px minmax(0,1fr);
+      gap:9px;
+    }
+
+    .admin-story-fields .wide{grid-column:1 / -1}
+
+    @media (max-width:650px){
+      .topbar{
+        margin-bottom:8px;
+        padding-top:calc(8px + env(safe-area-inset-top));
+        padding-bottom:5px;
+      }
+
+      .brand-sub{margin-top:2px}
+
+      .terminal-auth-bar{
+        margin-top:4px;
+        padding:5px 7px;
+        gap:3px 8px;
+      }
+
+      .terminal-auth-order .terminal-auth-value{line-height:1.25}
+      .admin-story-fields{grid-template-columns:1fr}
+      .admin-story-fields .wide{grid-column:auto}
+    }
+
+
+    .admin-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+    @media (max-width:650px){
+      .admin-tab-button{
+        padding:9px 6px;
+        font-size:10.5px;
+      }
+    }
+
   </style>
 </head>
 <body class="home-active">
@@ -3132,14 +3224,10 @@
       </section>
 
       <section id="page-story" class="page">
-        <h2 class="page-title">物語を知る</h2>
+        <h2 id="storyPageTitle" class="page-title">物語を知る</h2>
         <div class="card">
-          <div class="eyebrow">THE STORY OF UNDERGROUND UTOPIA</div>
-          <p class="lead">
-            ここは、何者にもなれなかった人たちが流れ着く地下。かつて夢を見ていた彼らは、どこかにあるはずのユートピアを目指して歩き始める。
-            しかし、たどり着いた先でも現実は簡単には変わらない。それでも、誰かが隣にいることで、今日が少しだけ良い日になる。
-            これは、何者にもなれなかった人たちが、もう一度自分の人生へ帰っていく物語。
-          </p>
+          <div id="storyEyebrow" class="eyebrow">THE STORY OF UNDERGROUND UTOPIA</div>
+          <p id="storyIntro" class="lead"></p>
         </div>
         <div id="storyMap" class="story-map"></div>
       </section>
@@ -3182,7 +3270,7 @@
   <nav class="bottom-nav" aria-label="メインメニュー">
     <button class="nav-btn active" data-page="home"><span>⌂</span>ホーム</button>
     <button class="nav-btn" data-page="songs"><span>♫</span>セットリスト</button>
-    <button class="nav-btn" data-page="story"><span>◎</span>物語</button>
+    <button class="nav-btn locked" data-page="story" type="button" disabled aria-disabled="true" title="物語記録は現在封鎖されています"><span>▣</span>物語</button>
     <button class="nav-btn" data-page="progress"><span>▥</span>進捗</button>
   </nav>
 
@@ -3226,7 +3314,7 @@
 
       <div class="admin-note">
         <strong>この端末に下書き保存</strong>は、操作中の端末だけに反映されます。
-        Google管理者ログイン後に<strong>全員へ反映</strong>を押すと、ホーム情報・タイムスケジュール・セットリスト・楽曲詳細をまとめて全端末へ公開します。
+        Google管理者ログイン後に<strong>全員へ反映</strong>を押すと、ホーム情報・タイムスケジュール・セットリスト・楽曲詳細・物語をまとめて全端末へ公開します。
       </div>
 
       <div class="firebase-admin-box" aria-live="polite">
@@ -3249,6 +3337,7 @@
         <div class="admin-tabs" role="tablist" aria-label="管理画面の編集対象">
           <button class="admin-tab-button active" type="button" data-admin-tab="home" role="tab">ホーム編集</button>
           <button class="admin-tab-button" type="button" data-admin-tab="setlists" role="tab">本番・セットリスト</button>
+          <button class="admin-tab-button" type="button" data-admin-tab="story" role="tab">物語編集</button>
         </div>
 
         <section id="adminTabHome" class="admin-tab-panel active" data-admin-panel="home">
@@ -3508,6 +3597,35 @@
       </div>
         </section>
 
+        <section id="adminTabStory" class="admin-tab-panel" data-admin-panel="story">
+          <section class="admin-dashboard-card wide">
+            <div class="admin-setlist-head">
+              <div>
+                <div class="admin-field-label">物語ページ</div>
+                <div class="admin-hint">現在、利用者側の物語タブは封鎖中です。公開前に内容を編集できます。</div>
+              </div>
+              <button id="adminAddStorySection" class="admin-btn compact" type="button">＋ セクション</button>
+            </div>
+
+            <div class="admin-form-grid">
+              <label class="admin-field wide">
+                <span class="admin-field-label">ページタイトル</span>
+                <input id="adminStoryPageTitle" class="admin-input" type="text">
+              </label>
+              <label class="admin-field wide">
+                <span class="admin-field-label">英字見出し</span>
+                <input id="adminStoryEyebrow" class="admin-input" type="text">
+              </label>
+              <label class="admin-field wide">
+                <span class="admin-field-label">導入文</span>
+                <textarea id="adminStoryIntro" class="admin-textarea" rows="5"></textarea>
+              </label>
+            </div>
+
+            <div id="adminStorySections" class="admin-story-list"></div>
+          </section>
+        </section>
+
         <div class="admin-footer-actions admin-global-footer">
           <button id="adminCancel" class="admin-btn ghost" type="button">変更を破棄</button>
           <button id="adminSave" class="admin-btn secondary" type="button">この端末に下書き保存</button>
@@ -3533,7 +3651,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260627-v26";
+    const APP_BUILD_VERSION = "20260628-v27";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -3606,36 +3724,106 @@
     ];
 
     const terminalOrders = [
-      "本日の探索は第13区画から開始せよ。",
-      "灯りの消えた通路へ単独で入るな。",
-      "楽園の座標は未確定。記録を続けよ。",
-      "隣人の歩調を確認し、隊列を乱すな。",
-      "音の反響を手がかりに旧坑道を調査せよ。",
-      "第7配管区の異音を確認せよ。",
-      "失われた地図の断片を回収せよ。",
-      "本日の合言葉は「帰る場所はつくれる」。",
-      "不要な照明を落とし、電力を温存せよ。",
-      "楽園は発見するものではない。築け。",
-      "誰かが遅れている。先へ行かず、待て。",
-      "見つからない道は、音で示せ。",
-      "本日の任務：昨日より良い地下を残せ。",
-      "古い扉には印を付け、無理に開くな。",
-      "持ち場を離れる際は必ず記録を残せ。",
-      "第24区画の通信状況を報告せよ。",
-      "地下水路の増水に警戒せよ。",
-      "予備電源の残量を確認せよ。",
-      "不安は隠すな。共有し、軽くせよ。",
-      "使われていない椅子を一つ空けておけ。",
-      "今日の失敗を、明日の地図に加えよ。",
-      "進路不明時は最も近い灯りへ戻れ。",
-      "無音区域では足音を合わせよ。",
-      "誰かの名前を忘れないこと。それも任務だ。",
-      "楽園候補地の環境記録を更新せよ。",
-      "旧居住区の壁面文字を保存せよ。",
-      "食料庫の配給記録を確認せよ。",
-      "本日の探索終了後、全員の帰還を確認せよ。",
-      "ここを楽園に変える作業を続行せよ。",
-      "目的地より、共に進む者を見失うな。"
+          "本日の探索は第13区画から開始せよ。",
+          "灯りの消えた通路へ単独で入るな。",
+          "不要な照明を落とし、電力を温存せよ。",
+          "第7配管区の異音を確認せよ。",
+          "地下水路の水位を記録せよ。",
+          "予備電源の残量を確認せよ。",
+          "食料庫の配給記録を確認せよ。",
+          "旧居住区の換気装置を点検せよ。",
+          "使用していない区画の扉を施錠せよ。",
+          "本日の作業終了後、全員の帰還を確認せよ。",
+          "失われた地図の断片を回収せよ。",
+          "古い扉には印を付け、無理に開くな。",
+          "音の反響を手がかりに旧坑道を調査せよ。",
+          "分岐点では必ず帰還経路を記録せよ。",
+          "未登録の通路を発見した場合は座標を報告せよ。",
+          "壁面に残された文字を保存せよ。",
+          "地図にない階段を発見しても、単独で進むな。",
+          "地下深部から届く信号の発信源を確認せよ。",
+          "通行不能区画の迂回経路を調査せよ。",
+          "楽園候補区画の環境記録を更新せよ。",
+          "第24区画の通信状況を報告せよ。",
+          "通信が途絶えた場合は、最も近い中継器へ戻れ。",
+          "本日の活動記録を中央書庫へ送信せよ。",
+          "聞き慣れない信号には即座に応答するな。",
+          "途切れた通信にも、誰かの声が残っている。記録せよ。",
+          "持ち場を離れる際は必ず記録を残せ。",
+          "昨日の失敗を、本日の地図へ加えよ。",
+          "消去された記録の復元を試みよ。",
+          "地下住民IDの認証状態を確認せよ。",
+          "忘れてはならない名前を、記録簿へ残せ。",
+          "隣人の歩調を確認し、隊列を乱すな。",
+          "誰かが遅れている。先へ行かず、待て。",
+          "無音区域では全員の足音を合わせよ。",
+          "進路不明時は最も近い灯りへ戻れ。",
+          "最後尾の住民が見える速度で進め。",
+          "隊列から離れた者を責めるな。まず迎えに行け。",
+          "使われていない椅子を一つ空けておけ。",
+          "今日出会った者へ、自分の区画を名乗れ。",
+          "作業開始前に、全員の呼吸を確認せよ。",
+          "目的地より、共に進む者を見失うな。",
+          "楽園は発見するものではない。築け。",
+          "ここを楽園に変える作業を続行せよ。",
+          "本日の任務は、昨日より良い地下を残すこと。",
+          "壊れた場所を隠すな。修復の印を残せ。",
+          "小さな灯りで構わない。消さずに守れ。",
+          "空いている壁に、次の住民のための目印を残せ。",
+          "誰も使わない場所にも、帰還経路を用意せよ。",
+          "新しい居住区には、最初に集会場所を設けよ。",
+          "楽園の設計図に、他者の居場所を忘れるな。",
+          "完成を急ぐな。暮らし続けられる場所を築け。",
+          "不安は隠すな。共有し、軽くせよ。",
+          "疲労を確認した者は、作業を中断して休め。",
+          "今日できなかったことを、失敗とは記録するな。",
+          "自分の灯りが弱い日は、隣人の灯りを借りよ。",
+          "沈黙している者の存在を忘れるな。",
+          "無理に前を向く必要はない。立ち止まる場所を確保せよ。",
+          "帰る場所を失った者へ、空き区画を案内せよ。",
+          "眠れない住民には、夜間通信を開放せよ。",
+          "本日の損失より、残されたものを確認せよ。",
+          "自分を守ることも、共同体を守る任務である。",
+          "見つからない道は、音で示せ。",
+          "音響保管区の機材状態を確認せよ。",
+          "演奏開始前に、全員の基準音をそろえよ。",
+          "音が途切れても、呼吸まで止めるな。",
+          "地下に残る反響を、次の演奏へ利用せよ。",
+          "誰か一人の音を、全員で覆い隠すな。",
+          "無音もまた記録の一部として扱え。",
+          "本日の演奏を、未到達区画へ届けよ。",
+          "合図が届かない時は、互いの視線を確認せよ。",
+          "音楽は楽園への道標である。丁寧に鳴らせ。",
+          "中央管理局は、全区画の生存信号を確認している。",
+          "本日の合言葉は「帰る場所はつくれる」。",
+          "許可なき区画封鎖を禁ずる。",
+          "管理権限は支配ではなく、居場所を守るために使用せよ。",
+          "新規居住者の登録を最優先せよ。",
+          "配給不足を個人の責任として処理するな。",
+          "楽園建設計画は全住民の参加をもって継続される。",
+          "中央管理局への異議申立て経路を確保せよ。",
+          "命令より安全を優先すべき場合、現場判断を許可する。",
+          "地下の未来は、階級ではなく行動によって決定される。",
+          "遠くの光だけを楽園と呼ぶな。",
+          "地上に答えがあるとは限らない。ここで考え続けよ。",
+          "変わらない現実にも、変えられる一日がある。",
+          "何者にもなれなかった者の名前を消すな。",
+          "夢を失った者にも、作業灯を一つ残せ。",
+          "過去へ戻る道より、今日を帰れる道を探せ。",
+          "大きな希望がなくても、小さな改善を続けよ。",
+          "楽園に到達したと宣言する者を、すぐには信用するな。",
+          "完璧な場所より、誰かを迎えられる場所を選べ。",
+          "地下にいることを敗北として記録するな。",
+          "本日は誰かの話を最後まで聞け。",
+          "一つ余分に灯りを点け、帰還者を待て。",
+          "今日の任務を終えた者は、まだ終えていない者を手伝え。",
+          "閉ざされた扉の前で、自分を責め続けるな。",
+          "失われたものを悼む時間を確保せよ。",
+          "楽園の条件を、中央管理局だけに決めさせるな。",
+          "次の住民が迷わないよう、足跡を残せ。",
+          "帰還報告の最後に、今日良かったことを一つ記録せよ。",
+          "明日もここへ戻れるよう、本日の設備を整えよ。",
+          "本日の最終指令――今日は帰ろう。"
     ];
 
     function secureRandomInteger(maxExclusive){
@@ -3688,15 +3876,29 @@
       return currentRank;
     }
 
+    let currentTerminalOrderIndex = -1;
+
+    function rotateTerminalOrder(){
+      if(!terminalOrders.length) return;
+      let nextIndex = secureRandomInteger(terminalOrders.length);
+      if(terminalOrders.length > 1 && nextIndex === currentTerminalOrderIndex){
+        nextIndex = (nextIndex + 1 + secureRandomInteger(terminalOrders.length - 1)) % terminalOrders.length;
+      }
+      currentTerminalOrderIndex = nextIndex;
+      const order = terminalOrders[nextIndex];
+      const orderElement = document.getElementById("terminalOrderValue");
+      if(orderElement){
+        orderElement.textContent = order;
+        orderElement.title = order;
+      }
+    }
+
     function initializeTerminalIdentity(){
       const residentId = getOrCreateResidentId();
       const accessCount = registerTerminalAccess();
       const accessRank = getAccessRank(accessCount);
-      const randomOrder = terminalOrders[secureRandomInteger(terminalOrders.length)];
-
       const residentElement = document.getElementById("residentIdValue");
       const accessElement = document.getElementById("accessLevelValue");
-      const orderElement = document.getElementById("terminalOrderValue");
 
       if(residentElement) residentElement.textContent = residentId;
       if(accessElement){
@@ -3704,10 +3906,7 @@
         accessElement.textContent = `${displayedCount} / ${accessRank.title}`;
         accessElement.title = `アクセス回数 ${accessCount}回`;
       }
-      if(orderElement){
-        orderElement.textContent = randomOrder;
-        orderElement.title = randomOrder;
-      }
+      rotateTerminalOrder();
     }
 
     // ============================
@@ -4771,12 +4970,15 @@
     const performanceStorageKey = "underground-utopia-performances-v1";
     const activePerformanceStorageKey = "underground-utopia-active-performance-v1";
     const songDetailsStorageKey = "underground-utopia-song-details-v1";
+    const storyStorageKey = "underground-utopia-story-v1";
     const defaultPerformanceId = "underground-utopia-2026";
     let performanceCatalog = [];
     let activePerformanceId = localStorage.getItem(activePerformanceStorageKey) || defaultPerformanceId;
     let songDetailsCatalog = [];
+    let storyData = null;
     let adminWorkingCatalog = [];
     let adminWorkingSongDetails = [];
+    let adminWorkingStory = null;
     let adminSelectedPerformanceId = defaultPerformanceId;
 
     const homeStorageKey = "underground-utopia-home-dashboard-v1";
@@ -5418,6 +5620,59 @@
       })) : [];
     }
 
+    function buildDefaultStoryData(){
+      return {
+        pageTitle:"物語を知る",
+        eyebrow:"THE STORY OF UNDERGROUND UTOPIA",
+        intro:"ここは、何者にもなれなかった人たちが流れ着く地下。かつて夢を見ていた彼らは、どこかにあるはずのユートピアを目指して歩き始める。\nしかし、たどり着いた先でも現実は簡単には変わらない。それでも、誰かが隣にいることで、今日が少しだけ良い日になる。\nこれは、何者にもなれなかった人たちが、もう一度自分の人生へ帰っていく物語。",
+        sections:sections.map(section=>({
+          id:section.id || makeLocalId("story-section"),
+          no:String(section.no || ""),
+          title:String(section.title || ""),
+          story:String(section.story || ""),
+          keywords:normalizeStringList(section.keywords),
+          direction:String(section.direction || "")
+        }))
+      };
+    }
+
+    function normalizeStoryData(value){
+      const defaults = buildDefaultStoryData();
+      const source = value && typeof value === "object" ? value : {};
+      const sourceSections = Array.isArray(source.sections) ? source.sections : defaults.sections;
+      return {
+        pageTitle:String(source.pageTitle ?? defaults.pageTitle).trim() || defaults.pageTitle,
+        eyebrow:String(source.eyebrow ?? defaults.eyebrow).trim() || defaults.eyebrow,
+        intro:String(source.intro ?? defaults.intro).trim(),
+        sections:sourceSections.map((section,index)=>({
+          id:section?.id || makeLocalId("story-section"),
+          no:String(section?.no ?? section?.label ?? `${index+1}`).trim(),
+          title:String(section?.title || "新しいセクション").trim() || "新しいセクション",
+          story:String(section?.story || "").trim(),
+          keywords:normalizeStringList(section?.keywords),
+          direction:String(section?.direction || "").trim()
+        }))
+      };
+    }
+
+    function initializeStoryData(){
+      const local = localStorage.getItem(storyStorageKey);
+      if(local){
+        try{
+          storyData = normalizeStoryData(JSON.parse(local));
+          return;
+        }catch(error){
+          console.warn("端末内の物語データを読み込めませんでした",error);
+        }
+      }
+      storyData = normalizeStoryData(null);
+    }
+
+    function saveStoryData(){
+      storyData = normalizeStoryData(storyData);
+      localStorage.setItem(storyStorageKey,JSON.stringify(storyData));
+    }
+
     function normalizeStandaloneTimelines(value){
       return Array.isArray(value) ? value.map(item=>({
         id:item.id || makeLocalId("standalone-timeline"),
@@ -5822,6 +6077,7 @@
       adminWorkingCatalog = cloneData(performanceCatalog);
       adminWorkingHome = cloneData(homeData);
       adminWorkingSongDetails = cloneData(songDetailsCatalog);
+      adminWorkingStory = cloneData(storyData);
       adminSelectedPerformanceId = activePerformanceId;
       if(!adminWorkingCatalog.some(item=>item.id===adminSelectedPerformanceId)){
         adminSelectedPerformanceId = adminWorkingCatalog[0]?.id || "";
@@ -5829,6 +6085,7 @@
       renderAdminPerformanceSelect();
       renderAdminEditor();
       renderAdminHomeEditor();
+      renderAdminStoryEditor();
       switchAdminTab("home");
 
       const panel = document.getElementById("adminPanel");
@@ -6218,6 +6475,99 @@
       renderAdminTimelineItems();
     }
 
+    function renderAdminStoryEditor(){
+      adminWorkingStory = normalizeStoryData(adminWorkingStory);
+      const pageTitle = document.getElementById("adminStoryPageTitle");
+      const eyebrow = document.getElementById("adminStoryEyebrow");
+      const intro = document.getElementById("adminStoryIntro");
+      const root = document.getElementById("adminStorySections");
+      if(!pageTitle || !eyebrow || !intro || !root) return;
+
+      pageTitle.value = adminWorkingStory.pageTitle;
+      eyebrow.value = adminWorkingStory.eyebrow;
+      intro.value = adminWorkingStory.intro;
+      pageTitle.oninput = ()=>adminWorkingStory.pageTitle = pageTitle.value;
+      eyebrow.oninput = ()=>adminWorkingStory.eyebrow = eyebrow.value;
+      intro.oninput = ()=>adminWorkingStory.intro = intro.value;
+
+      root.innerHTML = adminWorkingStory.sections.length ? adminWorkingStory.sections.map((section,index)=>`
+        <article class="admin-story-item" data-story-section-index="${index}">
+          <div class="admin-story-item-head">
+            <span class="admin-story-item-title">SECTION ${escapeHtml(section.no || String(index+1))}</span>
+            <div class="admin-row-actions">
+              <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="-1" ${index===0?"disabled":""}>↑</button>
+              <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="1" ${index===adminWorkingStory.sections.length-1?"disabled":""}>↓</button>
+              <button class="admin-icon-btn" type="button" data-delete-story="${index}">×</button>
+            </div>
+          </div>
+          <div class="admin-story-fields">
+            <label class="admin-field">
+              <span class="admin-field-label">番号・ラベル</span>
+              <input class="admin-input" value="${escapeHtml(section.no)}" data-story-field="no" data-story-index="${index}">
+            </label>
+            <label class="admin-field">
+              <span class="admin-field-label">タイトル</span>
+              <input class="admin-input" value="${escapeHtml(section.title)}" data-story-field="title" data-story-index="${index}">
+            </label>
+            <label class="admin-field wide">
+              <span class="admin-field-label">物語本文</span>
+              <textarea class="admin-textarea" data-story-field="story" data-story-index="${index}">${escapeHtml(section.story)}</textarea>
+            </label>
+            <label class="admin-field wide">
+              <span class="admin-field-label">キーワード（1行につき1つ）</span>
+              <textarea class="admin-textarea" data-story-field="keywords" data-story-index="${index}">${escapeHtml(section.keywords.join("\n"))}</textarea>
+            </label>
+            <label class="admin-field wide">
+              <span class="admin-field-label">演奏者の意識</span>
+              <textarea class="admin-textarea" data-story-field="direction" data-story-index="${index}">${escapeHtml(section.direction)}</textarea>
+            </label>
+          </div>
+        </article>
+      `).join("") : `<div class="admin-empty">物語セクションはまだありません。</div>`;
+
+      root.querySelectorAll("[data-story-field]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          const section = adminWorkingStory.sections[Number(input.dataset.storyIndex)];
+          if(!section) return;
+          if(input.dataset.storyField === "keywords") section.keywords = normalizeStringList(input.value);
+          else section[input.dataset.storyField] = input.value;
+        });
+      });
+
+      root.querySelectorAll("[data-move-story]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const index = Number(button.dataset.moveStory);
+          const next = index + Number(button.dataset.direction);
+          if(next < 0 || next >= adminWorkingStory.sections.length) return;
+          [adminWorkingStory.sections[index],adminWorkingStory.sections[next]] = [adminWorkingStory.sections[next],adminWorkingStory.sections[index]];
+          renderAdminStoryEditor();
+        });
+      });
+
+      root.querySelectorAll("[data-delete-story]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          adminWorkingStory.sections.splice(Number(button.dataset.deleteStory),1);
+          renderAdminStoryEditor();
+        });
+      });
+    }
+
+    function addAdminStorySection(){
+      adminWorkingStory = normalizeStoryData(adminWorkingStory);
+      adminWorkingStory.sections.push({
+        id:makeLocalId("story-section"),
+        no:String(adminWorkingStory.sections.length+1),
+        title:"新しいセクション",
+        story:"",
+        keywords:[],
+        direction:""
+      });
+      renderAdminStoryEditor();
+      requestAnimationFrame(()=>{
+        document.querySelector("[data-story-section-index]:last-child")?.scrollIntoView({behavior:"smooth",block:"center"});
+      });
+    }
+
     function setAdminAuthorized(value){
       adminAuthorized = Boolean(value);
       document.getElementById("adminPanel")?.classList.toggle("admin-authorized",adminAuthorized);
@@ -6412,7 +6762,8 @@
       return {
         catalog:cloneData(normalizeCatalog(adminWorkingCatalog)),
         home:cloneData(normalizeHomeData(adminWorkingHome)),
-        songDetails:cloneData(normalizeSongDetails(adminWorkingSongDetails.length ? adminWorkingSongDetails : songDetailsCatalog))
+        songDetails:cloneData(normalizeSongDetails(adminWorkingSongDetails.length ? adminWorkingSongDetails : songDetailsCatalog)),
+        story:cloneData(normalizeStoryData(adminWorkingStory || storyData))
       };
     }
 
@@ -6428,16 +6779,19 @@
       performanceCatalog = data.catalog;
       homeData = data.home;
       songDetailsCatalog = data.songDetails;
+      storyData = data.story;
       activePerformanceId = adminSelectedPerformanceId || performanceCatalog[0].id;
       savePerformanceCatalog();
       saveHomeData();
       saveSongDetails();
+      saveStoryData();
 
       activeFilter = "all";
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
       renderHomeDashboard();
+      renderStories();
       closeAdmin();
     }
 
@@ -6450,20 +6804,24 @@
       const catalog = Array.isArray(data) ? data : data?.catalog;
       const incomingHome = Array.isArray(data) ? null : data?.home;
       const incomingSongDetails = Array.isArray(data) ? null : data?.songDetails;
+      const incomingStory = Array.isArray(data) ? null : data?.story;
       if(Array.isArray(catalog)) performanceCatalog = normalizeCatalog(catalog);
       if(incomingHome) homeData = normalizeHomeData(incomingHome);
       if(Array.isArray(incomingSongDetails)) songDetailsCatalog = normalizeSongDetails(incomingSongDetails);
+      if(incomingStory) storyData = normalizeStoryData(incomingStory);
       if(!performanceCatalog.some(item=>item.id===activePerformanceId)){
         activePerformanceId = performanceCatalog[0]?.id || defaultPerformanceId;
       }
       savePerformanceCatalog();
       saveHomeData();
       saveSongDetails();
+      saveStoryData();
       activeFilter = "all";
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
       renderHomeDashboard();
+      renderStories();
       if(previousGeoSignature !== geoConfigSignature()){
         clearGeoSession();
       }
@@ -6474,10 +6832,12 @@
         adminWorkingCatalog = cloneData(performanceCatalog);
         adminWorkingHome = cloneData(homeData);
         adminWorkingSongDetails = cloneData(songDetailsCatalog);
+        adminWorkingStory = cloneData(storyData);
         adminSelectedPerformanceId = activePerformanceId;
         renderAdminPerformanceSelect();
         renderAdminEditor();
         renderAdminHomeEditor();
+        renderAdminStoryEditor();
       }
     }
 
@@ -6487,6 +6847,7 @@
       getCurrentCatalog:()=>cloneData(performanceCatalog),
       getCurrentHome:()=>cloneData(homeData),
       getCurrentSongDetails:()=>cloneData(songDetailsCatalog),
+      getCurrentStory:()=>cloneData(storyData),
       applyPublishedPortalData,
       applyPublishedCatalog:catalog=>applyPublishedPortalData({catalog}),
       setAdminAuthorized,
@@ -6540,6 +6901,7 @@
       document.getElementById("adminAddSchedule").addEventListener("click",addAdminScheduleItem);
       document.getElementById("adminAddStandaloneTimeline")?.addEventListener("click",addAdminStandaloneTimeline);
       document.getElementById("adminAddTimelineItem").addEventListener("click",addAdminTimelineItem);
+      document.getElementById("adminAddStorySection").addEventListener("click",addAdminStorySection);
 
       document.querySelectorAll("[data-admin-tab]").forEach(button=>{
         button.addEventListener("click",()=>switchAdminTab(button.dataset.adminTab));
@@ -6563,6 +6925,7 @@
         localStorage.removeItem(activePerformanceStorageKey);
         localStorage.removeItem(homeStorageKey);
         localStorage.removeItem(songDetailsStorageKey);
+        localStorage.removeItem(storyStorageKey);
         location.reload();
       });
 
@@ -7168,19 +7531,31 @@
     }
 
     function renderStories(){
+      const data = normalizeStoryData(storyData);
+      const title = document.getElementById("storyPageTitle");
+      const eyebrow = document.getElementById("storyEyebrow");
+      const intro = document.getElementById("storyIntro");
       const map = document.getElementById("storyMap");
-      map.innerHTML = sections.map(section=>`
+      if(title) title.textContent = data.pageTitle;
+      if(eyebrow) eyebrow.textContent = data.eyebrow;
+      if(intro) intro.innerHTML = nl2br(data.intro);
+      if(!map) return;
+      map.innerHTML = data.sections.map(section=>`
         <article class="card story-card">
-          <span class="section-badge">SECTION ${section.no}</span>
-          <h3>${section.title}</h3>
+          <span class="section-badge">SECTION ${escapeHtml(section.no)}</span>
+          <h3>${escapeHtml(section.title)}</h3>
           <span class="label">STORY</span>
-          <p>${section.story}</p>
-          <span class="label">KEYWORDS</span>
-          <div class="keywords">
-            ${section.keywords.map(word=>`<span class="keyword">${word}</span>`).join("")}
-          </div>
-          <span class="label">演奏者の意識</span>
-          <p>${section.direction}</p>
+          <p>${nl2br(section.story)}</p>
+          ${section.keywords.length ? `
+            <span class="label">KEYWORDS</span>
+            <div class="keywords">
+              ${section.keywords.map(word=>`<span class="keyword">${escapeHtml(word)}</span>`).join("")}
+            </div>
+          ` : ""}
+          ${section.direction ? `
+            <span class="label">演奏者の意識</span>
+            <p>${nl2br(section.direction)}</p>
+          ` : ""}
         </article>
       `).join("");
     }
@@ -7562,6 +7937,7 @@
     }
 
     function switchPage(pageName,options={}){
+      if(pageName === "story" && !options.allowLockedStory) return;
       if(!options.skipGeoCheck && geoRestrictionApplies(pageName) && !readGeoSession()){
         openLocationGate(pageName);
         return;
@@ -7585,7 +7961,11 @@
     }
 
     document.querySelectorAll(".nav-btn").forEach(button=>{
-      button.addEventListener("click",()=>switchPage(button.dataset.page));
+      button.addEventListener("click",()=>{
+        if(button.disabled || button.getAttribute("aria-disabled") === "true") return;
+        if(button.dataset.page === "home") rotateTerminalOrder();
+        switchPage(button.dataset.page);
+      });
     });
 
     document.getElementById("closeDetail").addEventListener("click",closeDetail);
@@ -7635,6 +8015,7 @@
       updateDepthPanel("home",false);
       initializeHomeData();
       initializeSongDetails();
+      initializeStoryData();
       await initializePerformanceCatalog();
       normalizeProgress();
       renderHomeDashboard();
@@ -7830,11 +8211,12 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:7,
+          version:8,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
           songDetails:portalData.songDetails,
+          story:portalData.story,
           updatedAt:serverTimestamp(),
           updatedBy:{
             uid:currentFirebaseUser.uid,
@@ -7897,7 +8279,7 @@
         const data = snapshot.data() || {};
         const catalog = data.catalog;
         if(Array.isArray(catalog) && window.utopiaSetlistApp){
-          window.utopiaSetlistApp.applyPublishedPortalData({catalog,home:data.home,songDetails:data.songDetails});
+          window.utopiaSetlistApp.applyPublishedPortalData({catalog,home:data.home,songDetails:data.songDetails,story:data.story});
           setDataStatus("Firebaseの公開情報を表示しています。", "online");
         }else{
           setDataStatus("Firebaseの公開データ形式を確認できませんでした。", "warning");
