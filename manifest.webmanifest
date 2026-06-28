@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "地下住民端末",
+  "short_name": "地下住民端末",
+  "description": "UndergrounD UtopiA 地下住民専用端末",
+  "lang": "ja",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c1214",
+  "theme_color": "#11181b",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
