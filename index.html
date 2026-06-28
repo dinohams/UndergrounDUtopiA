@@ -7,9 +7,16 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>UndergrounD UtopiA｜地下住人専用端末</title>
-  <meta name="application-name" content="UndergrounD UtopiA Portal v26" />
-  <meta name="app-build" content="20260628-v27" />
+  <title>地下住民端末</title>
+  <meta name="application-name" content="地下住民端末" />
+  <meta name="apple-mobile-web-app-title" content="地下住民端末" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v28" />
+  <link rel="icon" type="image/png" href="./asset/icon.png?v=20260629-v28" />
+  <link rel="apple-touch-icon" href="./asset/icon.png?v=20260629-v28" />
+  <meta name="app-build" content="20260629-v28" />
   <style>
     :root{
       --bg:#0c1214;
@@ -1051,6 +1058,23 @@
       overflow-y:auto;
       background:linear-gradient(180deg,#10191c,#0b1214);
       padding:14px 14px 34px;
+      transform:translateX(0);
+    }
+
+    .detail-inner.edge-swiping{
+      will-change:transform;
+      transition:none;
+    }
+
+    .detail-inner.edge-snapback{
+      transition:transform .18s cubic-bezier(.22,.8,.28,1);
+    }
+
+    @media (max-width:760px){
+      .detail-panel.open{
+        touch-action:pan-y;
+        overscroll-behavior-x:none;
+      }
     }
     .detail-head{
       position:sticky;
@@ -1968,6 +1992,47 @@
       color:var(--muted);
       font-size:13px;
       line-height:1.7;
+    }
+
+    .schedule-month-tabs{
+      display:flex;
+      gap:8px;
+      margin:0 0 10px;
+      padding:1px 1px 4px;
+      overflow-x:auto;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      scroll-snap-type:x proximity;
+    }
+
+    .schedule-month-tabs::-webkit-scrollbar{display:none}
+
+    .schedule-month-tab{
+      flex:0 0 auto;
+      scroll-snap-align:start;
+      min-width:62px;
+      border:1px solid rgba(217,179,122,.28);
+      border-radius:999px;
+      padding:7px 13px;
+      background:rgba(9,15,17,.42);
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+      line-height:1.2;
+      white-space:nowrap;
+    }
+
+    .schedule-month-tab.active{
+      border-color:rgba(217,179,122,.66);
+      background:linear-gradient(180deg,rgba(196,139,90,.28),rgba(80,55,38,.26));
+      color:var(--gold);
+      box-shadow:inset 0 0 0 1px rgba(217,179,122,.08);
+    }
+
+    .schedule-month-tab:focus-visible{
+      outline:2px solid rgba(217,179,122,.72);
+      outline-offset:2px;
     }
 
     .upcoming-schedule-list{
@@ -3206,8 +3271,8 @@
 
         <div class="card home-information-card" id="upcomingScheduleCard">
           <h2 class="card-title today-heading">直近の予定</h2>
+          <div id="upcomingScheduleMonths" class="schedule-month-tabs" role="tablist" aria-label="予定を月別に表示"></div>
           <div id="upcomingScheduleList" class="upcoming-schedule-list" data-scroll-handoff></div>
-          <button id="toggleScheduleButton" class="home-expand-button" type="button" hidden>その先の予定を見る</button>
         </div>
 
         <div class="card home-information-card" id="performanceTimetableCard">
@@ -3651,7 +3716,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260628-v27";
+    const APP_BUILD_VERSION = "20260629-v28";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -4984,7 +5049,7 @@
     const homeStorageKey = "underground-utopia-home-dashboard-v1";
     let homeData = buildDefaultHomeData();
     let adminWorkingHome = buildDefaultHomeData();
-    let scheduleExpanded = false;
+    let activeScheduleMonth = "";
     let adminAuthorized = false;
 
     function makeLocalId(prefix="item"){
@@ -6049,8 +6114,16 @@
       openDetailPanel();
     }
 
+    function resetDetailSwipePosition(){
+      const inner = document.querySelector("#detailPanel .detail-inner");
+      if(!inner) return;
+      inner.classList.remove("edge-swiping","edge-snapback");
+      inner.style.transform = "translateX(0)";
+    }
+
     function openDetailPanel(){
       const panel = document.getElementById("detailPanel");
+      resetDetailSwipePosition();
       panel.classList.add("open");
       panel.setAttribute("aria-hidden","false");
       document.body.style.overflow = "hidden";
@@ -6964,10 +7037,6 @@
         openAdmin();
       });
 
-      document.getElementById("toggleScheduleButton").addEventListener("click",()=>{
-        scheduleExpanded = !scheduleExpanded;
-        renderUpcomingSchedule();
-      });
     }
 
     function isScrollableY(element){
@@ -7346,13 +7415,60 @@
       return "～";
     }
 
+    function scheduleMonthKey(dateString){
+      const match = String(dateString || "").match(/^(\d{4})-(\d{2})/);
+      return match ? `${match[1]}-${match[2]}` : "";
+    }
+
+    function formatScheduleMonthLabel(monthKey,showYear=false){
+      const [year,month] = String(monthKey || "").split("-");
+      const monthNumber = Number(month);
+      if(!year || !Number.isFinite(monthNumber)) return monthKey;
+      return showYear ? `${year}年${monthNumber}月` : `${monthNumber}月`;
+    }
+
     function renderUpcomingSchedule(){
       const root = document.getElementById("upcomingScheduleList");
-      const button = document.getElementById("toggleScheduleButton");
-      if(!root || !button) return;
+      const tabsRoot = document.getElementById("upcomingScheduleMonths");
+      if(!root || !tabsRoot) return;
+
       const groups = getUpcomingScheduleGroups();
-      const visible = scheduleExpanded ? groups : groups.slice(0,3);
-      const visibleItems = visible.flatMap(group=>
+      const monthGroups = new Map();
+      groups.forEach(group=>{
+        const monthKey = scheduleMonthKey(group.date);
+        if(!monthKey) return;
+        if(!monthGroups.has(monthKey)) monthGroups.set(monthKey,[]);
+        monthGroups.get(monthKey).push(group);
+      });
+
+      const monthKeys = [...monthGroups.keys()].sort();
+      if(!monthKeys.length){
+        activeScheduleMonth = "";
+        tabsRoot.innerHTML = "";
+        root.innerHTML = `<div class="home-empty">今後の予定はまだ登録されていません。</div>`;
+        return;
+      }
+
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+      if(!monthKeys.includes(activeScheduleMonth)){
+        activeScheduleMonth = monthKeys.includes(currentMonthKey)
+          ? currentMonthKey
+          : (monthKeys.find(key=>key >= currentMonthKey) || monthKeys[0]);
+      }
+
+      const showYear = new Set(monthKeys.map(key=>key.slice(0,4))).size > 1;
+      tabsRoot.innerHTML = monthKeys.map(monthKey=>`
+        <button
+          class="schedule-month-tab ${monthKey===activeScheduleMonth ? "active" : ""}"
+          type="button"
+          role="tab"
+          aria-selected="${monthKey===activeScheduleMonth ? "true" : "false"}"
+          data-schedule-month="${escapeHtml(monthKey)}"
+        >${escapeHtml(formatScheduleMonthLabel(monthKey,showYear))}</button>
+      `).join("");
+
+      const visibleItems = (monthGroups.get(activeScheduleMonth) || []).flatMap(group=>
         group.items.map(item=>({date:group.date,item}))
       );
 
@@ -7365,10 +7481,23 @@
           </span>
           <span class="schedule-entry-time">${escapeHtml(formatScheduleTimeRange(item))}</span>
         </div>
-      `).join("") : `<div class="home-empty">今後の予定はまだ登録されていません。</div>`;
+      `).join("") : `<div class="home-empty">この月の予定はまだ登録されていません。</div>`;
 
-      button.hidden = groups.length <= 3;
-      button.textContent = scheduleExpanded ? "3日分だけ表示" : "その先の予定を見る";
+      tabsRoot.querySelectorAll("[data-schedule-month]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          activeScheduleMonth = button.dataset.scheduleMonth || activeScheduleMonth;
+          renderUpcomingSchedule();
+          document.getElementById("upcomingScheduleList")?.scrollTo({top:0,behavior:"smooth"});
+        });
+      });
+
+      window.requestAnimationFrame(()=>{
+        tabsRoot.querySelector(".schedule-month-tab.active")?.scrollIntoView({
+          behavior:"smooth",
+          block:"nearest",
+          inline:"center"
+        });
+      });
     }
 
     function todayDateKey(){
@@ -7870,6 +7999,90 @@
       panel.classList.remove("open");
       panel.setAttribute("aria-hidden","true");
       document.body.style.overflow = "";
+      resetDetailSwipePosition();
+    }
+
+    function bindDetailEdgeSwipe(){
+      const panel = document.getElementById("detailPanel");
+      const inner = panel?.querySelector(".detail-inner");
+      if(!panel || !inner) return;
+
+      const state = {
+        active:false,
+        horizontal:false,
+        startX:0,
+        startY:0,
+        lastX:0,
+        startTime:0
+      };
+
+      const isMobileSwipe = ()=>window.matchMedia("(max-width:760px)").matches;
+
+      panel.addEventListener("touchstart",event=>{
+        if(!isMobileSwipe() || !panel.classList.contains("open") || event.touches.length !== 1) return;
+        const touch = event.touches[0];
+        if(touch.clientX > 32) return;
+        if(event.target.closest("input,textarea,select,[contenteditable='true']")) return;
+
+        state.active = true;
+        state.horizontal = false;
+        state.startX = touch.clientX;
+        state.startY = touch.clientY;
+        state.lastX = touch.clientX;
+        state.startTime = performance.now();
+        inner.classList.remove("edge-snapback");
+        inner.classList.add("edge-swiping");
+      },{passive:true});
+
+      panel.addEventListener("touchmove",event=>{
+        if(!state.active || event.touches.length !== 1) return;
+        const touch = event.touches[0];
+        const dx = Math.max(0,touch.clientX - state.startX);
+        const dy = touch.clientY - state.startY;
+
+        if(!state.horizontal){
+          if(Math.abs(dy) > 10 && Math.abs(dy) > dx){
+            state.active = false;
+            resetDetailSwipePosition();
+            return;
+          }
+          if(dx < 9 || dx < Math.abs(dy) * 1.25) return;
+          state.horizontal = true;
+        }
+
+        event.preventDefault();
+        state.lastX = touch.clientX;
+        const translated = Math.min(window.innerWidth,dx * .86);
+        inner.style.transform = `translateX(${translated}px)`;
+      },{passive:false});
+
+      const finishSwipe = ()=>{
+        if(!state.active){
+          state.horizontal = false;
+          return;
+        }
+
+        const dx = Math.max(0,state.lastX - state.startX);
+        const elapsed = Math.max(1,performance.now() - state.startTime);
+        const velocity = dx / elapsed;
+        const shouldClose = state.horizontal && (dx >= 92 || velocity >= .55);
+
+        state.active = false;
+        state.horizontal = false;
+        inner.classList.remove("edge-swiping");
+        inner.classList.add("edge-snapback");
+
+        if(shouldClose){
+          inner.style.transform = `translateX(${window.innerWidth}px)`;
+          window.setTimeout(closeDetail,170);
+        }else{
+          inner.style.transform = "translateX(0)";
+          window.setTimeout(()=>inner.classList.remove("edge-snapback"),190);
+        }
+      };
+
+      panel.addEventListener("touchend",finishSwipe,{passive:true});
+      panel.addEventListener("touchcancel",finishSwipe,{passive:true});
     }
 
     function renderAllProgress(){
@@ -7972,6 +8185,7 @@
     document.getElementById("detailPanel").addEventListener("click",event=>{
       if(event.target.id==="detailPanel") closeDetail();
     });
+    bindDetailEdgeSwipe();
 
     document.getElementById("resetProgress").addEventListener("click",()=>{
       const ok = confirm("この端末に保存されている進捗をすべてリセットします。よろしいですか？");
