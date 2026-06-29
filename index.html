@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v34" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v34" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v34" />
-  <meta name="app-build" content="20260629-v34" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v35" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v35" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v35" />
+  <meta name="app-build" content="20260629-v35" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3702,6 +3702,20 @@
       padding-right:max(8px,calc((100vw - 760px) / 2 + 8px));
       background-color:#091012;
     }
+
+    /* v35：メトロノーム画面は計器を広く使うため通常ヘッダーを隠す */
+    body.metronome-active .topbar{
+      display:none;
+    }
+
+    html.standalone-shell body.metronome-active .app-shell > main{
+      padding-top:calc(18px + env(safe-area-inset-top));
+    }
+
+    .metronome-start-btn:disabled{
+      cursor:wait;
+      opacity:.68;
+    }
   </style>
 </head>
 <body class="home-active">
@@ -3808,9 +3822,7 @@
           <div class="card metronome-device-card">
             <div class="metronome-device" aria-label="振り子式メトロノーム">
               <div id="metronomeStatus" class="metronome-status">STANDBY</div>
-              <div class="metronome-scale" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="metronome-scale" aria-hidden="true"></div>
               <div id="metronomeNeedleWrap" class="metronome-needle-wrap" aria-hidden="true">
                 <span class="metronome-needle"></span>
                 <span class="metronome-weight"></span>
@@ -4266,7 +4278,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260629-v34";
+    const APP_BUILD_VERSION = "20260629-v35";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8684,7 +8696,11 @@
       bpm:Math.min(300,Math.max(30,Number(localStorage.getItem(metronomeBpmStorageKey)) || 120)),
       selectedRate:null,
       running:false,
+      starting:false,
+      startToken:0,
       audioContext:null,
+      audioBuffer:null,
+      audioLoadPromise:null,
       schedulerTimer:0,
       nextNoteTime:0,
       scheduledNodes:[],
@@ -8744,31 +8760,60 @@
 
     function clearScheduledMetronomeNodes(){
       metronomeState.scheduledNodes.forEach(node=>{
-        try{ node.oscillator.stop(); }catch(error){}
+        try{ node.source.stop(); }catch(error){}
       });
       metronomeState.scheduledNodes = [];
     }
 
+    async function decodeMetronomeAudioData(context,arrayBuffer){
+      const bufferCopy = arrayBuffer.slice(0);
+      try{
+        const decoded = context.decodeAudioData(bufferCopy);
+        if(decoded && typeof decoded.then === "function") return await decoded;
+      }catch(error){}
+
+      return await new Promise((resolve,reject)=>{
+        context.decodeAudioData(arrayBuffer.slice(0),resolve,reject);
+      });
+    }
+
+    async function loadMetronomeAudioBuffer(){
+      if(metronomeState.audioBuffer) return metronomeState.audioBuffer;
+      if(metronomeState.audioLoadPromise) return metronomeState.audioLoadPromise;
+      if(!metronomeState.audioContext) throw new Error("AudioContext is not ready");
+
+      metronomeState.audioLoadPromise = (async()=>{
+        const response = await fetch(`./meto.mp3?v=${APP_BUILD_VERSION}`,{cache:"force-cache"});
+        if(!response.ok) throw new Error(`meto.mp3: ${response.status}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await decodeMetronomeAudioData(metronomeState.audioContext,arrayBuffer);
+        metronomeState.audioBuffer = audioBuffer;
+        return audioBuffer;
+      })();
+
+      try{
+        return await metronomeState.audioLoadPromise;
+      }finally{
+        metronomeState.audioLoadPromise = null;
+      }
+    }
+
     function scheduleMetronomeClick(time){
       const context = metronomeState.audioContext;
-      if(!context) return;
+      const buffer = metronomeState.audioBuffer;
+      if(!context || !buffer) return;
 
-      const oscillator = context.createOscillator();
+      const source = context.createBufferSource();
       const gain = context.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(1180,time);
-      oscillator.frequency.exponentialRampToValueAtTime(820,time + .025);
-      gain.gain.setValueAtTime(.0001,time);
-      gain.gain.exponentialRampToValueAtTime(.22,time + .002);
-      gain.gain.exponentialRampToValueAtTime(.0001,time + .045);
-      oscillator.connect(gain);
+      source.buffer = buffer;
+      gain.gain.setValueAtTime(.92,time);
+      source.connect(gain);
       gain.connect(context.destination);
-      oscillator.start(time);
-      oscillator.stop(time + .055);
+      source.start(time);
 
-      const scheduled = {oscillator,gain};
+      const scheduled = {source,gain};
       metronomeState.scheduledNodes.push(scheduled);
-      oscillator.addEventListener("ended",()=>{
+      source.addEventListener("ended",()=>{
         metronomeState.scheduledNodes = metronomeState.scheduledNodes.filter(item=>item!==scheduled);
       },{once:true});
     }
@@ -8811,43 +8856,66 @@
       const button = document.getElementById("metronomeStartStop");
       const status = document.getElementById("metronomeStatus");
       if(button){
-        button.textContent = metronomeState.running ? "STOP" : "START";
+        button.textContent = metronomeState.starting ? "LOADING" : (metronomeState.running ? "STOP" : "START");
         button.classList.toggle("running",metronomeState.running);
+        button.disabled = metronomeState.starting;
       }
       if(status){
-        status.textContent = metronomeState.running ? "RUNNING" : "STANDBY";
+        status.textContent = metronomeState.starting ? "LOADING" : (metronomeState.running ? "RUNNING" : "STANDBY");
         status.classList.toggle("running",metronomeState.running);
       }
     }
 
     async function startMetronome(){
+      if(metronomeState.running || metronomeState.starting) return;
+
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if(!AudioContextClass){
         alert("このブラウザではメトロノーム音を再生できません。");
         return;
       }
 
-      if(!metronomeState.audioContext){
-        metronomeState.audioContext = new AudioContextClass();
-      }
-      if(metronomeState.audioContext.state === "suspended"){
-        await metronomeState.audioContext.resume();
-      }
-
-      clearScheduledMetronomeNodes();
-      window.clearInterval(metronomeState.schedulerTimer);
-      cancelAnimationFrame(metronomeState.visualFrame);
-
-      metronomeState.running = true;
-      metronomeState.nextNoteTime = metronomeState.audioContext.currentTime + .055;
-      metronomeState.visualEpoch = metronomeState.nextNoteTime;
-      runMetronomeScheduler();
-      metronomeState.schedulerTimer = window.setInterval(runMetronomeScheduler,25);
-      metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
+      const requestToken = ++metronomeState.startToken;
+      metronomeState.starting = true;
       syncMetronomeRunningUi();
+
+      try{
+        if(!metronomeState.audioContext){
+          metronomeState.audioContext = new AudioContextClass();
+        }
+        if(metronomeState.audioContext.state === "suspended"){
+          await metronomeState.audioContext.resume();
+        }
+
+        await loadMetronomeAudioBuffer();
+        if(requestToken !== metronomeState.startToken) return;
+
+        clearScheduledMetronomeNodes();
+        window.clearInterval(metronomeState.schedulerTimer);
+        cancelAnimationFrame(metronomeState.visualFrame);
+
+        metronomeState.running = true;
+        metronomeState.nextNoteTime = metronomeState.audioContext.currentTime + .055;
+        metronomeState.visualEpoch = metronomeState.nextNoteTime;
+        runMetronomeScheduler();
+        metronomeState.schedulerTimer = window.setInterval(runMetronomeScheduler,25);
+        metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
+      }catch(error){
+        console.error("meto.mp3 load failed",error);
+        if(requestToken === metronomeState.startToken){
+          alert("meto.mp3を読み込めませんでした。GitHubのルート直下にmeto.mp3を配置してください。");
+        }
+      }finally{
+        if(requestToken === metronomeState.startToken){
+          metronomeState.starting = false;
+          syncMetronomeRunningUi();
+        }
+      }
     }
 
     function stopMetronome(){
+      metronomeState.startToken += 1;
+      metronomeState.starting = false;
       metronomeState.running = false;
       window.clearInterval(metronomeState.schedulerTimer);
       metronomeState.schedulerTimer = 0;
@@ -9054,6 +9122,7 @@
       }
 
       document.body.classList.add("home-active");
+      document.body.classList.toggle("metronome-active",pageName === "metronome");
       document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.remove("active"));
       document.getElementById(`page-${pageName}`).classList.add("active");
