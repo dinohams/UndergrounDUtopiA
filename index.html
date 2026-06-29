@@ -8797,7 +8797,8 @@
         metronomeState.audioLoadPromise = null;
       }
     }
-
+      const METRONOME_AUDIO_TRIM = 0.035;
+      const METRONOME_SOUND_DELAY = 0;
     function scheduleMetronomeClick(time){
       const context = metronomeState.audioContext;
       const buffer = metronomeState.audioBuffer;
@@ -8806,11 +8807,13 @@
       const source = context.createBufferSource();
       const gain = context.createGain();
       source.buffer = buffer;
-      gain.gain.setValueAtTime(.92,time);
+      const playTime = time + METRONOME_SOUND_DELAY;
+
+      gain.gain.setValueAtTime(.92, playTime);
       source.connect(gain);
       gain.connect(context.destination);
-      source.start(time);
-
+      source.start(playTime, METRONOME_AUDIO_TRIM);
+   
       const scheduled = {source,gain};
       metronomeState.scheduledNodes.push(scheduled);
       source.addEventListener("ended",()=>{
