@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v36" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v36" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v36" />
-  <meta name="app-build" content="20260629-v36" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v37" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v37" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v37" />
+  <meta name="app-build" content="20260630-v37" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4278,7 +4278,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260629-v36";
+    const APP_BUILD_VERSION = "20260630-v37";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8690,9 +8690,9 @@
     const metronomeSelectedSongStorageKey = "underground-utopia-metronome-song-v1";
     const metronomeBpmStorageKey = "underground-utopia-metronome-bpm-v1";
 
-    // iPhoneなどで音がスピーカーから出るまでの遅延分だけ、針の表示を遅らせる。
-    // 端末から遅延値を取得できない場合は40ミリ秒を使用する。
-    const METRONOME_VISUAL_DELAY_FALLBACK = 0.040;
+    // iPhone側で音が実際に聞こえるまでのわずかな遅延に合わせ、
+    // 針の表示だけ40ミリ秒遅らせる。音声再生処理そのものは変更しない。
+    const METRONOME_VISUAL_DELAY = 0.040;
 
     const metronomeState = {
       selectedSongTitle:localStorage.getItem(metronomeSelectedSongStorageKey) || "",
@@ -8704,7 +8704,6 @@
       startToken:0,
       audioContext:null,
       audioBuffer:null,
-      audioTrimOffset:0,
       audioLoadPromise:null,
       schedulerTimer:0,
       nextNoteTime:0,
@@ -8782,59 +8781,6 @@
       });
     }
 
-    function detectMetronomeAudioTrimOffset(audioBuffer){
-      if(!audioBuffer || !audioBuffer.length || !audioBuffer.sampleRate) return 0;
-
-      const channelCount = Math.max(1,audioBuffer.numberOfChannels || 1);
-      let peak = 0;
-
-      for(let channelIndex=0;channelIndex<channelCount;channelIndex+=1){
-        const data = audioBuffer.getChannelData(channelIndex);
-        for(let index=0;index<data.length;index+=1){
-          const value = Math.abs(data[index]);
-          if(value > peak) peak = value;
-        }
-      }
-
-      if(peak <= 0) return 0;
-
-      const threshold = Math.max(0.006,peak * 0.055);
-      let firstSoundSample = audioBuffer.length;
-
-      for(let channelIndex=0;channelIndex<channelCount;channelIndex+=1){
-        const data = audioBuffer.getChannelData(channelIndex);
-        for(let index=0;index<data.length;index+=1){
-          if(Math.abs(data[index]) >= threshold){
-            firstSoundSample = Math.min(firstSoundSample,index);
-            break;
-          }
-        }
-      }
-
-      if(firstSoundSample >= audioBuffer.length) return 0;
-
-      // 音の立ち上がりを切りすぎないよう、検出位置より2ミリ秒前から再生する。
-      const preRollSamples = Math.round(audioBuffer.sampleRate * 0.002);
-      return Math.max(0,(firstSoundSample - preRollSamples) / audioBuffer.sampleRate);
-    }
-
-    function getMetronomeVisualDelay(){
-      const context = metronomeState.audioContext;
-      if(!context) return METRONOME_VISUAL_DELAY_FALLBACK;
-
-      const outputLatency = Number(context.outputLatency);
-      if(Number.isFinite(outputLatency) && outputLatency > 0){
-        return Math.min(0.120,Math.max(METRONOME_VISUAL_DELAY_FALLBACK,outputLatency));
-      }
-
-      const baseLatency = Number(context.baseLatency);
-      if(Number.isFinite(baseLatency) && baseLatency > 0){
-        return Math.min(0.120,Math.max(METRONOME_VISUAL_DELAY_FALLBACK,baseLatency));
-      }
-
-      return METRONOME_VISUAL_DELAY_FALLBACK;
-    }
-
     async function loadMetronomeAudioBuffer(){
       if(metronomeState.audioBuffer) return metronomeState.audioBuffer;
       if(metronomeState.audioLoadPromise) return metronomeState.audioLoadPromise;
@@ -8846,7 +8792,6 @@
         const arrayBuffer = await response.arrayBuffer();
         const audioBuffer = await decodeMetronomeAudioData(metronomeState.audioContext,arrayBuffer);
         metronomeState.audioBuffer = audioBuffer;
-        metronomeState.audioTrimOffset = detectMetronomeAudioTrimOffset(audioBuffer);
         return audioBuffer;
       })();
 
@@ -8868,7 +8813,7 @@
       gain.gain.setValueAtTime(.92,time);
       source.connect(gain);
       gain.connect(context.destination);
-      source.start(time,metronomeState.audioTrimOffset);
+      source.start(time);
 
       const scheduled = {source,gain};
       metronomeState.scheduledNodes.push(scheduled);
@@ -8898,8 +8843,9 @@
       }
 
       const secondsPerBeat = 60 / metronomeState.bpm;
-      const visualDelay = getMetronomeVisualDelay();
-      const elapsed = metronomeState.audioContext.currentTime - metronomeState.visualEpoch - visualDelay;
+      const elapsed = metronomeState.audioContext.currentTime
+        - metronomeState.visualEpoch
+        - METRONOME_VISUAL_DELAY;
 
       if(elapsed < 0){
         needle.style.transform = "translateX(-50%) rotate(0deg)";
