@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v33" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v33" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v33" />
-  <meta name="app-build" content="20260629-v33" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v34" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v34" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v34" />
+  <meta name="app-build" content="20260629-v34" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -1213,7 +1213,7 @@
       transform:translateX(-50%);
       width:min(100%,760px);
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(5,1fr);
       padding:8px 8px calc(8px + env(safe-area-inset-bottom));
       background:rgba(9,14,16,.96);
       border-top:1px solid rgba(196,139,90,.35);
@@ -3318,6 +3318,372 @@
       background:transparent;
     }
 
+
+    /* =========================================
+       メトロノーム
+       ========================================= */
+    .metronome-page{
+      padding-bottom:18px;
+    }
+
+    .metronome-layout{
+      display:grid;
+      gap:16px;
+    }
+
+    .metronome-song-card,
+    .metronome-device-card{
+      overflow:hidden;
+    }
+
+    .metronome-song-select{
+      margin-top:10px;
+    }
+
+    .metronome-tempo-summary{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .metronome-tempo-box{
+      border:1px solid rgba(217,179,122,.34);
+      border-radius:14px;
+      padding:12px 14px;
+      background:rgba(8,14,16,.48);
+    }
+
+    .metronome-tempo-box span{
+      display:block;
+      color:var(--muted);
+      font-size:11px;
+      letter-spacing:.08em;
+      margin-bottom:5px;
+    }
+
+    .metronome-tempo-box strong{
+      display:block;
+      color:var(--gold);
+      font-size:25px;
+      line-height:1.15;
+    }
+    .metronome-tempo-box strong span{
+      display:inline;
+      color:inherit;
+      font-size:inherit;
+      letter-spacing:0;
+      margin:0;
+    }
+
+    .metronome-multipliers{
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:7px;
+      margin-top:14px;
+    }
+
+    .metronome-rate-btn{
+      min-height:42px;
+      border:1px solid rgba(217,179,122,.34);
+      border-radius:12px;
+      background:rgba(8,14,16,.48);
+      color:#d8dede;
+      font-family:inherit;
+      font-size:13px;
+      transition:.18s ease;
+    }
+
+    .metronome-rate-btn.active{
+      color:#fff4df;
+      border-color:rgba(225,178,111,.78);
+      background:rgba(196,139,90,.20);
+      box-shadow:0 0 0 1px rgba(225,178,111,.12) inset;
+    }
+
+    .metronome-rate-btn:disabled{
+      opacity:.34;
+      cursor:not-allowed;
+    }
+
+    .metronome-device{
+      position:relative;
+      width:min(100%,360px);
+      aspect-ratio:1 / 1.03;
+      margin:0 auto 14px;
+      border:1px solid rgba(217,179,122,.44);
+      border-radius:28px 28px 18px 18px;
+      background:
+        linear-gradient(180deg,rgba(16,24,27,.90),rgba(7,12,14,.90)),
+        radial-gradient(circle at 50% 18%,rgba(198,142,90,.12),transparent 42%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.025),
+        inset 0 -26px 40px rgba(0,0,0,.24),
+        0 14px 34px rgba(0,0,0,.24);
+      overflow:hidden;
+    }
+
+    .metronome-device::before{
+      content:"";
+      position:absolute;
+      left:18%;
+      right:18%;
+      bottom:10%;
+      height:48%;
+      clip-path:polygon(50% 0,100% 100%,0 100%);
+      border:1px solid rgba(217,179,122,.26);
+      background:linear-gradient(180deg,rgba(48,61,64,.28),rgba(5,10,12,.55));
+    }
+
+    .metronome-scale{
+      position:absolute;
+      left:18%;
+      right:18%;
+      top:13%;
+      height:24%;
+      border-top:1px solid rgba(217,179,122,.34);
+      border-radius:50%;
+    }
+
+    .metronome-scale span{
+      position:absolute;
+      left:50%;
+      top:-2px;
+      width:1px;
+      height:12px;
+      background:rgba(217,179,122,.50);
+      transform-origin:0 92px;
+    }
+
+    .metronome-scale span:nth-child(1){transform:rotate(-48deg)}
+    .metronome-scale span:nth-child(2){transform:rotate(-32deg)}
+    .metronome-scale span:nth-child(3){transform:rotate(-16deg)}
+    .metronome-scale span:nth-child(4){transform:rotate(0deg)}
+    .metronome-scale span:nth-child(5){transform:rotate(16deg)}
+    .metronome-scale span:nth-child(6){transform:rotate(32deg)}
+    .metronome-scale span:nth-child(7){transform:rotate(48deg)}
+
+    .metronome-needle-wrap{
+      position:absolute;
+      left:50%;
+      bottom:18%;
+      width:18px;
+      height:62%;
+      transform:translateX(-50%);
+      transform-origin:50% 100%;
+      will-change:transform;
+    }
+
+    .metronome-needle{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:3px;
+      height:100%;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background:linear-gradient(180deg,#e2b06f,#a5683d);
+      box-shadow:0 0 10px rgba(226,176,111,.18);
+    }
+
+    .metronome-weight{
+      position:absolute;
+      left:50%;
+      top:30%;
+      width:24px;
+      height:42px;
+      transform:translate(-50%,-50%);
+      border:1px solid rgba(241,203,145,.72);
+      border-radius:6px;
+      background:linear-gradient(180deg,#bd8050,#6c412b);
+      box-shadow:0 4px 12px rgba(0,0,0,.26);
+    }
+
+    .metronome-pivot{
+      position:absolute;
+      left:50%;
+      bottom:16.5%;
+      width:17px;
+      height:17px;
+      transform:translateX(-50%);
+      border-radius:50%;
+      border:2px solid rgba(234,192,130,.8);
+      background:#7d4c31;
+      box-shadow:0 0 0 5px rgba(9,15,17,.82);
+    }
+
+    .metronome-device-readout{
+      position:absolute;
+      left:50%;
+      bottom:3.8%;
+      transform:translateX(-50%);
+      display:flex;
+      align-items:baseline;
+      gap:7px;
+      color:var(--gold);
+      white-space:nowrap;
+    }
+
+    .metronome-device-readout strong{
+      font-size:34px;
+      line-height:1;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .metronome-device-readout span{
+      font-size:11px;
+      letter-spacing:.12em;
+    }
+
+    .metronome-status{
+      position:absolute;
+      top:6%;
+      left:0;
+      right:0;
+      text-align:center;
+      color:#8f9a9c;
+      font-size:10px;
+      letter-spacing:.18em;
+    }
+
+    .metronome-status.running{
+      color:#d9ae76;
+    }
+
+    .metronome-bpm-controls{
+      display:grid;
+      grid-template-columns:52px minmax(0,1fr) 52px;
+      gap:9px;
+      align-items:center;
+      width:min(100%,360px);
+      margin:0 auto;
+    }
+
+    .metronome-step-btn,
+    .metronome-start-btn{
+      border:1px solid rgba(217,179,122,.42);
+      background:rgba(8,14,16,.58);
+      color:var(--gold);
+      border-radius:13px;
+      min-height:48px;
+      font-family:inherit;
+    }
+
+    .metronome-step-btn{
+      font-size:25px;
+    }
+
+    .metronome-bpm-input-wrap{
+      display:flex;
+      align-items:baseline;
+      justify-content:center;
+      gap:7px;
+      min-height:48px;
+      border:1px solid rgba(111,135,145,.45);
+      border-radius:13px;
+      background:rgba(8,14,16,.58);
+      padding:4px 10px;
+    }
+
+    .metronome-bpm-input{
+      width:92px;
+      border:0;
+      outline:0;
+      background:transparent;
+      color:#fff4df;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:29px;
+      text-align:center;
+      font-variant-numeric:tabular-nums;
+      appearance:textfield;
+    }
+
+    .metronome-bpm-input::-webkit-outer-spin-button,
+    .metronome-bpm-input::-webkit-inner-spin-button{
+      -webkit-appearance:none;
+      margin:0;
+    }
+
+    .metronome-bpm-unit{
+      color:#9aa4a6;
+      font-size:11px;
+      letter-spacing:.1em;
+    }
+
+    .metronome-start-btn{
+      display:block;
+      width:min(100%,360px);
+      margin:11px auto 0;
+      min-height:52px;
+      font-size:16px;
+      letter-spacing:.16em;
+      background:linear-gradient(180deg,rgba(146,89,51,.64),rgba(82,48,31,.72));
+    }
+
+    .metronome-start-btn.running{
+      color:#fff5e5;
+      border-color:rgba(225,178,111,.80);
+      background:linear-gradient(180deg,rgba(116,47,38,.72),rgba(68,28,25,.80));
+    }
+
+    .metronome-help{
+      margin:12px 0 0;
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.7;
+      text-align:center;
+    }
+
+    .metronome-nav-symbol{
+      position:relative;
+      width:18px;
+      height:18px;
+      margin:0 auto 6px;
+      display:block !important;
+      border-left:2px solid currentColor;
+      border-right:2px solid currentColor;
+      border-bottom:2px solid currentColor;
+      clip-path:polygon(50% 0,100% 100%,0 100%);
+    }
+
+    .metronome-nav-symbol::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:2px;
+      width:1px;
+      height:13px;
+      background:currentColor;
+      transform:translateX(-50%) rotate(13deg);
+      transform-origin:50% 100%;
+    }
+
+    @media (max-width:430px){
+      .bottom-nav .nav-btn{
+        font-size:10px;
+        padding-left:1px;
+        padding-right:1px;
+      }
+
+      .bottom-nav .nav-btn[data-page="metronome"]{
+        font-size:8.8px;
+      }
+
+      .metronome-multipliers{
+        gap:5px;
+      }
+
+      .metronome-rate-btn{
+        min-height:40px;
+        padding:0;
+        font-size:12px;
+      }
+
+      .metronome-device{
+        width:min(100%,330px);
+      }
+    }
+
     html.standalone-shell .app-shell > main > .page{
       width:min(100%,760px);
       margin:0 auto;
@@ -3345,7 +3711,7 @@
       <div class="brand">
         <div class="brand-text">
           <h1 class="brand-title">UndergrounD UtopiA</h1>
-          <p class="brand-sub">地下住人専用端末</p>
+          <p class="brand-sub">地下住民専用端末</p>
         </div>
         <div class="depth-panel" aria-label="現在の深度">
           <div class="depth-gauge" aria-hidden="true">
@@ -3406,6 +3772,71 @@
 
       </section>
 
+
+      <section id="page-metronome" class="page metronome-page">
+        <h2 class="page-title">メトロノーム</h2>
+
+        <div class="metronome-layout">
+          <div class="card metronome-song-card">
+            <div class="eyebrow">TEMPO CONTROL UNIT</div>
+            <label class="select-wrap metronome-song-select">
+              <span class="label">楽曲を選択</span>
+              <select id="metronomeSongSelect" aria-label="メトロノームで使用する曲を選択"></select>
+            </label>
+
+            <div class="metronome-tempo-summary">
+              <div class="metronome-tempo-box">
+                <span>基準テンポ</span>
+                <strong id="metronomeBaseTempo">未登録</strong>
+              </div>
+              <div class="metronome-tempo-box">
+                <span>現在テンポ</span>
+                <strong><span id="metronomeCurrentTempo">120</span> BPM</strong>
+              </div>
+            </div>
+
+            <div id="metronomeMultipliers" class="metronome-multipliers" aria-label="基準テンポに対する倍率">
+              <button class="metronome-rate-btn" type="button" data-tempo-rate="0.5">0.5</button>
+              <button class="metronome-rate-btn" type="button" data-tempo-rate="0.6">0.6</button>
+              <button class="metronome-rate-btn" type="button" data-tempo-rate="0.7">0.7</button>
+              <button class="metronome-rate-btn" type="button" data-tempo-rate="0.8">0.8</button>
+              <button class="metronome-rate-btn" type="button" data-tempo-rate="0.9">0.9</button>
+              <button class="metronome-rate-btn" type="button" data-tempo-rate="1">1.0</button>
+            </div>
+          </div>
+
+          <div class="card metronome-device-card">
+            <div class="metronome-device" aria-label="振り子式メトロノーム">
+              <div id="metronomeStatus" class="metronome-status">STANDBY</div>
+              <div class="metronome-scale" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div id="metronomeNeedleWrap" class="metronome-needle-wrap" aria-hidden="true">
+                <span class="metronome-needle"></span>
+                <span class="metronome-weight"></span>
+              </div>
+              <span class="metronome-pivot" aria-hidden="true"></span>
+              <div class="metronome-device-readout">
+                <strong id="metronomeDeviceTempo">120</strong>
+                <span>BPM</span>
+              </div>
+            </div>
+
+            <div class="metronome-bpm-controls">
+              <button id="metronomeMinus" class="metronome-step-btn" type="button" aria-label="テンポを1下げる">−</button>
+              <label class="metronome-bpm-input-wrap">
+                <input id="metronomeBpmInput" class="metronome-bpm-input" type="number" min="30" max="300" step="1" inputmode="numeric" value="120" aria-label="現在のテンポ">
+                <span class="metronome-bpm-unit">BPM</span>
+              </label>
+              <button id="metronomePlus" class="metronome-step-btn" type="button" aria-label="テンポを1上げる">＋</button>
+            </div>
+
+            <button id="metronomeStartStop" class="metronome-start-btn" type="button">START</button>
+            <p class="metronome-help">基準テンポ未登録の曲でも、BPMを直接入力して使用できます。</p>
+          </div>
+        </div>
+      </section>
+
       <section id="page-story" class="page">
         <h2 id="storyPageTitle" class="page-title">物語を知る</h2>
         <div class="card">
@@ -3453,6 +3884,7 @@
   <nav class="bottom-nav" aria-label="メインメニュー">
     <button class="nav-btn active" data-page="home"><span>⌂</span>ホーム</button>
     <button class="nav-btn" data-page="songs"><span>♫</span>セットリスト</button>
+    <button class="nav-btn" data-page="metronome"><span class="metronome-nav-symbol" aria-hidden="true"></span>メトロノーム</button>
     <button class="nav-btn locked" data-page="story" type="button" disabled aria-disabled="true" title="物語記録は現在封鎖されています"><span>▣</span>物語</button>
     <button class="nav-btn" data-page="progress"><span>▥</span>進捗</button>
   </nav>
@@ -3483,7 +3915,7 @@
         <div class="admin-head-copy">
           <div class="eyebrow">HIDDEN ADMIN MODE</div>
           <h2 class="admin-title">
-            <span class="admin-title-desktop">地下住人専用端末 管理画面</span>
+            <span class="admin-title-desktop">地下住民専用端末 管理画面</span>
             <span class="admin-title-mobile">管理画面</span>
           </h2>
         </div>
@@ -3834,7 +4266,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260629-v33";
+    const APP_BUILD_VERSION = "20260629-v34";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -5199,11 +5631,19 @@
       return [];
     }
 
+    function normalizeSongBaseBpm(value){
+      const number = Number(value);
+      if(!Number.isFinite(number)) return null;
+      const rounded = Math.round(number);
+      return rounded >= 30 && rounded <= 300 ? rounded : null;
+    }
+
     function buildDefaultSongDetails(){
       return songs.map(song=>({
         id:song.id || makeLocalId("song-detail"),
         title:String(song.title || "").trim(),
         youtubeUrl:"",
+        baseBpm:normalizeSongBaseBpm(song.baseBpm ?? song.bpm),
         infoTitle:"この曲の役割",
         infoBody:String(song.role || "").trim(),
         stage:normalizeStringList(song.stage)
@@ -5227,6 +5667,7 @@
             id:raw.id || existing.id || makeLocalId("song-detail"),
             title,
             youtubeUrl:String(raw.youtubeUrl ?? existing.youtubeUrl ?? "").trim(),
+            baseBpm:normalizeSongBaseBpm(raw.baseBpm ?? raw.bpm ?? existing.baseBpm),
             infoTitle:String(raw.infoTitle ?? existing.infoTitle ?? "この曲の役割").trim() || "この曲の役割",
             infoBody:String(raw.infoBody ?? raw.role ?? existing.infoBody ?? "").trim(),
             stage:normalizeStringList(raw.stage ?? existing.stage)
@@ -5268,6 +5709,7 @@
         id:makeLocalId("song-detail"),
         title:cleanTitle,
         youtubeUrl:"",
+        baseBpm:null,
         infoTitle:"この曲の役割",
         infoBody:"",
         stage:[]
@@ -5284,6 +5726,7 @@
         id:existing?.id || makeLocalId("song-detail"),
         title:cleanTitle,
         youtubeUrl:String(patch.youtubeUrl || "").trim(),
+        baseBpm:normalizeSongBaseBpm(patch.baseBpm),
         infoTitle:String(patch.infoTitle || "この曲の役割").trim() || "この曲の役割",
         infoBody:String(patch.infoBody || "").trim(),
         stage:normalizeStringList(patch.stage)
@@ -6983,6 +7426,7 @@
       renderSongs();
       renderHomeDashboard();
       renderStories();
+      renderMetronomeSongOptions();
       closeAdmin();
     }
 
@@ -7013,6 +7457,7 @@
       renderSongs();
       renderHomeDashboard();
       renderStories();
+      renderMetronomeSongOptions();
       if(previousGeoSignature !== geoConfigSignature()){
         clearGeoSession();
       }
@@ -8040,6 +8485,11 @@
           <div id="sharedSongYoutubePreview" class="youtube-editor-preview">${renderYouTubeSource(detail.youtubeUrl,{editor:true})}</div>
 
           <label class="admin-field" style="display:block;margin-top:12px">
+            <span class="admin-field-label">基準テンポ（BPM）</span>
+            <input id="sharedSongBaseBpm" class="admin-input" type="number" min="30" max="300" step="1" inputmode="numeric" value="${detail.baseBpm ?? ""}" placeholder="例：150">
+          </label>
+
+          <label class="admin-field" style="display:block;margin-top:12px">
             <span class="admin-field-label">2番目のカードのタイトル</span>
             <input id="sharedSongInfoTitle" class="admin-input" value="${escapeHtml(detail.infoTitle || "この曲の役割")}" placeholder="例：この曲の役割">
           </label>
@@ -8076,12 +8526,19 @@
           alert("YouTubeのURLを確認してください。通常動画・短縮URL・ShortsのURLに対応しています。");
           return;
         }
+        const rawBaseBpm = document.getElementById("sharedSongBaseBpm").value.trim();
+        if(rawBaseBpm && !normalizeSongBaseBpm(rawBaseBpm)){
+          alert("基準テンポは30〜300 BPMの範囲で入力してください。");
+          return;
+        }
         upsertSharedSongDetail(item.title,{
           youtubeUrl:normalizeYouTubeUrl(rawYoutubeUrl),
+          baseBpm:rawBaseBpm,
           infoTitle:document.getElementById("sharedSongInfoTitle").value,
           infoBody:document.getElementById("sharedSongInfoBody").value,
           stage:document.getElementById("sharedSongStage").value
         });
+        renderMetronomeSongOptions();
         alert("共通楽曲詳細をこの端末に保存しました。全員へ公開する場合は、管理画面から「全員へ反映」を押してください。");
         renderSharedSongDetail(item,performance,context);
       });
@@ -8217,9 +8674,313 @@
       });
     }
 
+
+    const metronomeSelectedSongStorageKey = "underground-utopia-metronome-song-v1";
+    const metronomeBpmStorageKey = "underground-utopia-metronome-bpm-v1";
+
+    const metronomeState = {
+      selectedSongTitle:localStorage.getItem(metronomeSelectedSongStorageKey) || "",
+      baseBpm:null,
+      bpm:Math.min(300,Math.max(30,Number(localStorage.getItem(metronomeBpmStorageKey)) || 120)),
+      selectedRate:null,
+      running:false,
+      audioContext:null,
+      schedulerTimer:0,
+      nextNoteTime:0,
+      scheduledNodes:[],
+      visualEpoch:0,
+      visualFrame:0
+    };
+
+    function getMetronomeSongs(){
+      const seen = new Set();
+      const result = [];
+
+      getChronologicalPerformances().forEach(performance=>{
+        (performance.items || []).forEach(item=>{
+          if(item.type !== "song" && item.type !== "medley") return;
+          const title = String(item.title || "").trim();
+          const key = normalizeSongTitleKey(title);
+          if(!key || seen.has(key)) return;
+          seen.add(key);
+          const detail = findSharedSongDetail(title);
+          result.push({
+            title,
+            baseBpm:normalizeSongBaseBpm(detail?.baseBpm)
+          });
+        });
+      });
+
+      return result;
+    }
+
+    function updateMetronomeRateButtons(){
+      document.querySelectorAll("[data-tempo-rate]").forEach(button=>{
+        const rate = Number(button.dataset.tempoRate);
+        button.disabled = !metronomeState.baseBpm;
+        button.classList.toggle("active",metronomeState.selectedRate === rate);
+        if(metronomeState.baseBpm){
+          button.title = `${Math.round(metronomeState.baseBpm * rate)} BPM`;
+        }else{
+          button.removeAttribute("title");
+        }
+      });
+    }
+
+    function updateMetronomeReadout(){
+      const baseElement = document.getElementById("metronomeBaseTempo");
+      const currentElement = document.getElementById("metronomeCurrentTempo");
+      const deviceElement = document.getElementById("metronomeDeviceTempo");
+      const input = document.getElementById("metronomeBpmInput");
+
+      if(baseElement){
+        baseElement.textContent = metronomeState.baseBpm ? `${metronomeState.baseBpm} BPM` : "未登録";
+      }
+      if(currentElement) currentElement.textContent = String(metronomeState.bpm);
+      if(deviceElement) deviceElement.textContent = String(metronomeState.bpm);
+      if(input && document.activeElement !== input) input.value = String(metronomeState.bpm);
+      updateMetronomeRateButtons();
+    }
+
+    function clearScheduledMetronomeNodes(){
+      metronomeState.scheduledNodes.forEach(node=>{
+        try{ node.oscillator.stop(); }catch(error){}
+      });
+      metronomeState.scheduledNodes = [];
+    }
+
+    function scheduleMetronomeClick(time){
+      const context = metronomeState.audioContext;
+      if(!context) return;
+
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(1180,time);
+      oscillator.frequency.exponentialRampToValueAtTime(820,time + .025);
+      gain.gain.setValueAtTime(.0001,time);
+      gain.gain.exponentialRampToValueAtTime(.22,time + .002);
+      gain.gain.exponentialRampToValueAtTime(.0001,time + .045);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(time);
+      oscillator.stop(time + .055);
+
+      const scheduled = {oscillator,gain};
+      metronomeState.scheduledNodes.push(scheduled);
+      oscillator.addEventListener("ended",()=>{
+        metronomeState.scheduledNodes = metronomeState.scheduledNodes.filter(item=>item!==scheduled);
+      },{once:true});
+    }
+
+    function runMetronomeScheduler(){
+      if(!metronomeState.running || !metronomeState.audioContext) return;
+      const secondsPerBeat = 60 / metronomeState.bpm;
+      const scheduleAhead = .12;
+
+      while(metronomeState.nextNoteTime < metronomeState.audioContext.currentTime + scheduleAhead){
+        scheduleMetronomeClick(metronomeState.nextNoteTime);
+        metronomeState.nextNoteTime += secondsPerBeat;
+      }
+    }
+
+    function animateMetronomeNeedle(){
+      const needle = document.getElementById("metronomeNeedleWrap");
+      if(!needle) return;
+
+      if(!metronomeState.running || !metronomeState.audioContext){
+        needle.style.transform = "translateX(-50%) rotate(0deg)";
+        return;
+      }
+
+      const secondsPerBeat = 60 / metronomeState.bpm;
+      const elapsed = metronomeState.audioContext.currentTime - metronomeState.visualEpoch;
+
+      if(elapsed < 0){
+        needle.style.transform = "translateX(-50%) rotate(0deg)";
+      }else{
+        const beatPosition = elapsed / secondsPerBeat;
+        const angle = -31 * Math.cos(Math.PI * beatPosition);
+        needle.style.transform = `translateX(-50%) rotate(${angle.toFixed(2)}deg)`;
+      }
+
+      metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
+    }
+
+    function syncMetronomeRunningUi(){
+      const button = document.getElementById("metronomeStartStop");
+      const status = document.getElementById("metronomeStatus");
+      if(button){
+        button.textContent = metronomeState.running ? "STOP" : "START";
+        button.classList.toggle("running",metronomeState.running);
+      }
+      if(status){
+        status.textContent = metronomeState.running ? "RUNNING" : "STANDBY";
+        status.classList.toggle("running",metronomeState.running);
+      }
+    }
+
+    async function startMetronome(){
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if(!AudioContextClass){
+        alert("このブラウザではメトロノーム音を再生できません。");
+        return;
+      }
+
+      if(!metronomeState.audioContext){
+        metronomeState.audioContext = new AudioContextClass();
+      }
+      if(metronomeState.audioContext.state === "suspended"){
+        await metronomeState.audioContext.resume();
+      }
+
+      clearScheduledMetronomeNodes();
+      window.clearInterval(metronomeState.schedulerTimer);
+      cancelAnimationFrame(metronomeState.visualFrame);
+
+      metronomeState.running = true;
+      metronomeState.nextNoteTime = metronomeState.audioContext.currentTime + .055;
+      metronomeState.visualEpoch = metronomeState.nextNoteTime;
+      runMetronomeScheduler();
+      metronomeState.schedulerTimer = window.setInterval(runMetronomeScheduler,25);
+      metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
+      syncMetronomeRunningUi();
+    }
+
+    function stopMetronome(){
+      metronomeState.running = false;
+      window.clearInterval(metronomeState.schedulerTimer);
+      metronomeState.schedulerTimer = 0;
+      cancelAnimationFrame(metronomeState.visualFrame);
+      metronomeState.visualFrame = 0;
+      clearScheduledMetronomeNodes();
+      const needle = document.getElementById("metronomeNeedleWrap");
+      if(needle) needle.style.transform = "translateX(-50%) rotate(0deg)";
+      syncMetronomeRunningUi();
+    }
+
+    function restartMetronomeIfRunning(){
+      if(!metronomeState.running) return;
+      stopMetronome();
+      startMetronome();
+    }
+
+    function setMetronomeBpm(value,{rate=null,restart=true}={}){
+      const numeric = Math.round(Number(value));
+      if(!Number.isFinite(numeric)) return;
+      metronomeState.bpm = Math.min(300,Math.max(30,numeric));
+      metronomeState.selectedRate = rate;
+      localStorage.setItem(metronomeBpmStorageKey,String(metronomeState.bpm));
+      updateMetronomeReadout();
+      if(restart) restartMetronomeIfRunning();
+    }
+
+    function selectMetronomeSong(title){
+      const songsForMetronome = getMetronomeSongs();
+      const selected = songsForMetronome.find(song=>song.title===title) || songsForMetronome[0] || null;
+
+      metronomeState.selectedSongTitle = selected?.title || "";
+      metronomeState.baseBpm = selected?.baseBpm || null;
+      metronomeState.selectedRate = metronomeState.baseBpm ? 1 : null;
+
+      if(metronomeState.selectedSongTitle){
+        localStorage.setItem(metronomeSelectedSongStorageKey,metronomeState.selectedSongTitle);
+      }else{
+        localStorage.removeItem(metronomeSelectedSongStorageKey);
+      }
+
+      if(metronomeState.baseBpm){
+        setMetronomeBpm(metronomeState.baseBpm,{rate:1});
+      }else{
+        updateMetronomeReadout();
+      }
+    }
+
+    function renderMetronomeSongOptions(){
+      const select = document.getElementById("metronomeSongSelect");
+      if(!select) return;
+
+      const songsForMetronome = getMetronomeSongs();
+      select.innerHTML = songsForMetronome.length
+        ? songsForMetronome.map(song=>`
+            <option value="${escapeHtml(song.title)}">${escapeHtml(song.title)}</option>
+          `).join("")
+        : `<option value="">楽曲が登録されていません</option>`;
+
+      const validTitle = songsForMetronome.some(song=>song.title===metronomeState.selectedSongTitle)
+        ? metronomeState.selectedSongTitle
+        : songsForMetronome[0]?.title || "";
+
+      select.value = validTitle;
+      const selected = songsForMetronome.find(song=>song.title===validTitle) || null;
+      if(validTitle !== metronomeState.selectedSongTitle || !metronomeState.selectedSongTitle){
+        selectMetronomeSong(validTitle);
+      }else{
+        metronomeState.baseBpm = selected?.baseBpm || null;
+        updateMetronomeReadout();
+      }
+    }
+
+    function bindMetronomeControls(){
+      const select = document.getElementById("metronomeSongSelect");
+      if(!select || select.dataset.bound === "true") return;
+      select.dataset.bound = "true";
+
+      select.addEventListener("change",()=>selectMetronomeSong(select.value));
+
+      document.querySelectorAll("[data-tempo-rate]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          if(!metronomeState.baseBpm) return;
+          const rate = Number(button.dataset.tempoRate);
+          setMetronomeBpm(Math.round(metronomeState.baseBpm * rate),{rate});
+        });
+      });
+
+      document.getElementById("metronomeMinus")?.addEventListener("click",()=>{
+        setMetronomeBpm(metronomeState.bpm - 1,{rate:null});
+      });
+      document.getElementById("metronomePlus")?.addEventListener("click",()=>{
+        setMetronomeBpm(metronomeState.bpm + 1,{rate:null});
+      });
+
+      const bpmInput = document.getElementById("metronomeBpmInput");
+      const commitInput = ()=>{
+        const value = Number(bpmInput.value);
+        if(!Number.isFinite(value)){
+          bpmInput.value = String(metronomeState.bpm);
+          return;
+        }
+        setMetronomeBpm(value,{rate:null});
+      };
+      bpmInput?.addEventListener("change",commitInput);
+      bpmInput?.addEventListener("blur",commitInput);
+      bpmInput?.addEventListener("keydown",event=>{
+        if(event.key === "Enter"){
+          commitInput();
+          bpmInput.blur();
+        }
+      });
+
+      document.getElementById("metronomeStartStop")?.addEventListener("click",()=>{
+        if(metronomeState.running){
+          stopMetronome();
+        }else{
+          startMetronome();
+        }
+      });
+
+      document.addEventListener("visibilitychange",()=>{
+        if(document.visibilityState !== "visible") stopMetronome();
+      });
+
+      updateMetronomeReadout();
+      syncMetronomeRunningUi();
+    }
+
     const depthProfiles = {
       home:{depth:-135,sector:"SECTOR U-13",angle:-35},
       songs:{depth:-240,sector:"SECTOR S-24",angle:-6},
+      metronome:{depth:-220,sector:"SECTOR M-22",angle:-14},
       story:{depth:-480,sector:"SECTOR A-48",angle:52},
       progress:{depth:-310,sector:"SECTOR P-31",angle:18}
     };
@@ -8286,6 +9047,7 @@
 
     function switchPage(pageName,options={}){
       if(pageName === "story" && !options.allowLockedStory) return;
+      if(pageName !== "metronome") stopMetronome();
       if(!options.skipGeoCheck && geoRestrictionApplies(pageName) && !readGeoSession()){
         openLocationGate(pageName);
         return;
@@ -8305,6 +9067,10 @@
         renderPerformanceSelector();
         renderFilters();
         renderSongs();
+      }
+      if(pageName==="metronome"){
+        renderMetronomeSongOptions();
+        updateMetronomeReadout();
       }
     }
 
@@ -8373,6 +9139,8 @@
       renderFilters();
       renderSongs();
       renderAllProgress();
+      renderMetronomeSongOptions();
+      bindMetronomeControls();
       bindSetlistButtons();
       bindAdminControls();
       bindNestedScrollHandoff();
@@ -8560,7 +9328,7 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:8,
+          version:9,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
