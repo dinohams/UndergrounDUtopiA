@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260629-v35" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260629-v35" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260629-v35" />
-  <meta name="app-build" content="20260629-v35" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v37" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v37" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v37" />
+  <meta name="app-build" content="20260630-v37" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4278,7 +4278,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260629-v35";
+    const APP_BUILD_VERSION = "20260630-v37";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8690,6 +8690,10 @@
     const metronomeSelectedSongStorageKey = "underground-utopia-metronome-song-v1";
     const metronomeBpmStorageKey = "underground-utopia-metronome-bpm-v1";
 
+    // iPhone側で音が実際に聞こえるまでのわずかな遅延に合わせ、
+    // 針の表示だけ40ミリ秒遅らせる。音声再生処理そのものは変更しない。
+    const METRONOME_VISUAL_DELAY = 0.040;
+
     const metronomeState = {
       selectedSongTitle:localStorage.getItem(metronomeSelectedSongStorageKey) || "",
       baseBpm:null,
@@ -8839,7 +8843,9 @@
       }
 
       const secondsPerBeat = 60 / metronomeState.bpm;
-      const elapsed = metronomeState.audioContext.currentTime - metronomeState.visualEpoch;
+      const elapsed = metronomeState.audioContext.currentTime
+        - metronomeState.visualEpoch
+        - METRONOME_VISUAL_DELAY;
 
       if(elapsed < 0){
         needle.style.transform = "translateX(-50%) rotate(0deg)";
