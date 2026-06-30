@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v54" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v54" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v54" />
-  <meta name="app-build" content="20260630-v54" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v56" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v56" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v56" />
+  <meta name="app-build" content="20260701-v56" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -500,15 +500,32 @@
 
     .terminal-auth-order{
       overflow:hidden;
+      align-items:center;
     }
 
     .terminal-auth-order .terminal-auth-value{
-      overflow:hidden;
-      text-overflow:ellipsis;
+      flex:1 1 auto;
+      width:0;
+      min-width:0;
+      display:block;
+      overflow-x:auto;
+      overflow-y:hidden;
+      white-space:nowrap;
+      text-overflow:clip;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-x:contain;
       color:#ddd5c8;
       font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
       font-weight:600;
       letter-spacing:.015em;
+    }
+
+    .terminal-auth-order .terminal-auth-value::-webkit-scrollbar{
+      display:none;
+      width:0;
+      height:0;
     }
 
     #accessLevelValue{
@@ -538,8 +555,8 @@
       }
 
       .terminal-auth-order .terminal-auth-value{
-        white-space:normal;
-        line-height:1.45;
+        white-space:nowrap;
+        line-height:1.28;
       }
     }
 
@@ -3841,6 +3858,242 @@
       cursor:wait;
       opacity:.68;
     }
+  
+
+    /* =========================================
+       v56：カテゴリ別MESSAGE収集アーカイブ
+       ========================================= */
+    .message-archive-card{
+      margin-top:14px;
+    }
+
+    .message-archive-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .message-archive-head .card-title{
+      margin-bottom:0;
+    }
+
+    .message-archive-total{
+      flex:0 0 auto;
+      display:flex;
+      align-items:baseline;
+      gap:4px;
+      padding:8px 11px;
+      border:1px solid rgba(217,179,122,.38);
+      border-radius:12px;
+      background:rgba(9,15,17,.46);
+      color:var(--muted);
+      font-family:Georgia,"Times New Roman","Yu Mincho",serif;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .message-archive-total strong{
+      color:var(--gold);
+      font-size:25px;
+      line-height:1;
+      font-weight:600;
+    }
+
+    .message-archive-total span{
+      font-size:12px;
+    }
+
+    .message-archive-copy{
+      margin:10px 0 13px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.7;
+    }
+
+    .message-archive-summary{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+
+    .message-archive-summary-row{
+      width:100%;
+      appearance:none;
+      -webkit-appearance:none;
+      min-width:0;
+      padding:9px 10px;
+      border:1px solid rgba(174,185,185,.16);
+      border-radius:11px;
+      background:rgba(9,15,17,.35);
+      color:inherit;
+      font:inherit;
+      text-align:left;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+      transition:border-color .16s ease,background .16s ease,transform .12s ease;
+    }
+
+    .message-archive-summary-row:hover,
+    .message-archive-summary-row:focus-visible{
+      border-color:rgba(217,179,122,.46);
+      background:rgba(18,27,29,.62);
+      outline:none;
+    }
+
+    .message-archive-summary-row:active{
+      transform:translateY(1px);
+    }
+
+    .message-archive-summary-label{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      color:#dfe3e3;
+      font-size:11px;
+      line-height:1.45;
+    }
+
+    .message-archive-summary-label span:first-child{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .message-archive-summary-label strong{
+      flex:0 0 auto;
+      color:var(--gold);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:11px;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .message-archive-mini-bar{
+      display:block;
+      width:100%;
+      height:5px;
+      margin-top:7px;
+      overflow:hidden;
+      border-radius:999px;
+      background:rgba(4,9,11,.72);
+    }
+
+    .message-archive-mini-bar span{
+      display:block;
+      width:0;
+      height:100%;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#6d8790,#c18a59);
+    }
+
+    .message-archive-overview{
+      margin-bottom:13px;
+    }
+
+    .message-archive-overview .big-score{
+      font-size:45px;
+    }
+
+    .message-archive-category{
+      margin-top:10px;
+      overflow:hidden;
+      border:1px solid rgba(217,179,122,.30);
+      border-radius:14px;
+      background:rgba(9,15,17,.45);
+    }
+
+    .message-archive-category > summary{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:13px 14px;
+      list-style:none;
+      cursor:pointer;
+      color:var(--ivory);
+      font-weight:800;
+    }
+
+    .message-archive-category > summary::-webkit-details-marker{display:none}
+    .message-archive-category > summary::after{
+      content:"＋";
+      color:var(--copper);
+      font-size:18px;
+    }
+    .message-archive-category[open] > summary::after{content:"−"}
+
+    .message-archive-category-title{
+      min-width:0;
+      line-height:1.45;
+    }
+
+    .message-archive-category-count{
+      flex:0 0 auto;
+      margin-left:auto;
+      color:var(--gold);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:12px;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .message-archive-list{
+      border-top:1px solid rgba(217,179,122,.16);
+      padding:5px 12px 10px;
+    }
+
+    .message-archive-entry{
+      display:grid;
+      grid-template-columns:42px minmax(0,1fr);
+      gap:8px;
+      align-items:baseline;
+      padding:10px 2px;
+      border-bottom:1px dashed rgba(174,185,185,.13);
+    }
+
+    .message-archive-entry:last-child{border-bottom:0}
+
+    .message-archive-number{
+      color:var(--copper);
+      font-family:"Courier New",ui-monospace,monospace;
+      font-size:10px;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .message-archive-text{
+      color:#e5e0d8;
+      font-size:13px;
+      line-height:1.65;
+      overflow-wrap:anywhere;
+    }
+
+    .message-archive-entry.locked .message-archive-number{
+      color:#657174;
+    }
+
+    .message-archive-entry.locked .message-archive-text{
+      color:#6f7a7c;
+      letter-spacing:.16em;
+    }
+
+    @media (max-width:520px){
+      .message-archive-summary{
+        grid-template-columns:1fr;
+      }
+
+      .message-archive-entry{
+        grid-template-columns:35px minmax(0,1fr);
+        gap:6px;
+      }
+
+      .message-archive-number{
+        font-size:9px;
+      }
+
+      .message-archive-text{
+        font-size:12px;
+      }
+    }
+
   </style>
 </head>
 <body class="home-active">
@@ -3879,8 +4132,8 @@
           <strong id="accessLevelValue" class="terminal-auth-value">001 / 新規地下住民</strong>
         </div>
         <div class="terminal-auth-field terminal-auth-order">
-          <span class="terminal-auth-label">ORDER :</span>
-          <span id="terminalOrderValue" class="terminal-auth-value">通信指令を受信しています。</span>
+          <span class="terminal-auth-label">MESSAGE :</span>
+          <span id="terminalOrderValue" class="terminal-auth-value">通信を受信しています。</span>
         </div>
       </div>
       </div>
@@ -4004,6 +4257,20 @@
           <div id="progressSummary" class="progress-list"></div>
         </div>
 
+        <div class="card message-archive-card">
+          <div class="message-archive-head">
+            <div>
+              <div class="eyebrow">MESSAGE ARCHIVE</div>
+              <h2 class="card-title">アングラの民の戯言一覧</h2>
+            </div>
+            <div class="message-archive-total" aria-label="発見済みMESSAGE数">
+              <strong id="messageArchiveUnlocked">0</strong>
+              <span id="messageArchiveTotal">/ 280</span>
+            </div>
+          </div>
+          <p class="message-archive-copy">端末に一度表示されたMESSAGEが記録されます。カテゴリをタップすると一覧を確認できます。</p>
+          <div id="messageArchiveCategorySummary" class="message-archive-summary"></div>
+        </div>
 
         <button id="resetProgress" class="btn ghost">この端末の進捗をリセット</button>
         <p class="footer-note">保存先はこの端末のブラウザ内です。ブラウザのデータを削除すると進捗も消えます。</p>
@@ -4397,7 +4664,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v54";
+    const APP_BUILD_VERSION = "20260701-v56";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -4438,7 +4705,7 @@
     });
 
     // ============================
-    // 地下住民ID・アクセス階級・中央管理局指令
+    // 地下住民ID・アクセス階級・地下通信MESSAGE
     // ============================
     const residentIdStorageKey = "underground-utopia-resident-id-v1";
     const accessCountStorageKey = "underground-utopia-access-count-v1";
@@ -4469,108 +4736,1745 @@
       {count:200,title:"地下統治者"}
     ];
 
-    const terminalOrders = [
-          "本日の探索は第13区画から開始せよ。",
-          "灯りの消えた通路へ単独で入るな。",
-          "不要な照明を落とし、電力を温存せよ。",
-          "第7配管区の異音を確認せよ。",
-          "地下水路の水位を記録せよ。",
-          "予備電源の残量を確認せよ。",
-          "食料庫の配給記録を確認せよ。",
-          "旧居住区の換気装置を点検せよ。",
-          "使用していない区画の扉を施錠せよ。",
-          "本日の作業終了後、全員の帰還を確認せよ。",
-          "失われた地図の断片を回収せよ。",
-          "古い扉には印を付け、無理に開くな。",
-          "音の反響を手がかりに旧坑道を調査せよ。",
-          "分岐点では必ず帰還経路を記録せよ。",
-          "未登録の通路を発見した場合は座標を報告せよ。",
-          "壁面に残された文字を保存せよ。",
-          "地図にない階段を発見しても、単独で進むな。",
-          "地下深部から届く信号の発信源を確認せよ。",
-          "通行不能区画の迂回経路を調査せよ。",
-          "楽園候補区画の環境記録を更新せよ。",
-          "第24区画の通信状況を報告せよ。",
-          "通信が途絶えた場合は、最も近い中継器へ戻れ。",
-          "本日の活動記録を中央書庫へ送信せよ。",
-          "聞き慣れない信号には即座に応答するな。",
-          "途切れた通信にも、誰かの声が残っている。記録せよ。",
-          "持ち場を離れる際は必ず記録を残せ。",
-          "昨日の失敗を、本日の地図へ加えよ。",
-          "消去された記録の復元を試みよ。",
-          "地下住民IDの認証状態を確認せよ。",
-          "忘れてはならない名前を、記録簿へ残せ。",
-          "隣人の歩調を確認し、隊列を乱すな。",
-          "誰かが遅れている。先へ行かず、待て。",
-          "無音区域では全員の足音を合わせよ。",
-          "進路不明時は最も近い灯りへ戻れ。",
-          "最後尾の住民が見える速度で進め。",
-          "隊列から離れた者を責めるな。まず迎えに行け。",
-          "使われていない椅子を一つ空けておけ。",
-          "今日出会った者へ、自分の区画を名乗れ。",
-          "作業開始前に、全員の呼吸を確認せよ。",
-          "目的地より、共に進む者を見失うな。",
-          "楽園は発見するものではない。築け。",
-          "ここを楽園に変える作業を続行せよ。",
-          "本日の任務は、昨日より良い地下を残すこと。",
-          "壊れた場所を隠すな。修復の印を残せ。",
-          "小さな灯りで構わない。消さずに守れ。",
-          "空いている壁に、次の住民のための目印を残せ。",
-          "誰も使わない場所にも、帰還経路を用意せよ。",
-          "新しい居住区には、最初に集会場所を設けよ。",
-          "楽園の設計図に、他者の居場所を忘れるな。",
-          "完成を急ぐな。暮らし続けられる場所を築け。",
-          "不安は隠すな。共有し、軽くせよ。",
-          "疲労を確認した者は、作業を中断して休め。",
-          "今日できなかったことを、失敗とは記録するな。",
-          "自分の灯りが弱い日は、隣人の灯りを借りよ。",
-          "沈黙している者の存在を忘れるな。",
-          "無理に前を向く必要はない。立ち止まる場所を確保せよ。",
-          "帰る場所を失った者へ、空き区画を案内せよ。",
-          "眠れない住民には、夜間通信を開放せよ。",
-          "本日の損失より、残されたものを確認せよ。",
-          "自分を守ることも、共同体を守る任務である。",
-          "見つからない道は、音で示せ。",
-          "音響保管区の機材状態を確認せよ。",
-          "演奏開始前に、全員の基準音をそろえよ。",
-          "音が途切れても、呼吸まで止めるな。",
-          "地下に残る反響を、次の演奏へ利用せよ。",
-          "誰か一人の音を、全員で覆い隠すな。",
-          "無音もまた記録の一部として扱え。",
-          "本日の演奏を、未到達区画へ届けよ。",
-          "合図が届かない時は、互いの視線を確認せよ。",
-          "音楽は楽園への道標である。丁寧に鳴らせ。",
-          "中央管理局は、全区画の生存信号を確認している。",
-          "本日の合言葉は「帰る場所はつくれる」。",
-          "許可なき区画封鎖を禁ずる。",
-          "管理権限は支配ではなく、居場所を守るために使用せよ。",
-          "新規居住者の登録を最優先せよ。",
-          "配給不足を個人の責任として処理するな。",
-          "楽園建設計画は全住民の参加をもって継続される。",
-          "中央管理局への異議申立て経路を確保せよ。",
-          "命令より安全を優先すべき場合、現場判断を許可する。",
-          "地下の未来は、階級ではなく行動によって決定される。",
-          "遠くの光だけを楽園と呼ぶな。",
-          "地上に答えがあるとは限らない。ここで考え続けよ。",
-          "変わらない現実にも、変えられる一日がある。",
-          "何者にもなれなかった者の名前を消すな。",
-          "夢を失った者にも、作業灯を一つ残せ。",
-          "過去へ戻る道より、今日を帰れる道を探せ。",
-          "大きな希望がなくても、小さな改善を続けよ。",
-          "楽園に到達したと宣言する者を、すぐには信用するな。",
-          "完璧な場所より、誰かを迎えられる場所を選べ。",
-          "地下にいることを敗北として記録するな。",
-          "本日は誰かの話を最後まで聞け。",
-          "一つ余分に灯りを点け、帰還者を待て。",
-          "今日の任務を終えた者は、まだ終えていない者を手伝え。",
-          "閉ざされた扉の前で、自分を責め続けるな。",
-          "失われたものを悼む時間を確保せよ。",
-          "楽園の条件を、中央管理局だけに決めさせるな。",
-          "次の住民が迷わないよう、足跡を残せ。",
-          "帰還報告の最後に、今日良かったことを一つ記録せよ。",
-          "明日もここへ戻れるよう、本日の設備を整えよ。",
-          "本日の最終指令――今日は帰ろう。"
-    ];
+    const terminalMessageCategories = [
+      {
+            "id": "CMD",
+            "label": "中央管理局指令"
+      },
+      {
+            "id": "EXP",
+            "label": "探査隊通信"
+      },
+      {
+            "id": "WRK",
+            "label": "現場作業員報告"
+      },
+      {
+            "id": "RES",
+            "label": "地下住民の声"
+      },
+      {
+            "id": "LOG",
+            "label": "残された記録・独白"
+      },
+      {
+            "id": "UNK",
+            "label": "異常信号・未確認信号"
+      }
+];
+
+    const terminalMessages = [
+      {
+            "no": 1,
+            "id": "CMD-001",
+            "category": "CMD",
+            "text": "本日の探索は第13区画から開始せよ。"
+      },
+      {
+            "no": 2,
+            "id": "CMD-002",
+            "category": "CMD",
+            "text": "灯りの消えた通路へ単独で入るな。"
+      },
+      {
+            "no": 3,
+            "id": "CMD-003",
+            "category": "CMD",
+            "text": "不要な照明を落とし、電力を温存せよ。"
+      },
+      {
+            "no": 4,
+            "id": "CMD-004",
+            "category": "CMD",
+            "text": "第7配管区の異音を確認せよ。"
+      },
+      {
+            "no": 5,
+            "id": "CMD-005",
+            "category": "CMD",
+            "text": "地下水路の水位を記録せよ。"
+      },
+      {
+            "no": 6,
+            "id": "CMD-006",
+            "category": "CMD",
+            "text": "予備電源の残量を確認せよ。"
+      },
+      {
+            "no": 7,
+            "id": "CMD-007",
+            "category": "CMD",
+            "text": "食料庫の配給記録を確認せよ。"
+      },
+      {
+            "no": 8,
+            "id": "CMD-008",
+            "category": "CMD",
+            "text": "旧居住区の換気装置を点検せよ。"
+      },
+      {
+            "no": 9,
+            "id": "CMD-009",
+            "category": "CMD",
+            "text": "使用していない区画の扉を施錠せよ。"
+      },
+      {
+            "no": 10,
+            "id": "CMD-010",
+            "category": "CMD",
+            "text": "本日の作業終了後、全員の帰還を確認せよ。"
+      },
+      {
+            "no": 11,
+            "id": "CMD-011",
+            "category": "CMD",
+            "text": "失われた地図の断片を回収せよ。"
+      },
+      {
+            "no": 12,
+            "id": "CMD-012",
+            "category": "CMD",
+            "text": "古い扉には印を付け、無理に開くな。"
+      },
+      {
+            "no": 13,
+            "id": "CMD-013",
+            "category": "CMD",
+            "text": "分岐点では必ず帰還経路を記録せよ。"
+      },
+      {
+            "no": 14,
+            "id": "CMD-014",
+            "category": "CMD",
+            "text": "未登録の通路を発見した場合は座標を報告せよ。"
+      },
+      {
+            "no": 15,
+            "id": "CMD-015",
+            "category": "CMD",
+            "text": "壁面に残された文字を保存せよ。"
+      },
+      {
+            "no": 16,
+            "id": "CMD-016",
+            "category": "CMD",
+            "text": "地図にない階段を発見しても、単独で進むな。"
+      },
+      {
+            "no": 17,
+            "id": "CMD-017",
+            "category": "CMD",
+            "text": "地下深部から届く信号の発信源を確認せよ。"
+      },
+      {
+            "no": 18,
+            "id": "CMD-018",
+            "category": "CMD",
+            "text": "通行不能区画の迂回経路を調査せよ。"
+      },
+      {
+            "no": 19,
+            "id": "CMD-019",
+            "category": "CMD",
+            "text": "楽園候補区画の環境記録を更新せよ。"
+      },
+      {
+            "no": 20,
+            "id": "CMD-020",
+            "category": "CMD",
+            "text": "第24区画の通信状況を報告せよ。"
+      },
+      {
+            "no": 21,
+            "id": "CMD-021",
+            "category": "CMD",
+            "text": "通信が途絶えた場合は、最も近い中継器へ戻れ。"
+      },
+      {
+            "no": 22,
+            "id": "CMD-022",
+            "category": "CMD",
+            "text": "本日の活動記録を中央書庫へ送信せよ。"
+      },
+      {
+            "no": 23,
+            "id": "CMD-023",
+            "category": "CMD",
+            "text": "聞き慣れない信号には即座に応答するな。"
+      },
+      {
+            "no": 24,
+            "id": "CMD-024",
+            "category": "CMD",
+            "text": "持ち場を離れる際は必ず記録を残せ。"
+      },
+      {
+            "no": 25,
+            "id": "CMD-025",
+            "category": "CMD",
+            "text": "昨日の失敗を、本日の地図へ加えよ。"
+      },
+      {
+            "no": 26,
+            "id": "CMD-026",
+            "category": "CMD",
+            "text": "消去された記録の復元を試みよ。"
+      },
+      {
+            "no": 27,
+            "id": "CMD-027",
+            "category": "CMD",
+            "text": "地下住民IDの認証状態を確認せよ。"
+      },
+      {
+            "no": 28,
+            "id": "CMD-028",
+            "category": "CMD",
+            "text": "忘れてはならない名前を、記録簿へ残せ。"
+      },
+      {
+            "no": 29,
+            "id": "CMD-029",
+            "category": "CMD",
+            "text": "隣人の歩調を確認し、隊列を乱すな。"
+      },
+      {
+            "no": 30,
+            "id": "CMD-030",
+            "category": "CMD",
+            "text": "誰かが遅れている。先へ行かず、待て。"
+      },
+      {
+            "no": 31,
+            "id": "CMD-031",
+            "category": "CMD",
+            "text": "進路不明時は最も近い灯りへ戻れ。"
+      },
+      {
+            "no": 32,
+            "id": "CMD-032",
+            "category": "CMD",
+            "text": "最後尾の住民が見える速度で進め。"
+      },
+      {
+            "no": 33,
+            "id": "CMD-033",
+            "category": "CMD",
+            "text": "隊列から離れた者を責めるな。まず迎えに行け。"
+      },
+      {
+            "no": 34,
+            "id": "CMD-034",
+            "category": "CMD",
+            "text": "目的地より、共に進む者を見失うな。"
+      },
+      {
+            "no": 35,
+            "id": "CMD-035",
+            "category": "CMD",
+            "text": "楽園は発見するものではない。築け。"
+      },
+      {
+            "no": 36,
+            "id": "CMD-036",
+            "category": "CMD",
+            "text": "音響区より苦情。音程をもっと合わせる努力をせよ。"
+      },
+      {
+            "no": 37,
+            "id": "CMD-037",
+            "category": "CMD",
+            "text": "本日の任務は、昨日より良い地下を残すこと。"
+      },
+      {
+            "no": 38,
+            "id": "CMD-038",
+            "category": "CMD",
+            "text": "壊れた場所を隠すな。修復の印を残せ。"
+      },
+      {
+            "no": 39,
+            "id": "CMD-039",
+            "category": "CMD",
+            "text": "小さな灯りで構わない。消さずに守れ。"
+      },
+      {
+            "no": 40,
+            "id": "CMD-040",
+            "category": "CMD",
+            "text": "最終音を確認。全員、姿勢を崩さず余韻を待て。"
+      },
+      {
+            "no": 41,
+            "id": "CMD-041",
+            "category": "CMD",
+            "text": "誰も使わない場所にも、帰還経路を用意せよ。"
+      },
+      {
+            "no": 42,
+            "id": "CMD-042",
+            "category": "CMD",
+            "text": "完成を急ぐな。暮らし続けられる場所を築け。"
+      },
+      {
+            "no": 43,
+            "id": "CMD-043",
+            "category": "CMD",
+            "text": "不安は隠すな。共有し、軽くせよ。"
+      },
+      {
+            "no": 44,
+            "id": "CMD-044",
+            "category": "CMD",
+            "text": "疲労を確認した者は、作業を中断して休め。"
+      },
+      {
+            "no": 45,
+            "id": "CMD-045",
+            "category": "CMD",
+            "text": "今日できなかったことを、失敗とは記録するな。"
+      },
+      {
+            "no": 46,
+            "id": "CMD-046",
+            "category": "CMD",
+            "text": "自分の灯りが弱い日は、隣人の灯りを借りよ。"
+      },
+      {
+            "no": 47,
+            "id": "CMD-047",
+            "category": "CMD",
+            "text": "無理に前を向く必要はない。立ち止まる場所を確保せよ。"
+      },
+      {
+            "no": 48,
+            "id": "CMD-048",
+            "category": "CMD",
+            "text": "管理権限は支配ではなく、居場所を守るために使用せよ。"
+      },
+      {
+            "no": 49,
+            "id": "CMD-049",
+            "category": "CMD",
+            "text": "合言葉「オーバーグラウンド・ユートピア」"
+      },
+      {
+            "no": 50,
+            "id": "CMD-050",
+            "category": "CMD",
+            "text": "本日の最終指令――今日は帰ろう。"
+      },
+      {
+            "no": 51,
+            "id": "EXP-001",
+            "category": "EXP",
+            "text": "第18区画に未登録通路を確認！　中央管理局へ座標を送信！"
+      },
+      {
+            "no": 52,
+            "id": "EXP-002",
+            "category": "EXP",
+            "text": "こちら第3探査班。旧居住区への進入経路を発見した。"
+      },
+      {
+            "no": 53,
+            "id": "EXP-003",
+            "category": "EXP",
+            "text": "灯りを発見！　繰り返す、第24区画に灯りを確認！"
+      },
+      {
+            "no": 54,
+            "id": "EXP-004",
+            "category": "EXP",
+            "text": "微弱な生存信号を受信。まだ途切れていない。"
+      },
+      {
+            "no": 55,
+            "id": "EXP-005",
+            "category": "EXP",
+            "text": "壁面に文字を確認！　消える前に記録班へ転送する！"
+      },
+      {
+            "no": 56,
+            "id": "EXP-006",
+            "category": "EXP",
+            "text": "第7配管区、異常なし。次の区画へ移動する。"
+      },
+      {
+            "no": 57,
+            "id": "EXP-007",
+            "category": "EXP",
+            "text": "最後尾が遅れている！　隊列を停止、全員その場で待機！"
+      },
+      {
+            "no": 58,
+            "id": "EXP-008",
+            "category": "EXP",
+            "text": "こちら探索班。帰還経路を見失った。中継器から信号を送ってくれ。"
+      },
+      {
+            "no": 59,
+            "id": "EXP-009",
+            "category": "EXP",
+            "text": "未確認音を検知。人の声……いや、反響かもしれない。"
+      },
+      {
+            "no": 60,
+            "id": "EXP-010",
+            "category": "EXP",
+            "text": "地下水路の水位上昇を確認。保守班、応答せよ。"
+      },
+      {
+            "no": 61,
+            "id": "EXP-011",
+            "category": "EXP",
+            "text": "第11分岐点に到達。地図と実際の通路が一致しない。"
+      },
+      {
+            "no": 62,
+            "id": "EXP-012",
+            "category": "EXP",
+            "text": "旧坑道の奥で新しい足跡を確認した。人数は不明。"
+      },
+      {
+            "no": 63,
+            "id": "EXP-013",
+            "category": "EXP",
+            "text": "通信状態良好。隊員同士の仲は不良。任務は続行（せざるを得ない）。"
+      },
+      {
+            "no": 64,
+            "id": "EXP-014",
+            "category": "EXP",
+            "text": "こちら第5探査班。予定より二十分遅れているが、全員無事だ。"
+      },
+      {
+            "no": 65,
+            "id": "EXP-015",
+            "category": "EXP",
+            "text": "第32区画の扉は内側から施錠されている。開放許可を求む。"
+      },
+      {
+            "no": 66,
+            "id": "EXP-016",
+            "category": "EXP",
+            "text": "目印の赤い布を確認。先行班はこの道を通ったらしい。"
+      },
+      {
+            "no": 67,
+            "id": "EXP-017",
+            "category": "EXP",
+            "text": "地図にない換気孔を発見。微かな風が流れている。"
+      },
+      {
+            "no": 68,
+            "id": "EXP-018",
+            "category": "EXP",
+            "text": "この先に複数の光の反応あり。これは虹の可能性が高い。"
+      },
+      {
+            "no": 69,
+            "id": "EXP-019",
+            "category": "EXP",
+            "text": "この先は足場が不安定だ。装備の軽い者から進む。"
+      },
+      {
+            "no": 70,
+            "id": "EXP-020",
+            "category": "EXP",
+            "text": "古い行先表示を発見。「革命道中」と読める。"
+      },
+      {
+            "no": 71,
+            "id": "EXP-021",
+            "category": "EXP",
+            "text": "第9区画に大量の楽譜を確認。すべて回収して持ち帰る。"
+      },
+      {
+            "no": 72,
+            "id": "EXP-022",
+            "category": "EXP",
+            "text": "第14区画より要望。「昨日の曲をもう一度」。"
+      },
+      {
+            "no": 73,
+            "id": "EXP-023",
+            "category": "EXP",
+            "text": "天井から水滴を確認。量は少ないが、通路全体に続いている。"
+      },
+      {
+            "no": 74,
+            "id": "EXP-024",
+            "category": "EXP",
+            "text": "分岐の右側から金属音を確認。まるでシンバルのようだ。"
+      },
+      {
+            "no": 75,
+            "id": "EXP-025",
+            "category": "EXP",
+            "text": "行方不明だった住民を発見。本人は「昼寝をしていただけ」と強く主張している。"
+      },
+      {
+            "no": 76,
+            "id": "EXP-026",
+            "category": "EXP",
+            "text": "第6中継器を発見したが、電源が落ちている。復旧を試みる。"
+      },
+      {
+            "no": 77,
+            "id": "EXP-027",
+            "category": "EXP",
+            "text": "旧居住区に生活痕を確認。最近まで誰かがいた可能性がある。"
+      },
+      {
+            "no": 78,
+            "id": "EXP-028",
+            "category": "EXP",
+            "text": "探査灯の残量は四割。予定を短縮して帰還する。"
+      },
+      {
+            "no": 79,
+            "id": "EXP-029",
+            "category": "EXP",
+            "text": "壁の向こうから規則的な打音を確認。三回、間を置いて二回。"
+      },
+      {
+            "no": 80,
+            "id": "EXP-030",
+            "category": "EXP",
+            "text": "こちら第2探査班。隊員一名が足を負傷。自力帰還は可能。"
+      },
+      {
+            "no": 81,
+            "id": "EXP-031",
+            "category": "EXP",
+            "text": "地下深部で温かい空気を確認した。発生源はまだ不明。"
+      },
+      {
+            "no": 82,
+            "id": "EXP-032",
+            "category": "EXP",
+            "text": "まもなくタイムオーバーだ。それでも必ず見つけるんだ。"
+      },
+      {
+            "no": 83,
+            "id": "EXP-033",
+            "category": "EXP",
+            "text": "無音区域に小さなリズムを確認。誰かが壁を叩いている。"
+      },
+      {
+            "no": 84,
+            "id": "EXP-034",
+            "category": "EXP",
+            "text": "坑道の先に広い空洞を確認。声が十秒以上反響する。"
+      },
+      {
+            "no": 85,
+            "id": "EXP-035",
+            "category": "EXP",
+            "text": "微弱な音楽を受信した。発信源は北側の未登録区画。"
+      },
+      {
+            "no": 86,
+            "id": "EXP-036",
+            "category": "EXP",
+            "text": "第4探査班より帰還報告。地図の空白を二か所更新した。"
+      },
+      {
+            "no": 87,
+            "id": "EXP-037",
+            "category": "EXP",
+            "text": "この通路は行き止まりではない。奥に隠し扉がある。"
+      },
+      {
+            "no": 88,
+            "id": "EXP-038",
+            "category": "EXP",
+            "text": "地面に新しい車輪の跡を確認。物資班へ照会する。"
+      },
+      {
+            "no": 89,
+            "id": "EXP-039",
+            "category": "EXP",
+            "text": "遠方に複数の灯りを確認。こちらへ近づいている。"
+      },
+      {
+            "no": 90,
+            "id": "EXP-040",
+            "category": "EXP",
+            "text": "全員帰還地点に到着。探索記録を中央書庫へ提出する。"
+      },
+      {
+            "no": 91,
+            "id": "EXP-041",
+            "category": "EXP",
+            "text": "第27区画で地下水の流れを確認！　飲用可能か採取班へ検査を依頼！"
+      },
+      {
+            "no": 92,
+            "id": "EXP-042",
+            "category": "EXP",
+            "text": "第8区画から楽器の音を受信。曲名は不明、拍子は四分の四。"
+      },
+      {
+            "no": 93,
+            "id": "EXP-043",
+            "category": "EXP",
+            "text": "北側壁面に新しい亀裂を確認。昨日の記録には存在しない。"
+      },
+      {
+            "no": 94,
+            "id": "EXP-044",
+            "category": "EXP",
+            "text": "遠くにトランペットの高音を確認。発信源へ接近する。"
+      },
+      {
+            "no": 95,
+            "id": "EXP-045",
+            "category": "EXP",
+            "text": "第20分岐点で先行班の標識を発見。帰還時刻は記録されていない。"
+      },
+      {
+            "no": 96,
+            "id": "EXP-046",
+            "category": "EXP",
+            "text": "楽園は近いぞ！繰り返す、楽園は近いぞ！"
+      },
+      {
+            "no": 97,
+            "id": "EXP-047",
+            "category": "EXP",
+            "text": "こちら偵察班。地面に暖かい場所がある。地下熱源の可能性あり。"
+      },
+      {
+            "no": 98,
+            "id": "EXP-048",
+            "category": "EXP",
+            "text": "壁面の番号が途中から逆順になっている。現在地を再計算する。"
+      },
+      {
+            "no": 99,
+            "id": "EXP-049",
+            "category": "EXP",
+            "text": "第31区画で通信範囲外へ入る。十分後に戻らなければ中継班を送れ。"
+      },
+      {
+            "no": 100,
+            "id": "EXP-050",
+            "category": "EXP",
+            "text": "帰還経路を再確認。全員、同じ灯りを目印に戻るぞ。"
+      },
+      {
+            "no": 101,
+            "id": "WRK-001",
+            "category": "WRK",
+            "text": "第12区画の換気装置、再起動を確認。空気循環は正常。"
+      },
+      {
+            "no": 102,
+            "id": "WRK-002",
+            "category": "WRK",
+            "text": "配管の修復完了！今後は水漏れの心配はなし！"
+      },
+      {
+            "no": 103,
+            "id": "WRK-003",
+            "category": "WRK",
+            "text": "予備発電機の燃料を補充した。次の点検は三日後。"
+      },
+      {
+            "no": 104,
+            "id": "WRK-004",
+            "category": "WRK",
+            "text": "第3居住区の照明を交換。暗かった通路が少しだけ明るくなった。"
+      },
+      {
+            "no": 105,
+            "id": "WRK-005",
+            "category": "WRK",
+            "text": "こちら楽器保守班。弦を交換、接点を清掃、準備完了。"
+      },
+      {
+            "no": 106,
+            "id": "WRK-006",
+            "category": "WRK",
+            "text": "こちら音響班。各人の音響機器の音量を調節したが改善せず。"
+      },
+      {
+            "no": 107,
+            "id": "WRK-007",
+            "category": "WRK",
+            "text": "食料庫の温度が基準値を超えている。冷却班を派遣してくれ。"
+      },
+      {
+            "no": 108,
+            "id": "WRK-008",
+            "category": "WRK",
+            "text": "第8区画の扉、開閉試験終了。まだ少し重いが使用可能。"
+      },
+      {
+            "no": 109,
+            "id": "WRK-009",
+            "category": "WRK",
+            "text": "音響区より報告。全員の基準音を確認、演奏準備完了。"
+      },
+      {
+            "no": 110,
+            "id": "WRK-010",
+            "category": "WRK",
+            "text": "工具庫の在庫を確認。十七番レンチだけが見つからない。"
+      },
+      {
+            "no": 111,
+            "id": "WRK-011",
+            "category": "WRK",
+            "text": "床面の亀裂を補修した。乾くまで黄色い線の内側に入るな。"
+      },
+      {
+            "no": 112,
+            "id": "WRK-012",
+            "category": "WRK",
+            "text": "古い配電盤から焦げた匂いを確認。電源を遮断する。"
+      },
+      {
+            "no": 113,
+            "id": "WRK-013",
+            "category": "WRK",
+            "text": "第21区画の暖房が復旧。住民の移動は不要となった。"
+      },
+      {
+            "no": 114,
+            "id": "WRK-014",
+            "category": "WRK",
+            "text": "こちら舞台班。中央の円形扉、開閉試験を開始する。"
+      },
+      {
+            "no": 115,
+            "id": "WRK-015",
+            "category": "WRK",
+            "text": "無線送信機を五台回収。うち二台は修理が必要だ。"
+      },
+      {
+            "no": 116,
+            "id": "WRK-016",
+            "category": "WRK",
+            "text": "居住区西側の手すりを交換した。子どもが寄りかかっても大丈夫だ。"
+      },
+      {
+            "no": 117,
+            "id": "WRK-017",
+            "category": "WRK",
+            "text": "第5倉庫の棚を固定。次の揺れには耐えられるはずだ。"
+      },
+      {
+            "no": 118,
+            "id": "WRK-018",
+            "category": "WRK",
+            "text": "無線機を耳に装着したが音が聴こえない。充電が必要な模様。"
+      },
+      {
+            "no": 119,
+            "id": "WRK-019",
+            "category": "WRK",
+            "text": "こちら音響保管班。古い楽譜を十二冊回収した。"
+      },
+      {
+            "no": 120,
+            "id": "WRK-020",
+            "category": "WRK",
+            "text": "予備電池を各中継地点へ配布した。受領確認を頼む。"
+      },
+      {
+            "no": 121,
+            "id": "WRK-021",
+            "category": "WRK",
+            "text": "音響区の電源ノイズを軽減。原因は古い延長ケーブルだった。"
+      },
+      {
+            "no": 122,
+            "id": "WRK-022",
+            "category": "WRK",
+            "text": "第14区画の時計を中央時刻に合わせた。三分遅れていた。"
+      },
+      {
+            "no": 123,
+            "id": "WRK-023",
+            "category": "WRK",
+            "text": "給水管の圧力が安定した。蛇口を一斉に開けないよう注意。"
+      },
+      {
+            "no": 124,
+            "id": "WRK-024",
+            "category": "WRK",
+            "text": "中央広場のベンチを修理。座ってもきしみにくくなった。"
+      },
+      {
+            "no": 125,
+            "id": "WRK-025",
+            "category": "WRK",
+            "text": "廃材から新しい案内板を三枚作った。設置場所を指示してくれ。"
+      },
+      {
+            "no": 126,
+            "id": "WRK-026",
+            "category": "WRK",
+            "text": "今日の合奏はそろわなかった。でも、昨日より互いを聴いていた。"
+      },
+      {
+            "no": 127,
+            "id": "WRK-027",
+            "category": "WRK",
+            "text": "第6居住区の非常ベルを試験。音量が大きすぎるため再調整する。"
+      },
+      {
+            "no": 128,
+            "id": "WRK-028",
+            "category": "WRK",
+            "text": "保守記録を更新。直した場所より、まだ直せていない場所の方が多い。"
+      },
+      {
+            "no": 129,
+            "id": "WRK-029",
+            "category": "WRK",
+            "text": "旧式ポンプを手動運転へ切り替えた。交代要員を二名求む。"
+      },
+      {
+            "no": 130,
+            "id": "WRK-030",
+            "category": "WRK",
+            "text": "床下から温水管を発見。冬までに居住区へ引けるかもしれない。"
+      },
+      {
+            "no": 131,
+            "id": "WRK-031",
+            "category": "WRK",
+            "text": "第9区画の壁画を傷つけず、周囲のひびだけ補修した。"
+      },
+      {
+            "no": 132,
+            "id": "WRK-032",
+            "category": "WRK",
+            "text": "非常口の表示灯を交換。帰り道が一つ見つけやすくなった。"
+      },
+      {
+            "no": 133,
+            "id": "WRK-033",
+            "category": "WRK",
+            "text": "修理待ちの椅子は残り六脚。明日には全部座れるようにする。"
+      },
+      {
+            "no": 134,
+            "id": "WRK-034",
+            "category": "WRK",
+            "text": "こちら清掃班。通路の泥を除去したが、足跡一つだけ残してある。"
+      },
+      {
+            "no": 135,
+            "id": "WRK-035",
+            "category": "WRK",
+            "text": "本日の保守作業を終了。設備より先に作業員を休ませる。"
+      },
+      {
+            "no": 136,
+            "id": "WRK-036",
+            "category": "WRK",
+            "text": "第4配給所の炊飯設備を復旧。次の食事から通常運転へ戻る。"
+      },
+      {
+            "no": 137,
+            "id": "WRK-037",
+            "category": "WRK",
+            "text": "居住区東側の異音の確認完了。タンバリンの音だった模様。"
+      },
+      {
+            "no": 138,
+            "id": "WRK-038",
+            "category": "WRK",
+            "text": "地下農園の照明にムービングライトを導入。"
+      },
+      {
+            "no": 139,
+            "id": "WRK-039",
+            "category": "WRK",
+            "text": "物資班より報告。毛布二十枚を第16区画へ搬入した。"
+      },
+      {
+            "no": 140,
+            "id": "WRK-040",
+            "category": "WRK",
+            "text": "排気管の固定具を交換。振動音は基準値まで低下した。"
+      },
+      {
+            "no": 141,
+            "id": "WRK-041",
+            "category": "WRK",
+            "text": "第2食堂の長机を補強。全員が肘をついてもたぶん耐える。"
+      },
+      {
+            "no": 142,
+            "id": "WRK-042",
+            "category": "WRK",
+            "text": "清掃班、音楽室の書類を除去した結果、必要なものまで除去した模様。"
+      },
+      {
+            "no": 143,
+            "id": "WRK-043",
+            "category": "WRK",
+            "text": "中継器のアンテナ角度を調整。第29区画との通信が安定した。"
+      },
+      {
+            "no": 144,
+            "id": "WRK-044",
+            "category": "WRK",
+            "text": "地下農園で新しい芽を六つ確認。水量は現状を維持する。"
+      },
+      {
+            "no": 145,
+            "id": "WRK-045",
+            "category": "WRK",
+            "text": "居住区の壁に断熱材を追加。夜間温度が二度上がる見込み。"
+      },
+      {
+            "no": 146,
+            "id": "WRK-046",
+            "category": "WRK",
+            "text": "物資庫の棚卸し完了。保存食は予定より四日分多い。"
+      },
+      {
+            "no": 147,
+            "id": "WRK-047",
+            "category": "WRK",
+            "text": "第11区画の排水溝を清掃。通路の湿気が少し下がった。"
+      },
+      {
+            "no": 148,
+            "id": "WRK-048",
+            "category": "WRK",
+            "text": "音響保管区の古いスピーカーを一台復旧。片側だけだが鳴る。"
+      },
+      {
+            "no": 149,
+            "id": "WRK-049",
+            "category": "WRK",
+            "text": "作業班より連絡。今日の予定は遅れているが、安全確認を優先する。"
+      },
+      {
+            "no": 150,
+            "id": "WRK-050",
+            "category": "WRK",
+            "text": "音量警告。だが住民からの苦情は今のところゼロ。"
+      },
+      {
+            "no": 151,
+            "id": "RES-001",
+            "category": "RES",
+            "text": "自分の代わりはいない。誰がなんと言おうとね。"
+      },
+      {
+            "no": 152,
+            "id": "RES-002",
+            "category": "RES",
+            "text": "隣の区画、また夜中までドラムを演奏してたよ。"
+      },
+      {
+            "no": 153,
+            "id": "RES-003",
+            "category": "RES",
+            "text": "賛美歌なんか聴いたって頭が痛くなるだけよ。"
+      },
+      {
+            "no": 154,
+            "id": "RES-004",
+            "category": "RES",
+            "text": "作業が終わったら、いつもの場所で待ってるね。"
+      },
+      {
+            "no": 155,
+            "id": "RES-005",
+            "category": "RES",
+            "text": "この前撮ってくれた動画、正直見づらかった。"
+      },
+      {
+            "no": 156,
+            "id": "RES-006",
+            "category": "RES",
+            "text": "この椅子、いつも同じ人が座ってるよね。"
+      },
+      {
+            "no": 157,
+            "id": "RES-007",
+            "category": "RES",
+            "text": "地上の空って、本当に毎日違う色だったのかな。"
+      },
+      {
+            "no": 158,
+            "id": "RES-008",
+            "category": "RES",
+            "text": "楽園じゃなくても、好きな人たちと暮らせれば十分じゃない？"
+      },
+      {
+            "no": 159,
+            "id": "RES-009",
+            "category": "RES",
+            "text": "あの通路は遠回りだけど、音楽が聞こえるから好き。"
+      },
+      {
+            "no": 160,
+            "id": "RES-010",
+            "category": "RES",
+            "text": "今日は何も良いことなかった。でも、まあ帰ろう。"
+      },
+      {
+            "no": 161,
+            "id": "RES-011",
+            "category": "RES",
+            "text": "新しい住民が来たらしい。今度、共用ラウンジで声をかけてみる。"
+      },
+      {
+            "no": 162,
+            "id": "RES-012",
+            "category": "RES",
+            "text": "ライブにも行けたし、今日はずいぶん良い日だ。"
+      },
+      {
+            "no": 163,
+            "id": "RES-013",
+            "category": "RES",
+            "text": "この壁の落書き、消さないでほしいな。昔の友だちが描いたんだ。"
+      },
+      {
+            "no": 164,
+            "id": "RES-014",
+            "category": "RES",
+            "text": "あるがままの姿で生きるのが一番ね。"
+      },
+      {
+            "no": 165,
+            "id": "RES-015",
+            "category": "RES",
+            "text": "眠れない夜は、中継器の光をぼんやり眺めてる。"
+      },
+      {
+            "no": 166,
+            "id": "RES-016",
+            "category": "RES",
+            "text": "地獄のような日々だけど、何回もあるともう慣れちゃうよね。"
+      },
+      {
+            "no": 167,
+            "id": "RES-017",
+            "category": "RES",
+            "text": "今日は誰とも話さなかった。でも外には出られた。"
+      },
+      {
+            "no": 168,
+            "id": "RES-018",
+            "category": "RES",
+            "text": "子どもたちが、また新しい区画名を勝手につけてる。"
+      },
+      {
+            "no": 169,
+            "id": "RES-019",
+            "category": "RES",
+            "text": "ここに来たばかりの頃より、地下の音には慣れた気がする。"
+      },
+      {
+            "no": 170,
+            "id": "RES-020",
+            "category": "RES",
+            "text": "隣の部屋から笑い声が聞こえると、少しほっとする。"
+      },
+      {
+            "no": 171,
+            "id": "RES-021",
+            "category": "RES",
+            "text": "このあと上映会あるけど、一緒に行く？"
+      },
+      {
+            "no": 172,
+            "id": "RES-022",
+            "category": "RES",
+            "text": "この服、古着市で見つけたんだ。意外と気に入ってる。"
+      },
+      {
+            "no": 173,
+            "id": "RES-023",
+            "category": "RES",
+            "text": "地上の話をする人は減ったけど、地上を忘れた人はいない。"
+      },
+      {
+            "no": 174,
+            "id": "RES-024",
+            "category": "RES",
+            "text": "今日は休みだから、何もしないことに忙しい。"
+      },
+      {
+            "no": 175,
+            "id": "RES-025",
+            "category": "RES",
+            "text": "運命論だなんて言う人もいるけど、そんなのはどうでもいいわ。"
+      },
+      {
+            "no": 176,
+            "id": "RES-026",
+            "category": "RES",
+            "text": "帰る場所って、部屋じゃなくて人のことかもしれないな。"
+      },
+      {
+            "no": 177,
+            "id": "RES-027",
+            "category": "RES",
+            "text": "たった一人だけにこの言葉が届けばそれで充分。"
+      },
+      {
+            "no": 178,
+            "id": "RES-028",
+            "category": "RES",
+            "text": "昨日落ち込んでた子、今日は音楽室にいた。"
+      },
+      {
+            "no": 179,
+            "id": "RES-029",
+            "category": "RES",
+            "text": "この通路の灯り、夜になると少し暖かい色になるんだ。"
+      },
+      {
+            "no": 180,
+            "id": "RES-030",
+            "category": "RES",
+            "text": "第19区画のサックス、この前より上手になってるね。"
+      },
+      {
+            "no": 181,
+            "id": "RES-031",
+            "category": "RES",
+            "text": "昔の写真を見つけたけど、誰が写ってるか分からなかった。"
+      },
+      {
+            "no": 182,
+            "id": "RES-032",
+            "category": "RES",
+            "text": "名前を呼ばれるだけで、自分がここにいるって分かる。"
+      },
+      {
+            "no": 183,
+            "id": "RES-033",
+            "category": "RES",
+            "text": "さあ朝だ。カーテンを開いて！"
+      },
+      {
+            "no": 184,
+            "id": "RES-034",
+            "category": "RES",
+            "text": "あの歌、タイトルは知らないけどサビだけ覚えた。"
+      },
+      {
+            "no": 185,
+            "id": "RES-035",
+            "category": "RES",
+            "text": "今日はちゃんと時間どおりに来た。それだけで合格にしてくれ。"
+      },
+      {
+            "no": 186,
+            "id": "RES-036",
+            "category": "RES",
+            "text": "一人になりたい日もある。でも完全な無音は嫌だね。"
+      },
+      {
+            "no": 187,
+            "id": "RES-037",
+            "category": "RES",
+            "text": "隣人が調整してくれた楽器、前よりずっと演奏しやすくなった。"
+      },
+      {
+            "no": 188,
+            "id": "RES-038",
+            "category": "RES",
+            "text": "明日の予定はまだ決めてないけど、朝になったら考えるよ。"
+      },
+      {
+            "no": 189,
+            "id": "RES-039",
+            "category": "RES",
+            "text": "人を笑う奴より、笑われる奴の方が成功するんだよ。"
+      },
+      {
+            "no": 190,
+            "id": "RES-040",
+            "category": "RES",
+            "text": "新しい区画には窓がない。でも天井に空の映像が流れてる。"
+      },
+      {
+            "no": 191,
+            "id": "RES-041",
+            "category": "RES",
+            "text": "誰かが毎週、共用スペースに花を飾ってる。"
+      },
+      {
+            "no": 192,
+            "id": "RES-042",
+            "category": "RES",
+            "text": "今日の演奏、遠くの居住区まで聞こえたらしいよ。"
+      },
+      {
+            "no": 193,
+            "id": "RES-043",
+            "category": "RES",
+            "text": "夢を諦めたんじゃなくて、形を変えて持ってるだけ。"
+      },
+      {
+            "no": 194,
+            "id": "RES-044",
+            "category": "RES",
+            "text": "ここは楽園じゃない。でも、ここで暮らすのは嫌いじゃない。"
+      },
+      {
+            "no": 195,
+            "id": "RES-045",
+            "category": "RES",
+            "text": "地下にいるけど、今でも「青」を忘れたことはないよ。"
+      },
+      {
+            "no": 196,
+            "id": "RES-046",
+            "category": "RES",
+            "text": "新しいベンチ、座ると少し右に傾くよね。"
+      },
+      {
+            "no": 197,
+            "id": "RES-047",
+            "category": "RES",
+            "text": "きれいごとって言われても、泥臭くても「自分」を生きたいんだ。"
+      },
+      {
+            "no": 198,
+            "id": "RES-048",
+            "category": "RES",
+            "text": "今日の合奏が始まったぞ。昨日よりましだと良いけど……。"
+      },
+      {
+            "no": 199,
+            "id": "RES-049",
+            "category": "RES",
+            "text": "演奏が始まる日は、みんな歩く速度が少しだけ速い。"
+      },
+      {
+            "no": 200,
+            "id": "RES-050",
+            "category": "RES",
+            "text": "明日も同じ日かもしれないけど、みんなに会えるならそれでいい。"
+      },
+      {
+            "no": 201,
+            "id": "LOG-001",
+            "category": "LOG",
+            "text": "前も上も見ることはできない。それでも自分を生きていく。"
+      },
+      {
+            "no": 202,
+            "id": "LOG-002",
+            "category": "LOG",
+            "text": "嫌だ、悲しい。そんな痛みを抱きしめて生きるのか。"
+      },
+      {
+            "no": 203,
+            "id": "LOG-003",
+            "category": "LOG",
+            "text": "ここに来て何年になるのか、数える意味が分からなくなった。"
+      },
+      {
+            "no": 204,
+            "id": "LOG-004",
+            "category": "LOG",
+            "text": "あの時君に捧げた歌はこんなにも哀しい歌だったのか……。"
+      },
+      {
+            "no": 205,
+            "id": "LOG-005",
+            "category": "LOG",
+            "text": "誰でもないものになりたかった。自分だけは違うと思っていた。"
+      },
+      {
+            "no": 206,
+            "id": "LOG-006",
+            "category": "LOG",
+            "text": "今日も現実は変わらなかった。昨日と違うのは、期待するのをやめたことだけだ。"
+      },
+      {
+            "no": 207,
+            "id": "LOG-007",
+            "category": "LOG",
+            "text": "この記録は報告ではない。ただ、何もなかった一日を忘れたくなかった。"
+      },
+      {
+            "no": 208,
+            "id": "LOG-008",
+            "category": "LOG",
+            "text": "何者にもなれなかった。それでも名前だけは残ると思っていた。"
+      },
+      {
+            "no": 209,
+            "id": "LOG-009",
+            "category": "LOG",
+            "text": "第26区画にて記録。ここに暮らしていた人々の声を、もう誰も覚えていない。"
+      },
+      {
+            "no": 210,
+            "id": "LOG-010",
+            "category": "LOG",
+            "text": "扉の向こうから歌が聞こえた。開けても何も変わらない気がして、そのまま戻った。"
+      },
+      {
+            "no": 211,
+            "id": "LOG-011",
+            "category": "LOG",
+            "text": "希望があった日に、できれば戻りたいと思う。"
+      },
+      {
+            "no": 212,
+            "id": "LOG-012",
+            "category": "LOG",
+            "text": "最後に見た地上は雨だった。だから空の色はもう覚えていない。"
+      },
+      {
+            "no": 213,
+            "id": "LOG-013",
+            "category": "LOG",
+            "text": "悲しみを紛らわせるには、どれだけ強くなる必要があるのだろう。"
+      },
+      {
+            "no": 214,
+            "id": "LOG-014",
+            "category": "LOG",
+            "text": "この気持ちを誰かに話したら、きっと笑われるだろう。"
+      },
+      {
+            "no": 215,
+            "id": "LOG-015",
+            "category": "LOG",
+            "text": "残酷な運命が、突然目の前に現れること、それをいつも想像してしまう。"
+      },
+      {
+            "no": 216,
+            "id": "LOG-016",
+            "category": "LOG",
+            "text": "私は楽園を見つけられなかった。隣人も、いつしか別の区画へ移った。"
+      },
+      {
+            "no": 217,
+            "id": "LOG-017",
+            "category": "LOG",
+            "text": "ここで立ち止まったことを、後退とは記録しないでほしい。進む理由がなかっただけだ。"
+      },
+      {
+            "no": 218,
+            "id": "LOG-018",
+            "category": "LOG",
+            "text": "あの頃、夢中になっていた自分はどこへ行ってしまったのだろう。"
+      },
+      {
+            "no": 219,
+            "id": "LOG-019",
+            "category": "LOG",
+            "text": "こんなに苦しいなら全てなかったことにしたかった。"
+      },
+      {
+            "no": 220,
+            "id": "LOG-020",
+            "category": "LOG",
+            "text": "過去へ戻りたいと何度も思った。戻れないと分かってから、考えることを減らした。"
+      },
+      {
+            "no": 221,
+            "id": "LOG-021",
+            "category": "LOG",
+            "text": "誰かの足音が近づくたび、期待しない練習だけが上手くなった。"
+      },
+      {
+            "no": 222,
+            "id": "LOG-022",
+            "category": "LOG",
+            "text": "小さいころはどんなことも不思議と叶っていた。"
+      },
+      {
+            "no": 223,
+            "id": "LOG-023",
+            "category": "LOG",
+            "text": "壊れた時計は止まったまま、私たちの予定だけが静かに消えていった。"
+      },
+      {
+            "no": 224,
+            "id": "LOG-024",
+            "category": "LOG",
+            "text": "あの日の失敗は消せない。教訓にしたところで、失った時間は戻らない。"
+      },
+      {
+            "no": 225,
+            "id": "LOG-025",
+            "category": "LOG",
+            "text": "明日になっても、自分は自分のままだ。"
+      },
+      {
+            "no": 226,
+            "id": "LOG-026",
+            "category": "LOG",
+            "text": "正直者は馬鹿をみる。それでもあるがままの姿でいたかった。"
+      },
+      {
+            "no": 227,
+            "id": "LOG-027",
+            "category": "LOG",
+            "text": "地上へ向かう階段は見つからなかった。地下へ続く道だけが増えていった。"
+      },
+      {
+            "no": 228,
+            "id": "LOG-028",
+            "category": "LOG",
+            "text": "今日良かったことを書けと言われた。空欄のまま提出した。"
+      },
+      {
+            "no": 229,
+            "id": "LOG-029",
+            "category": "LOG",
+            "text": "本日の記録を閉じる。明日になれば、また同じ頁を開く。"
+      },
+      {
+            "no": 230,
+            "id": "LOG-030",
+            "category": "LOG",
+            "text": "今日は帰ろう。帰る場所がまだ同じ形で残っているうちに。"
+      },
+      {
+            "no": 231,
+            "id": "LOG-031",
+            "category": "LOG",
+            "text": "努力は報われない。その不安感から今日は友人に当たってしまった。"
+      },
+      {
+            "no": 232,
+            "id": "LOG-032",
+            "category": "LOG",
+            "text": "昔はここを仮の居場所だと思っていた。今では、仮ではないと言うことさえ怖い。"
+      },
+      {
+            "no": 233,
+            "id": "LOG-033",
+            "category": "LOG",
+            "text": "扉の向こうで君の泣く声が聞こえる。なんて声をかければ良いのだろう。"
+      },
+      {
+            "no": 234,
+            "id": "LOG-034",
+            "category": "LOG",
+            "text": "夢を話す人が減った。笑われるからではなく、言葉にする力が残っていないからだ。"
+      },
+      {
+            "no": 235,
+            "id": "LOG-035",
+            "category": "LOG",
+            "text": "予定表には空白が増えた。忙しくなくなったのではなく、予定を立てなくなった。"
+      },
+      {
+            "no": 236,
+            "id": "LOG-036",
+            "category": "LOG",
+            "text": "誰かのために残した目印を、自分が見つけて帰ってきた。少しだけ虚しかった。"
+      },
+      {
+            "no": 237,
+            "id": "LOG-037",
+            "category": "LOG",
+            "text": "過去も未来も無くなれば、自由を手にすることはできるのかな。"
+      },
+      {
+            "no": 238,
+            "id": "LOG-038",
+            "category": "LOG",
+            "text": "今日もまた、君のいない時間へと帰っていく。"
+      },
+      {
+            "no": 239,
+            "id": "LOG-039",
+            "category": "LOG",
+            "text": "忘れたくないことほど、輪郭から先に消えていく。"
+      },
+      {
+            "no": 240,
+            "id": "LOG-040",
+            "category": "LOG",
+            "text": "何も変わらなかった一日を、今日も「無事」と記録する。"
+      },
+      {
+            "no": 241,
+            "id": "UNK-001",
+            "category": "UNK",
+            "text": "未確認信号を受信。「まだ下へ」とだけ繰り返している。"
+      },
+      {
+            "no": 242,
+            "id": "UNK-002",
+            "category": "UNK",
+            "text": "第0区画から通信。登録上、その区画は存在しない。"
+      },
+      {
+            "no": 243,
+            "id": "UNK-003",
+            "category": "UNK",
+            "text": "中継器がこちらの送信前に、同じ内容を返してきた。"
+      },
+      {
+            "no": 244,
+            "id": "UNK-004",
+            "category": "UNK",
+            "text": "人のいない通路で帰還報告を受信した。送信者IDは空欄。"
+      },
+      {
+            "no": 245,
+            "id": "UNK-005",
+            "category": "UNK",
+            "text": "地下深度計が一瞬だけプラスを示した。原因は不明。"
+      },
+      {
+            "no": 246,
+            "id": "UNK-006",
+            "category": "UNK",
+            "text": "消灯後も、壁の向こうで影だけが動いている。"
+      },
+      {
+            "no": 247,
+            "id": "UNK-007",
+            "category": "UNK",
+            "text": "古い受信機から明日の日付の記録が流れている。"
+      },
+      {
+            "no": 248,
+            "id": "UNK-008",
+            "category": "UNK",
+            "text": "第17区画の全時計が同時に十三分戻った。"
+      },
+      {
+            "no": 249,
+            "id": "UNK-009",
+            "category": "UNK",
+            "text": "謎の低音が配管を伝って響いている。"
+      },
+      {
+            "no": 250,
+            "id": "UNK-010",
+            "category": "UNK",
+            "text": "通信相手は自分の声だった。内容だけが記憶にない。"
+      },
+      {
+            "no": 251,
+            "id": "UNK-011",
+            "category": "UNK",
+            "text": "閉鎖区画から配給受領の署名を確認。署名者は十年前に退去済み。"
+      },
+      {
+            "no": 252,
+            "id": "UNK-012",
+            "category": "UNK",
+            "text": "無音区域で拍手を検知。人数は一名ではない。"
+      },
+      {
+            "no": 253,
+            "id": "UNK-013",
+            "category": "UNK",
+            "text": "扉を開けるたび、同じ通路へ戻ってくる。"
+      },
+      {
+            "no": 254,
+            "id": "UNK-014",
+            "category": "UNK",
+            "text": "深部から灯りが近づいている。熱源反応はない。"
+      },
+      {
+            "no": 255,
+            "id": "UNK-015",
+            "category": "UNK",
+            "text": "信号受信。「ふっかつのじゅもんを唱えよ」。応答するな。"
+      },
+      {
+            "no": 256,
+            "id": "UNK-016",
+            "category": "UNK",
+            "text": "第28区画の監視映像に、撮影しているカメラそのものが映っている。"
+      },
+      {
+            "no": 257,
+            "id": "UNK-017",
+            "category": "UNK",
+            "text": "同じ地下住民IDが三つの区画で同時に認証された。"
+      },
+      {
+            "no": 258,
+            "id": "UNK-018",
+            "category": "UNK",
+            "text": "中継器から、自分たちの会話が五分遅れて再送されている。"
+      },
+      {
+            "no": 259,
+            "id": "UNK-019",
+            "category": "UNK",
+            "text": "未登録周波数で「上ではなく下を見ろ」と受信した。"
+      },
+      {
+            "no": 260,
+            "id": "UNK-020",
+            "category": "UNK",
+            "text": "地図上の通路が、確認するたびに一メートルずつ長くなっている。"
+      },
+      {
+            "no": 261,
+            "id": "UNK-021",
+            "category": "UNK",
+            "text": "誰も操作していない昇降機が、存在しない階層で停止した。"
+      },
+      {
+            "no": 262,
+            "id": "UNK-022",
+            "category": "UNK",
+            "text": "第19区画の扉に、内側からこちらの人数が書かれている。"
+      },
+      {
+            "no": 263,
+            "id": "UNK-023",
+            "category": "UNK",
+            "text": "通路の先から帰還班の声を受信。しかし帰還班は現在、こちら側にいる。"
+      },
+      {
+            "no": 264,
+            "id": "UNK-024",
+            "category": "UNK",
+            "text": "深度計が「測定不能」ではなく「これ以上は不要」と表示した。"
+      },
+      {
+            "no": 265,
+            "id": "UNK-025",
+            "category": "UNK",
+            "text": "壁面の案内図に、今いる場所だけが描かれていない。"
+      },
+      {
+            "no": 266,
+            "id": "UNK-026",
+            "category": "UNK",
+            "text": "同じメッセージを百回受信した。百一回目だけ「聞こえている」と変わった。"
+      },
+      {
+            "no": 267,
+            "id": "UNK-027",
+            "category": "UNK",
+            "text": "閉鎖された音響区から、まだ演奏していない曲が流れている。"
+      },
+      {
+            "no": 268,
+            "id": "UNK-028",
+            "category": "UNK",
+            "text": "第5中継器の記録に、明日の帰還報告が保存されている。"
+      },
+      {
+            "no": 269,
+            "id": "UNK-029",
+            "category": "UNK",
+            "text": "全員が別の方向を指したのに、全員が同じ灯りを見ている。"
+      },
+      {
+            "no": 270,
+            "id": "UNK-030",
+            "category": "UNK",
+            "text": "通路の壁にある数字が、背を向けるたび一つ減っている。"
+      },
+      {
+            "no": 271,
+            "id": "UNK-031",
+            "category": "UNK",
+            "text": "未確認信号が地下住民IDを正確に読み上げている。"
+      },
+      {
+            "no": 272,
+            "id": "UNK-032",
+            "category": "UNK",
+            "text": "誰も触れていない扉の開閉記録が、一時間ごとに更新されている。"
+      },
+      {
+            "no": 273,
+            "id": "UNK-033",
+            "category": "UNK",
+            "text": "第13区画から「こけし」という謎の通信が届いた。"
+      },
+      {
+            "no": 274,
+            "id": "UNK-034",
+            "category": "UNK",
+            "text": "帰還経路の目印が、すべて反対方向を向いている。"
+      },
+      {
+            "no": 275,
+            "id": "UNK-035",
+            "category": "UNK",
+            "text": "通路の反響が、こちらの声ではなく別の言葉を返してくる。"
+      },
+      {
+            "no": 276,
+            "id": "UNK-036",
+            "category": "UNK",
+            "text": "監視記録では全員が一度立ち止まっている。誰もその瞬間を覚えていない。"
+      },
+      {
+            "no": 277,
+            "id": "UNK-037",
+            "category": "UNK",
+            "text": "中継器の受信履歴に、送信元「ユートピア」と表示された。"
+      },
+      {
+            "no": 278,
+            "id": "UNK-038",
+            "category": "UNK",
+            "text": "地図にない部屋から、毎日同じ時刻に椅子を引く音がする。"
+      },
+      {
+            "no": 279,
+            "id": "UNK-039",
+            "category": "UNK",
+            "text": "「∴⌁⋮⌖∷⧖⟟」解読不能。"
+      },
+      {
+            "no": 280,
+            "id": "UNK-040",
+            "category": "UNK",
+            "text": "この通信は未送信として記録されている。"
+      }
+];
+
+    const messageArchiveStorageKey = "underground-utopia-message-archive-v1";
+
+    function loadSeenTerminalMessageIds(){
+      try{
+        const parsed = JSON.parse(localStorage.getItem(messageArchiveStorageKey) || "[]");
+        const validIds = new Set(terminalMessages.map(message=>message.id));
+        return new Set(Array.isArray(parsed) ? parsed.filter(id=>validIds.has(id)) : []);
+      }catch(error){
+        console.warn("MESSAGE収集記録を読み込めませんでした",error);
+        return new Set();
+      }
+    }
+
+    let seenTerminalMessageIds = loadSeenTerminalMessageIds();
+
+    function saveSeenTerminalMessageIds(){
+      try{
+        localStorage.setItem(messageArchiveStorageKey,JSON.stringify([...seenTerminalMessageIds]));
+      }catch(error){
+        console.warn("MESSAGE収集記録を保存できませんでした",error);
+      }
+    }
+
+    function markTerminalMessageSeen(messageId){
+      if(!messageId || seenTerminalMessageIds.has(messageId)) return;
+      seenTerminalMessageIds.add(messageId);
+      saveSeenTerminalMessageIds();
+      renderMessageArchiveSummary();
+    }
 
     function secureRandomInteger(maxExclusive){
       if(window.crypto?.getRandomValues){
@@ -4622,21 +6526,23 @@
       return currentRank;
     }
 
-    let currentTerminalOrderIndex = -1;
+    let currentTerminalMessageIndex = -1;
 
-    function rotateTerminalOrder(){
-      if(!terminalOrders.length) return;
-      let nextIndex = secureRandomInteger(terminalOrders.length);
-      if(terminalOrders.length > 1 && nextIndex === currentTerminalOrderIndex){
-        nextIndex = (nextIndex + 1 + secureRandomInteger(terminalOrders.length - 1)) % terminalOrders.length;
+    function rotateTerminalMessage(){
+      if(!terminalMessages.length) return;
+      let nextIndex = secureRandomInteger(terminalMessages.length);
+      if(terminalMessages.length > 1 && nextIndex === currentTerminalMessageIndex){
+        nextIndex = (nextIndex + 1 + secureRandomInteger(terminalMessages.length - 1)) % terminalMessages.length;
       }
-      currentTerminalOrderIndex = nextIndex;
-      const order = terminalOrders[nextIndex];
-      const orderElement = document.getElementById("terminalOrderValue");
-      if(orderElement){
-        orderElement.textContent = order;
-        orderElement.title = order;
+      currentTerminalMessageIndex = nextIndex;
+      const message = terminalMessages[nextIndex];
+      const messageElement = document.getElementById("terminalOrderValue");
+      if(messageElement){
+        messageElement.textContent = message.text;
+        messageElement.title = message.text;
+        messageElement.scrollLeft = 0;
       }
+      markTerminalMessageSeen(message.id);
     }
 
     function initializeTerminalIdentity(){
@@ -4652,7 +6558,7 @@
         accessElement.textContent = `${displayedCount} / ${accessRank.title}`;
         accessElement.title = `アクセス回数 ${accessCount}回`;
       }
-      rotateTerminalOrder();
+      rotateTerminalMessage();
     }
 
     // ============================
@@ -8931,9 +10837,76 @@
       panel.addEventListener("touchcancel",finishSwipe,{passive:true});
     }
 
+    function getMessageArchiveCategoryStats(categoryId){
+      const categoryMessages = terminalMessages.filter(message=>message.category===categoryId);
+      const unlocked = categoryMessages.filter(message=>seenTerminalMessageIds.has(message.id)).length;
+      return {unlocked,total:categoryMessages.length};
+    }
+
+    function renderMessageArchiveSummary(){
+      const unlockedElement = document.getElementById("messageArchiveUnlocked");
+      const totalElement = document.getElementById("messageArchiveTotal");
+      const summaryElement = document.getElementById("messageArchiveCategorySummary");
+      const unlockedTotal = terminalMessages.filter(message=>seenTerminalMessageIds.has(message.id)).length;
+
+      if(unlockedElement) unlockedElement.textContent = String(unlockedTotal);
+      if(totalElement) totalElement.textContent = `/ ${terminalMessages.length}`;
+      if(summaryElement){
+        summaryElement.innerHTML = terminalMessageCategories.map(category=>{
+          const stats = getMessageArchiveCategoryStats(category.id);
+          const percent = stats.total ? Math.round(stats.unlocked / stats.total * 100) : 0;
+          return `
+            <button class="message-archive-summary-row" type="button" data-message-category="${escapeHtml(category.id)}" aria-label="${escapeHtml(category.label)}のMESSAGE一覧を開く">
+              <span class="message-archive-summary-label">
+                <span>${escapeHtml(category.label)}</span>
+                <strong>${stats.unlocked}/${stats.total}</strong>
+              </span>
+              <span class="message-archive-mini-bar" aria-hidden="true"><span style="width:${percent}%"></span></span>
+            </button>
+          `;
+        }).join("");
+        summaryElement.querySelectorAll("[data-message-category]").forEach(button=>{
+          button.addEventListener("click",()=>openMessageArchiveCategoryPanel(button.dataset.messageCategory));
+        });
+      }
+    }
+
+    function openMessageArchiveCategoryPanel(categoryId){
+      const category = terminalMessageCategories.find(item=>item.id===categoryId);
+      if(!category) return;
+      const categoryMessages = terminalMessages.filter(message=>message.category===category.id);
+      const stats = getMessageArchiveCategoryStats(category.id);
+      const percent = stats.total ? Math.round(stats.unlocked / stats.total * 100) : 0;
+      document.getElementById("detailHeading").textContent = category.label;
+      document.getElementById("detailContent").innerHTML = `
+        <div class="card progress-summary message-archive-overview">
+          <div class="eyebrow">MESSAGE ARCHIVE</div>
+          <div class="big-score">${stats.unlocked}<span style="font-size:.38em;color:var(--muted)"> / ${stats.total}</span></div>
+          <p class="song-meta">収集率 ${percent}%｜端末に表示されたMESSAGEだけが解放されます</p>
+        </div>
+        <div class="message-archive-category" role="region" aria-label="${escapeHtml(category.label)}">
+          <div class="message-archive-list" style="border-top:0">
+            ${categoryMessages.map(message=>{
+              const unlocked = seenTerminalMessageIds.has(message.id);
+              return `
+                <div class="message-archive-entry${unlocked ? "" : " locked"}">
+                  <span class="message-archive-number">${String(message.no).padStart(3,"0")}</span>
+                  <span class="message-archive-text">${unlocked ? escapeHtml(message.text) : "？？？"}</span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+      openDetailPanel();
+      const detailInner = document.querySelector("#detailPanel .detail-inner");
+      if(detailInner) detailInner.scrollTop = 0;
+    }
+
     function renderAllProgress(){
       normalizeProgress();
       renderProgressBars("progressSummary");
+      renderMessageArchiveSummary();
       const total = document.getElementById("totalScore");
       if(total) total.textContent = `${totalProgress()}%`;
     }
@@ -10045,7 +12018,7 @@
     document.querySelectorAll(".nav-btn").forEach(button=>{
       button.addEventListener("click",()=>{
         if(button.disabled || button.getAttribute("aria-disabled") === "true") return;
-        if(button.dataset.page === "home") rotateTerminalOrder();
+        if(button.dataset.page === "home") rotateTerminalMessage();
         switchPage(button.dataset.page);
       });
     });
@@ -10057,9 +12030,11 @@
     bindDetailEdgeSwipe();
 
     document.getElementById("resetProgress").addEventListener("click",()=>{
-      const ok = confirm("この端末に保存されている進捗をすべてリセットします。よろしいですか？");
+      const ok = confirm("この端末に保存されている進捗とMESSAGE収集記録をすべてリセットします。よろしいですか？");
       if(!ok) return;
       localStorage.removeItem(storageKey);
+      localStorage.removeItem(messageArchiveStorageKey);
+      seenTerminalMessageIds = new Set();
       progress = loadProgress();
       normalizeProgress();
       renderAllProgress();
