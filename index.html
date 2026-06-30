@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v46" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v46" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v46" />
-  <meta name="app-build" content="20260630-v46" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v47" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v47" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v47" />
+  <meta name="app-build" content="20260630-v47" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3399,7 +3399,83 @@
     }
 
     .metronome-page .page-title{
+      margin:0;
+    }
+
+    .metronome-title-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
       margin:0 2px 8px;
+    }
+
+    .metronome-background-toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-height:34px;
+      padding:4px 8px;
+      border:1px solid rgba(217,179,122,.34);
+      border-radius:999px;
+      background:rgba(8,14,16,.58);
+      color:#b8c0c1;
+      font-size:10px;
+      letter-spacing:.04em;
+      white-space:nowrap;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    .metronome-background-toggle input{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .metronome-background-track{
+      position:relative;
+      width:32px;
+      height:18px;
+      border:1px solid rgba(217,179,122,.38);
+      border-radius:999px;
+      background:rgba(2,7,9,.72);
+      transition:.18s ease;
+    }
+
+    .metronome-background-track::after{
+      content:"";
+      position:absolute;
+      left:2px;
+      top:2px;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:#7d898b;
+      transition:.18s ease;
+    }
+
+    .metronome-background-toggle input:checked + .metronome-background-track{
+      border-color:rgba(225,178,111,.78);
+      background:rgba(196,139,90,.20);
+    }
+
+    .metronome-background-toggle input:checked + .metronome-background-track::after{
+      transform:translateX(14px);
+      background:var(--gold);
+      box-shadow:0 0 8px rgba(225,178,111,.25);
+    }
+
+    .metronome-background-state{
+      min-width:22px;
+      color:#8f9a9c;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:10px;
+      text-align:right;
+    }
+
+    .metronome-background-toggle input:checked ~ .metronome-background-state{
+      color:var(--gold);
     }
 
     .metronome-layout{
@@ -3704,6 +3780,16 @@
         font-size:12px;
       }
 
+      .metronome-title-row{
+        gap:8px;
+      }
+
+      .metronome-background-toggle{
+        padding:3px 7px;
+        gap:5px;
+        font-size:9px;
+      }
+
       .metronome-device{
         width:min(100%,330px);
       }
@@ -3817,7 +3903,15 @@
 
 
       <section id="page-metronome" class="page metronome-page">
-        <h2 class="page-title">メトロノーム</h2>
+        <div class="metronome-title-row">
+          <h2 class="page-title">メトロノーム</h2>
+          <label class="metronome-background-toggle" for="metronomeBackgroundToggle">
+            <span>BG再生</span>
+            <input id="metronomeBackgroundToggle" type="checkbox" aria-label="バックグラウンド再生を切り替える">
+            <span class="metronome-background-track" aria-hidden="true"></span>
+            <span id="metronomeBackgroundState" class="metronome-background-state">OFF</span>
+          </label>
+        </div>
 
         <div class="metronome-layout">
           <div class="card metronome-song-card">
@@ -4293,7 +4387,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v46";
+    const APP_BUILD_VERSION = "20260630-v47";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8843,6 +8937,7 @@
 
     const metronomeSelectedSongStorageKey = "underground-utopia-metronome-song-v1";
     const metronomeBpmStorageKey = "underground-utopia-metronome-bpm-v1";
+    const metronomeBackgroundStorageKey = "underground-utopia-metronome-background-v1";
 
     // iPhone側で音が実際に聞こえるまでのわずかな遅延に合わせ、
     // 針の表示だけ100ミリ秒遅らせる。音声再生処理そのものは変更しない。
@@ -8853,6 +8948,8 @@
       baseBpm:null,
       bpm:Math.min(300,Math.max(30,Number(localStorage.getItem(metronomeBpmStorageKey)) || 120)),
       selectedRate:null,
+      backgroundEnabled:localStorage.getItem(metronomeBackgroundStorageKey) === "true",
+      playbackMode:"foreground",
       running:false,
       starting:false,
       startToken:0,
@@ -8863,7 +8960,10 @@
       nextNoteTime:0,
       scheduledNodes:[],
       visualEpoch:0,
-      visualFrame:0
+      visualFrame:0,
+      backgroundAudio:null,
+      backgroundObjectUrl:"",
+      backgroundLoopBpm:0
     };
 
     function getMetronomeSongs(){
@@ -8947,6 +9047,146 @@
       }
     }
 
+    function writeWavString(view,offset,text){
+      for(let index=0;index<text.length;index+=1){
+        view.setUint8(offset + index,text.charCodeAt(index));
+      }
+    }
+
+    function createBackgroundMetronomeWav(audioBuffer,bpm){
+      const sampleRate = audioBuffer.sampleRate;
+      const secondsPerBeat = 60 / bpm;
+      const beatsPerLoop = 8;
+      const loopDuration = secondsPerBeat * beatsPerLoop;
+      const totalSamples = Math.max(1,Math.ceil(loopDuration * sampleRate));
+      const mixed = new Float32Array(totalSamples);
+      const channelCount = Math.max(1,audioBuffer.numberOfChannels);
+      const channels = Array.from({length:channelCount},(_,index)=>audioBuffer.getChannelData(index));
+
+      for(let beat=0;beat<beatsPerLoop;beat+=1){
+        const offset = Math.round(beat * secondsPerBeat * sampleRate);
+        const available = Math.min(audioBuffer.length,totalSamples - offset);
+
+        for(let sampleIndex=0;sampleIndex<available;sampleIndex+=1){
+          let sample = 0;
+          for(let channelIndex=0;channelIndex<channelCount;channelIndex+=1){
+            sample += channels[channelIndex][sampleIndex] || 0;
+          }
+          sample = (sample / channelCount) * .92;
+          const targetIndex = (offset + sampleIndex) % totalSamples;
+          mixed[targetIndex] = Math.max(-1,Math.min(1,mixed[targetIndex] + sample));
+        }
+      }
+
+      const bytesPerSample = 2;
+      const dataSize = mixed.length * bytesPerSample;
+      const wavBuffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(wavBuffer);
+
+      writeWavString(view,0,"RIFF");
+      view.setUint32(4,36 + dataSize,true);
+      writeWavString(view,8,"WAVE");
+      writeWavString(view,12,"fmt ");
+      view.setUint32(16,16,true);
+      view.setUint16(20,1,true);
+      view.setUint16(22,1,true);
+      view.setUint32(24,sampleRate,true);
+      view.setUint32(28,sampleRate * bytesPerSample,true);
+      view.setUint16(32,bytesPerSample,true);
+      view.setUint16(34,16,true);
+      writeWavString(view,36,"data");
+      view.setUint32(40,dataSize,true);
+
+      let writeOffset = 44;
+      mixed.forEach(sample=>{
+        const clamped = Math.max(-1,Math.min(1,sample));
+        view.setInt16(writeOffset,clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff,true);
+        writeOffset += 2;
+      });
+
+      return new Blob([wavBuffer],{type:"audio/wav"});
+    }
+
+    function ensureBackgroundMetronomeAudio(){
+      if(metronomeState.backgroundAudio) return metronomeState.backgroundAudio;
+
+      const audio = new Audio();
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.playsInline = true;
+      audio.setAttribute("playsinline","");
+      audio.setAttribute("webkit-playsinline","");
+      audio.volume = .92;
+
+      audio.addEventListener("play",()=>{
+        if("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+      });
+      audio.addEventListener("pause",()=>{
+        if("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+      });
+      audio.addEventListener("error",()=>{
+        if(metronomeState.playbackMode === "background" && metronomeState.running){
+          stopMetronome();
+          alert("バックグラウンド再生用の音声を開始できませんでした。");
+        }
+      });
+
+      metronomeState.backgroundAudio = audio;
+      return audio;
+    }
+
+    function releaseBackgroundMetronomeLoop(){
+      const audio = metronomeState.backgroundAudio;
+      if(audio){
+        try{
+          audio.pause();
+          audio.removeAttribute("src");
+          audio.load();
+        }catch(error){}
+      }
+
+      if(metronomeState.backgroundObjectUrl){
+        URL.revokeObjectURL(metronomeState.backgroundObjectUrl);
+      }
+
+      metronomeState.backgroundObjectUrl = "";
+      metronomeState.backgroundLoopBpm = 0;
+    }
+
+    async function prepareBackgroundMetronomeLoop(){
+      if(!metronomeState.audioBuffer) await loadMetronomeAudioBuffer();
+      if(metronomeState.backgroundObjectUrl && metronomeState.backgroundLoopBpm === metronomeState.bpm){
+        return ensureBackgroundMetronomeAudio();
+      }
+
+      const audio = ensureBackgroundMetronomeAudio();
+      try{ audio.pause(); }catch(error){}
+
+      if(metronomeState.backgroundObjectUrl){
+        URL.revokeObjectURL(metronomeState.backgroundObjectUrl);
+      }
+
+      const wavBlob = createBackgroundMetronomeWav(metronomeState.audioBuffer,metronomeState.bpm);
+      metronomeState.backgroundObjectUrl = URL.createObjectURL(wavBlob);
+      metronomeState.backgroundLoopBpm = metronomeState.bpm;
+      audio.src = metronomeState.backgroundObjectUrl;
+      audio.currentTime = 0;
+      audio.load();
+      return audio;
+    }
+
+    function syncMetronomeBackgroundUi(){
+      const toggle = document.getElementById("metronomeBackgroundToggle");
+      const state = document.getElementById("metronomeBackgroundState");
+
+      if(toggle && toggle.checked !== metronomeState.backgroundEnabled){
+        toggle.checked = metronomeState.backgroundEnabled;
+      }
+      if(state){
+        state.textContent = metronomeState.backgroundEnabled ? "ON" : "OFF";
+      }
+    }
+
     function scheduleMetronomeClick(time){
       const context = metronomeState.audioContext;
       const buffer = metronomeState.audioBuffer;
@@ -8982,15 +9222,30 @@
       const needle = document.getElementById("metronomeNeedleWrap");
       if(!needle) return;
 
-      if(!metronomeState.running || !metronomeState.audioContext){
+      if(!metronomeState.running){
         needle.style.transform = "translateX(-50%) rotate(0deg)";
         return;
       }
 
       const secondsPerBeat = 60 / metronomeState.bpm;
-      const elapsed = metronomeState.audioContext.currentTime
-        - metronomeState.visualEpoch
-        - METRONOME_VISUAL_DELAY;
+      let elapsed = 0;
+
+      if(metronomeState.playbackMode === "background"){
+        const audio = metronomeState.backgroundAudio;
+        if(!audio || audio.paused){
+          needle.style.transform = "translateX(-50%) rotate(0deg)";
+          return;
+        }
+        elapsed = audio.currentTime - METRONOME_VISUAL_DELAY;
+      }else{
+        if(!metronomeState.audioContext){
+          needle.style.transform = "translateX(-50%) rotate(0deg)";
+          return;
+        }
+        elapsed = metronomeState.audioContext.currentTime
+          - metronomeState.visualEpoch
+          - METRONOME_VISUAL_DELAY;
+      }
 
       if(elapsed < 0){
         needle.style.transform = "translateX(-50%) rotate(0deg)";
@@ -9012,12 +9267,14 @@
         button.disabled = metronomeState.starting;
       }
       if(status){
-        status.textContent = metronomeState.starting ? "LOADING" : (metronomeState.running ? "RUNNING" : "STANDBY");
+        const runningLabel = metronomeState.playbackMode === "background" ? "BACKGROUND" : "RUNNING";
+        status.textContent = metronomeState.starting ? "LOADING" : (metronomeState.running ? runningLabel : "STANDBY");
         status.classList.toggle("running",metronomeState.running);
       }
+      syncMetronomeBackgroundUi();
     }
 
-    async function startMetronome(){
+    async function startForegroundMetronome(){
       if(metronomeState.running || metronomeState.starting) return;
 
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -9045,6 +9302,7 @@
         window.clearInterval(metronomeState.schedulerTimer);
         cancelAnimationFrame(metronomeState.visualFrame);
 
+        metronomeState.playbackMode = "foreground";
         metronomeState.running = true;
         metronomeState.nextNoteTime = metronomeState.audioContext.currentTime + .055;
         metronomeState.visualEpoch = metronomeState.nextNoteTime;
@@ -9064,6 +9322,83 @@
       }
     }
 
+    async function startBackgroundMetronome(){
+      if(metronomeState.running || metronomeState.starting) return;
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if(!AudioContextClass){
+        alert("このブラウザではメトロノーム音を再生できません。");
+        return;
+      }
+
+      const requestToken = ++metronomeState.startToken;
+      metronomeState.starting = true;
+      syncMetronomeRunningUi();
+
+      try{
+        if(!metronomeState.audioContext){
+          metronomeState.audioContext = new AudioContextClass();
+        }
+        if(metronomeState.audioContext.state === "suspended"){
+          await metronomeState.audioContext.resume();
+        }
+
+        await loadMetronomeAudioBuffer();
+        if(requestToken !== metronomeState.startToken) return;
+
+        const audio = await prepareBackgroundMetronomeLoop();
+        if(requestToken !== metronomeState.startToken) return;
+
+        clearScheduledMetronomeNodes();
+        window.clearInterval(metronomeState.schedulerTimer);
+        cancelAnimationFrame(metronomeState.visualFrame);
+
+        if("audioSession" in navigator){
+          try{ navigator.audioSession.type = "playback"; }catch(error){}
+        }
+
+        audio.currentTime = 0;
+        await audio.play();
+        if(requestToken !== metronomeState.startToken){
+          audio.pause();
+          return;
+        }
+
+        metronomeState.playbackMode = "background";
+        metronomeState.running = true;
+        metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
+
+        if("mediaSession" in navigator){
+          try{
+            navigator.mediaSession.metadata = new MediaMetadata({
+              title:"地下住民端末 メトロノーム",
+              artist:`${metronomeState.bpm} BPM`,
+              album:metronomeState.selectedSongTitle || "UndergrounD UtopiA"
+            });
+            navigator.mediaSession.setActionHandler("pause",()=>stopMetronome());
+            navigator.mediaSession.setActionHandler("play",()=>startMetronome());
+            navigator.mediaSession.playbackState = "playing";
+          }catch(error){}
+        }
+      }catch(error){
+        console.error("background metronome start failed",error);
+        if(requestToken === metronomeState.startToken){
+          alert("バックグラウンド再生を開始できませんでした。通常再生に切り替えてお試しください。");
+        }
+      }finally{
+        if(requestToken === metronomeState.startToken){
+          metronomeState.starting = false;
+          syncMetronomeRunningUi();
+        }
+      }
+    }
+
+    function startMetronome(){
+      return metronomeState.backgroundEnabled
+        ? startBackgroundMetronome()
+        : startForegroundMetronome();
+    }
+
     function stopMetronome(){
       metronomeState.startToken += 1;
       metronomeState.starting = false;
@@ -9073,6 +9408,21 @@
       cancelAnimationFrame(metronomeState.visualFrame);
       metronomeState.visualFrame = 0;
       clearScheduledMetronomeNodes();
+
+      if(metronomeState.backgroundAudio){
+        try{
+          metronomeState.backgroundAudio.pause();
+          metronomeState.backgroundAudio.currentTime = 0;
+        }catch(error){}
+      }
+
+      if("mediaSession" in navigator){
+        try{ navigator.mediaSession.playbackState = "none"; }catch(error){}
+      }
+      if("audioSession" in navigator){
+        try{ navigator.audioSession.type = "auto"; }catch(error){}
+      }
+
       const needle = document.getElementById("metronomeNeedleWrap");
       if(needle) needle.style.transform = "translateX(-50%) rotate(0deg)";
       syncMetronomeRunningUi();
@@ -9090,6 +9440,21 @@
       metronomeState.bpm = Math.min(300,Math.max(30,numeric));
       metronomeState.selectedRate = rate;
       localStorage.setItem(metronomeBpmStorageKey,String(metronomeState.bpm));
+
+      if(metronomeState.backgroundLoopBpm && metronomeState.backgroundLoopBpm !== metronomeState.bpm){
+        metronomeState.backgroundLoopBpm = 0;
+      }
+
+      if("mediaSession" in navigator && metronomeState.running && metronomeState.playbackMode === "background"){
+        try{
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title:"地下住民端末 メトロノーム",
+            artist:`${metronomeState.bpm} BPM`,
+            album:metronomeState.selectedSongTitle || "UndergrounD UtopiA"
+          });
+        }catch(error){}
+      }
+
       updateMetronomeReadout();
       if(restart) restartMetronomeIfRunning();
     }
@@ -9189,13 +9554,58 @@
         }
       });
 
+      const backgroundToggle = document.getElementById("metronomeBackgroundToggle");
+      backgroundToggle?.addEventListener("change",async()=>{
+        const wasRunning = metronomeState.running;
+        metronomeState.backgroundEnabled = backgroundToggle.checked;
+        localStorage.setItem(metronomeBackgroundStorageKey,String(metronomeState.backgroundEnabled));
+        syncMetronomeBackgroundUi();
+
+        if(metronomeState.backgroundEnabled){
+          try{
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if(AudioContextClass && !metronomeState.audioContext){
+              metronomeState.audioContext = new AudioContextClass();
+            }
+            if(metronomeState.audioContext?.state === "suspended"){
+              await metronomeState.audioContext.resume();
+            }
+            await loadMetronomeAudioBuffer();
+            await prepareBackgroundMetronomeLoop();
+          }catch(error){
+            console.warn("background metronome preload failed",error);
+          }
+        }
+
+        if(wasRunning){
+          stopMetronome();
+          await startMetronome();
+        }
+      });
+
       document.addEventListener("visibilitychange",()=>{
-        if(document.visibilityState !== "visible") stopMetronome();
+        if(document.visibilityState !== "visible"){
+          if(!metronomeState.backgroundEnabled) stopMetronome();
+          return;
+        }
+
+        if(
+          metronomeState.running
+          && metronomeState.playbackMode === "background"
+          && document.body.classList.contains("metronome-active")
+        ){
+          cancelAnimationFrame(metronomeState.visualFrame);
+          metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
+        }
       });
 
       updateMetronomeReadout();
       syncMetronomeRunningUi();
     }
+
+    window.addEventListener("pagehide",()=>{
+      if(!metronomeState.backgroundEnabled) stopMetronome();
+    });
 
     const depthProfiles = {
       home:{depth:-135,sector:"SECTOR U-13",angle:-35},
@@ -9267,7 +9677,12 @@
 
     function switchPage(pageName,options={}){
       if(pageName === "story" && !options.allowLockedStory) return;
-      if(pageName !== "metronome") stopMetronome();
+      if(
+        pageName !== "metronome"
+        && !(metronomeState.running && metronomeState.backgroundEnabled && metronomeState.playbackMode === "background")
+      ){
+        stopMetronome();
+      }
       if(!options.skipGeoCheck && geoRestrictionApplies(pageName) && !readGeoSession()){
         openLocationGate(pageName);
         return;
@@ -9292,6 +9707,11 @@
       if(pageName==="metronome"){
         renderMetronomeSongOptions();
         updateMetronomeReadout();
+        syncMetronomeBackgroundUi();
+        if(metronomeState.running && metronomeState.playbackMode === "background"){
+          cancelAnimationFrame(metronomeState.visualFrame);
+          metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
+        }
       }
     }
 
