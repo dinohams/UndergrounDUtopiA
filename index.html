@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v53" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v53" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v53" />
-  <meta name="app-build" content="20260630-v53" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v54" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v54" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v54" />
+  <meta name="app-build" content="20260630-v54" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -506,6 +506,12 @@
       overflow:hidden;
       text-overflow:ellipsis;
       color:#ddd5c8;
+      font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+      font-weight:600;
+      letter-spacing:.015em;
+    }
+
+    #accessLevelValue{
       font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
       font-weight:600;
       letter-spacing:.015em;
@@ -3870,7 +3876,7 @@
         </div>
         <div class="terminal-auth-field">
           <span class="terminal-auth-label">ACCESS LEVEL :</span>
-          <strong id="accessLevelValue" class="terminal-auth-value">001 / NEW RESIDENT</strong>
+          <strong id="accessLevelValue" class="terminal-auth-value">001 / 新規地下住民</strong>
         </div>
         <div class="terminal-auth-field terminal-auth-order">
           <span class="terminal-auth-label">ORDER :</span>
@@ -4391,7 +4397,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v53";
+    const APP_BUILD_VERSION = "20260630-v54";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -4441,8 +4447,8 @@
 
     const accessRanks = [
       {count:1,title:"新規地下住民"},
-      {count:10,title:"登録地下住民"},
-      {count:20,title:"認証地下住民"},
+      {count:10,title:"居住区登録者"},
+      {count:20,title:"探索許可者"},
       {count:30,title:"上級地下住民"},
       {count:40,title:"地下住民案内員"},
       {count:50,title:"区画作業員"},
