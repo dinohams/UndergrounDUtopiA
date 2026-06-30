@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v47" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v47" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v47" />
-  <meta name="app-build" content="20260630-v47" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v48" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v48" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v48" />
+  <meta name="app-build" content="20260630-v48" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4387,7 +4387,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v47";
+    const APP_BUILD_VERSION = "20260630-v48";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8963,7 +8963,8 @@
       visualFrame:0,
       backgroundAudio:null,
       backgroundObjectUrl:"",
-      backgroundLoopBpm:0
+      backgroundLoopBpm:0,
+      backgroundLoopProfile:""
     };
 
     function getMetronomeSongs(){
@@ -9053,15 +9054,100 @@
       }
     }
 
-    function createBackgroundMetronomeWav(audioBuffer,bpm){
-      const sampleRate = audioBuffer.sampleRate;
+    function isMobileBackgroundMetronomeDevice(){
+      const mobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+      const coarsePointer = window.matchMedia?.("(pointer:coarse) and (max-width:1024px)")?.matches;
+      return Boolean(mobileUa || coarsePointer);
+    }
+
+    function getBackgroundMetronomeProfile(){
+      if(isMobileBackgroundMetronomeDevice()){
+        return {
+          key:"mobile-long-30m-8bit-11025",
+          sampleRate:11025,
+          bitsPerSample:8,
+          targetDurationSeconds:30 * 60
+        };
+      }
+
+      return {
+        key:"desktop-8beat-16bit-native",
+        sampleRate:null,
+        bitsPerSample:16,
+        beatsPerLoop:8
+      };
+    }
+
+    function readMonoAudioSample(channels,position){
+      const lower = Math.max(0,Math.floor(position));
+      const upper = Math.min(channels[0].length - 1,lower + 1);
+      const fraction = position - lower;
+      let sample = 0;
+
+      for(let channelIndex=0;channelIndex<channels.length;channelIndex+=1){
+        const channel = channels[channelIndex];
+        const first = channel[lower] || 0;
+        const second = channel[upper] || 0;
+        sample += first + (second - first) * fraction;
+      }
+
+      return sample / channels.length;
+    }
+
+    function createBackgroundMetronomeWav(audioBuffer,bpm,profile=getBackgroundMetronomeProfile()){
       const secondsPerBeat = 60 / bpm;
-      const beatsPerLoop = 8;
+      const channelCount = Math.max(1,audioBuffer.numberOfChannels);
+      const channels = Array.from({length:channelCount},(_,index)=>audioBuffer.getChannelData(index));
+
+      if(profile.bitsPerSample === 8){
+        const sampleRate = profile.sampleRate;
+        const beatsPerLoop = Math.max(1,Math.floor(profile.targetDurationSeconds / secondsPerBeat));
+        const loopDuration = secondsPerBeat * beatsPerLoop;
+        const totalSamples = Math.max(1,Math.round(loopDuration * sampleRate));
+        const dataSize = totalSamples;
+        const wavBuffer = new ArrayBuffer(44 + dataSize);
+        const view = new DataView(wavBuffer);
+        const data = new Uint8Array(wavBuffer,44);
+        data.fill(128);
+
+        const sourceStep = audioBuffer.sampleRate / sampleRate;
+        const clickSamples = Math.max(1,Math.ceil(audioBuffer.length / sourceStep));
+
+        for(let beat=0;beat<beatsPerLoop;beat+=1){
+          const offset = Math.round(beat * secondsPerBeat * sampleRate);
+          const available = Math.min(clickSamples,totalSamples - offset);
+
+          for(let sampleIndex=0;sampleIndex<available;sampleIndex+=1){
+            const sourcePosition = sampleIndex * sourceStep;
+            const sample = readMonoAudioSample(channels,sourcePosition) * .86;
+            const targetIndex = offset + sampleIndex;
+            const mixedDelta = (data[targetIndex] - 128) + Math.round(sample * 112);
+            data[targetIndex] = Math.max(0,Math.min(255,128 + mixedDelta));
+          }
+        }
+
+        writeWavString(view,0,"RIFF");
+        view.setUint32(4,36 + dataSize,true);
+        writeWavString(view,8,"WAVE");
+        writeWavString(view,12,"fmt ");
+        view.setUint32(16,16,true);
+        view.setUint16(20,1,true);
+        view.setUint16(22,1,true);
+        view.setUint32(24,sampleRate,true);
+        view.setUint32(28,sampleRate,true);
+        view.setUint16(32,1,true);
+        view.setUint16(34,8,true);
+        writeWavString(view,36,"data");
+        view.setUint32(40,dataSize,true);
+
+        return new Blob([wavBuffer],{type:"audio/wav"});
+      }
+
+      const sampleRate = audioBuffer.sampleRate;
+      const beatsPerLoop = profile.beatsPerLoop || 8;
       const loopDuration = secondsPerBeat * beatsPerLoop;
       const totalSamples = Math.max(1,Math.ceil(loopDuration * sampleRate));
       const mixed = new Float32Array(totalSamples);
-      const channelCount = Math.max(1,audioBuffer.numberOfChannels);
-      const channels = Array.from({length:channelCount},(_,index)=>audioBuffer.getChannelData(index));
 
       for(let beat=0;beat<beatsPerLoop;beat+=1){
         const offset = Math.round(beat * secondsPerBeat * sampleRate);
@@ -9151,11 +9237,17 @@
 
       metronomeState.backgroundObjectUrl = "";
       metronomeState.backgroundLoopBpm = 0;
+      metronomeState.backgroundLoopProfile = "";
     }
 
     async function prepareBackgroundMetronomeLoop(){
       if(!metronomeState.audioBuffer) await loadMetronomeAudioBuffer();
-      if(metronomeState.backgroundObjectUrl && metronomeState.backgroundLoopBpm === metronomeState.bpm){
+      const profile = getBackgroundMetronomeProfile();
+      if(
+        metronomeState.backgroundObjectUrl
+        && metronomeState.backgroundLoopBpm === metronomeState.bpm
+        && metronomeState.backgroundLoopProfile === profile.key
+      ){
         return ensureBackgroundMetronomeAudio();
       }
 
@@ -9166,9 +9258,10 @@
         URL.revokeObjectURL(metronomeState.backgroundObjectUrl);
       }
 
-      const wavBlob = createBackgroundMetronomeWav(metronomeState.audioBuffer,metronomeState.bpm);
+      const wavBlob = createBackgroundMetronomeWav(metronomeState.audioBuffer,metronomeState.bpm,profile);
       metronomeState.backgroundObjectUrl = URL.createObjectURL(wavBlob);
       metronomeState.backgroundLoopBpm = metronomeState.bpm;
+      metronomeState.backgroundLoopProfile = profile.key;
       audio.src = metronomeState.backgroundObjectUrl;
       audio.currentTime = 0;
       audio.load();
