@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v49" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v49" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v49" />
-  <meta name="app-build" content="20260630-v49" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v50" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v50" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v50" />
+  <meta name="app-build" content="20260630-v50" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4387,7 +4387,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v49";
+    const APP_BUILD_VERSION = "20260630-v50";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8965,7 +8965,9 @@
       backgroundObjectUrl:"",
       backgroundLoopBpm:0,
       backgroundLoopProfile:"",
-      foregroundContextNeedsReset:false
+      foregroundContextNeedsReset:false,
+      foregroundCarrierAudio:null,
+      foregroundCarrierObjectUrl:""
     };
 
     function getMetronomeSongs(){
@@ -9064,8 +9066,8 @@
     function getBackgroundMetronomeProfile(){
       if(isMobileBackgroundMetronomeDevice()){
         return {
-          key:"mobile-long-10m-16bit-22050",
-          sampleRate:22050,
+          key:"mobile-long-10m-16bit-44100",
+          sampleRate:44100,
           bitsPerSample:16,
           targetDurationSeconds:10 * 60
         };
@@ -9101,7 +9103,7 @@
       const channels = Array.from({length:channelCount},(_,index)=>audioBuffer.getChannelData(index));
 
       if(profile.bitsPerSample === 16 && profile.targetDurationSeconds){
-        const sampleRate = profile.sampleRate || Math.min(audioBuffer.sampleRate,22050);
+        const sampleRate = profile.sampleRate || Math.min(audioBuffer.sampleRate,44100);
         const beatsPerLoop = Math.max(1,Math.floor(profile.targetDurationSeconds / secondsPerBeat));
         const loopDuration = secondsPerBeat * beatsPerLoop;
         const totalSamples = Math.max(1,Math.round(loopDuration * sampleRate));
@@ -9119,7 +9121,7 @@
 
           for(let sampleIndex=0;sampleIndex<available;sampleIndex+=1){
             const sourcePosition = sampleIndex * sourceStep;
-            const sample = readMonoAudioSample(channels,sourcePosition) * .92;
+            const sample = readMonoAudioSample(channels,sourcePosition) * .96;
             const targetIndex = offset + sampleIndex;
             const byteOffset = 44 + targetIndex * bytesPerSample;
             const existing = view.getInt16(byteOffset,true) / 0x7fff;
@@ -9237,6 +9239,72 @@
       });
 
       return new Blob([wavBuffer],{type:"audio/wav"});
+    }
+
+    function createSilentPlaybackCarrierWav(){
+      const sampleRate = 8000;
+      const durationSeconds = 1;
+      const totalSamples = sampleRate * durationSeconds;
+      const bytesPerSample = 2;
+      const dataSize = totalSamples * bytesPerSample;
+      const wavBuffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(wavBuffer);
+
+      writeWavString(view,0,"RIFF");
+      view.setUint32(4,36 + dataSize,true);
+      writeWavString(view,8,"WAVE");
+      writeWavString(view,12,"fmt ");
+      view.setUint32(16,16,true);
+      view.setUint16(20,1,true);
+      view.setUint16(22,1,true);
+      view.setUint32(24,sampleRate,true);
+      view.setUint32(28,sampleRate * bytesPerSample,true);
+      view.setUint16(32,bytesPerSample,true);
+      view.setUint16(34,16,true);
+      writeWavString(view,36,"data");
+      view.setUint32(40,dataSize,true);
+
+      return new Blob([wavBuffer],{type:"audio/wav"});
+    }
+
+    function ensureForegroundMetronomeCarrier(){
+      if(metronomeState.foregroundCarrierAudio) return metronomeState.foregroundCarrierAudio;
+
+      const audio = new Audio();
+      const objectUrl = URL.createObjectURL(createSilentPlaybackCarrierWav());
+      audio.src = objectUrl;
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.playsInline = true;
+      audio.muted = false;
+      audio.volume = 1;
+
+      metronomeState.foregroundCarrierAudio = audio;
+      metronomeState.foregroundCarrierObjectUrl = objectUrl;
+      return audio;
+    }
+
+    async function startForegroundMetronomeCarrier(){
+      if("audioSession" in navigator){
+        try{ navigator.audioSession.type = "playback"; }catch(error){}
+      }
+
+      const audio = ensureForegroundMetronomeCarrier();
+      try{
+        audio.currentTime = 0;
+        await audio.play();
+      }catch(error){
+        console.warn("foreground audio carrier could not start",error);
+      }
+    }
+
+    function stopForegroundMetronomeCarrier(){
+      const audio = metronomeState.foregroundCarrierAudio;
+      if(!audio) return;
+      try{
+        audio.pause();
+        audio.currentTime = 0;
+      }catch(error){}
     }
 
     function ensureBackgroundMetronomeAudio(){
@@ -9433,9 +9501,7 @@
             metronomeState.backgroundAudio.currentTime = 0;
           }catch(error){}
         }
-        if("audioSession" in navigator){
-          try{ navigator.audioSession.type = "auto"; }catch(error){}
-        }
+        await startForegroundMetronomeCarrier();
 
         if(
           metronomeState.foregroundContextNeedsReset
@@ -9466,6 +9532,10 @@
           await metronomeState.audioContext.resume();
         }
 
+        if("audioSession" in navigator){
+          try{ navigator.audioSession.type = "playback"; }catch(error){}
+        }
+
         await loadMetronomeAudioBuffer();
         if(requestToken !== metronomeState.startToken) return;
 
@@ -9482,6 +9552,7 @@
         metronomeState.visualFrame = requestAnimationFrame(animateMetronomeNeedle);
       }catch(error){
         console.error("meto.mp3 load failed",error);
+        stopForegroundMetronomeCarrier();
         if(requestToken === metronomeState.startToken){
           alert("meto.mp3を読み込めませんでした。GitHubのルート直下にmeto.mp3を配置してください。");
         }
@@ -9507,6 +9578,8 @@
       syncMetronomeRunningUi();
 
       try{
+        stopForegroundMetronomeCarrier();
+
         if(!metronomeState.audioContext){
           metronomeState.audioContext = new AudioContextClass();
         }
@@ -9580,6 +9653,7 @@
       cancelAnimationFrame(metronomeState.visualFrame);
       metronomeState.visualFrame = 0;
       clearScheduledMetronomeNodes();
+      stopForegroundMetronomeCarrier();
 
       if(metronomeState.backgroundAudio){
         try{
