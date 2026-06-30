@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v42" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v42" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v42" />
-  <meta name="app-build" content="20260630-v42" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v43" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v43" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v43" />
+  <meta name="app-build" content="20260630-v43" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3323,12 +3323,20 @@
        メトロノーム
        ========================================= */
     .metronome-page{
-      padding-bottom:18px;
+      padding-bottom:8px;
+    }
+
+    .metronome-page .page-title{
+      margin:0 2px 8px;
     }
 
     .metronome-layout{
       display:grid;
-      gap:16px;
+      gap:8px;
+    }
+
+    .metronome-layout .card + .card{
+      margin-top:0;
     }
 
     .metronome-song-card,
@@ -3336,51 +3344,19 @@
       overflow:hidden;
     }
 
+    .metronome-song-card{
+      padding:13px 14px 12px;
+    }
+
     .metronome-song-select{
-      margin-top:10px;
-    }
-
-    .metronome-tempo-summary{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
-      margin-top:16px;
-    }
-
-    .metronome-tempo-box{
-      border:1px solid rgba(217,179,122,.34);
-      border-radius:14px;
-      padding:12px 14px;
-      background:rgba(8,14,16,.48);
-    }
-
-    .metronome-tempo-box span{
-      display:block;
-      color:var(--muted);
-      font-size:11px;
-      letter-spacing:.08em;
-      margin-bottom:5px;
-    }
-
-    .metronome-tempo-box strong{
-      display:block;
-      color:var(--gold);
-      font-size:25px;
-      line-height:1.15;
-    }
-    .metronome-tempo-box strong span{
-      display:inline;
-      color:inherit;
-      font-size:inherit;
-      letter-spacing:0;
-      margin:0;
+      margin-top:0;
     }
 
     .metronome-multipliers{
       display:grid;
       grid-template-columns:repeat(6,minmax(0,1fr));
       gap:7px;
-      margin-top:14px;
+      margin-top:10px;
     }
 
     .metronome-rate-btn{
@@ -3685,8 +3661,12 @@
       display:none;
     }
 
+    body.metronome-active .app-shell > main{
+      padding-top:4px;
+    }
+
     html.standalone-shell body.metronome-active .app-shell > main{
-      padding-top:calc(18px + env(safe-area-inset-top));
+      padding-top:calc(2px + env(safe-area-inset-top));
     }
 
     .metronome-start-btn:disabled{
@@ -3769,22 +3749,11 @@
 
         <div class="metronome-layout">
           <div class="card metronome-song-card">
-            <div class="eyebrow">TEMPO CONTROL UNIT</div>
             <label class="select-wrap metronome-song-select">
               <span class="label">楽曲を選択</span>
               <select id="metronomeSongSelect" aria-label="メトロノームで使用する曲を選択"></select>
             </label>
 
-            <div class="metronome-tempo-summary">
-              <div class="metronome-tempo-box">
-                <span>基準テンポ</span>
-                <strong id="metronomeBaseTempo">未登録</strong>
-              </div>
-              <div class="metronome-tempo-box">
-                <span>現在テンポ</span>
-                <strong><span id="metronomeCurrentTempo">120</span> BPM</strong>
-              </div>
-            </div>
 
             <div id="metronomeMultipliers" class="metronome-multipliers" aria-label="基準テンポに対する倍率">
               <button class="metronome-rate-btn" type="button" data-tempo-rate="0.5">0.5</button>
@@ -4251,7 +4220,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v42";
+    const APP_BUILD_VERSION = "20260630-v43";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8721,14 +8690,7 @@
     }
 
     function updateMetronomeReadout(){
-      const baseElement = document.getElementById("metronomeBaseTempo");
-      const currentElement = document.getElementById("metronomeCurrentTempo");
       const input = document.getElementById("metronomeBpmInput");
-
-      if(baseElement){
-        baseElement.textContent = metronomeState.baseBpm ? `${metronomeState.baseBpm} BPM` : "未登録";
-      }
-      if(currentElement) currentElement.textContent = String(metronomeState.bpm);
       if(input && document.activeElement !== input) input.value = String(metronomeState.bpm);
       updateMetronomeRateButtons();
     }
@@ -8947,9 +8909,10 @@
 
       const songsForMetronome = getMetronomeSongs();
       select.innerHTML = songsForMetronome.length
-        ? songsForMetronome.map(song=>`
-            <option value="${escapeHtml(song.title)}">${escapeHtml(song.title)}</option>
-          `).join("")
+        ? songsForMetronome.map(song=>{
+            const tempoLabel = song.baseBpm ? `${song.baseBpm} BPM` : "未登録";
+            return `<option value="${escapeHtml(song.title)}">${escapeHtml(song.title)}（${tempoLabel}）</option>`;
+          }).join("")
         : `<option value="">楽曲が登録されていません</option>`;
 
       const validTitle = songsForMetronome.some(song=>song.title===metronomeState.selectedSongTitle)
