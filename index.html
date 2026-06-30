@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v50" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v50" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v50" />
-  <meta name="app-build" content="20260630-v50" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v51" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v51" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v51" />
+  <meta name="app-build" content="20260630-v51" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4387,7 +4387,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v50";
+    const APP_BUILD_VERSION = "20260630-v51";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -9307,6 +9307,25 @@
       }catch(error){}
     }
 
+    function releaseForegroundMetronomeCarrier(){
+      const audio = metronomeState.foregroundCarrierAudio;
+      if(audio){
+        try{
+          audio.pause();
+          audio.loop = false;
+          audio.removeAttribute("src");
+          audio.load();
+        }catch(error){}
+      }
+
+      if(metronomeState.foregroundCarrierObjectUrl){
+        URL.revokeObjectURL(metronomeState.foregroundCarrierObjectUrl);
+      }
+
+      metronomeState.foregroundCarrierAudio = null;
+      metronomeState.foregroundCarrierObjectUrl = "";
+    }
+
     function ensureBackgroundMetronomeAudio(){
       if(metronomeState.backgroundAudio) return metronomeState.backgroundAudio;
 
@@ -9352,6 +9371,25 @@
       metronomeState.backgroundObjectUrl = "";
       metronomeState.backgroundLoopBpm = 0;
       metronomeState.backgroundLoopProfile = "";
+    }
+
+    function releaseBackgroundMetronomeAudio(){
+      const audio = metronomeState.backgroundAudio;
+      if(audio){
+        try{ audio.loop = false; }catch(error){}
+      }
+      releaseBackgroundMetronomeLoop();
+      metronomeState.backgroundAudio = null;
+    }
+
+    function clearMetronomeMediaSession(){
+      if(!("mediaSession" in navigator)) return;
+
+      try{ navigator.mediaSession.playbackState = "none"; }catch(error){}
+      try{ navigator.mediaSession.metadata = null; }catch(error){}
+      ["play","pause","stop"].forEach(action=>{
+        try{ navigator.mediaSession.setActionHandler(action,null); }catch(error){}
+      });
     }
 
     async function prepareBackgroundMetronomeLoop(){
@@ -9662,9 +9700,7 @@
         }catch(error){}
       }
 
-      if("mediaSession" in navigator){
-        try{ navigator.mediaSession.playbackState = "none"; }catch(error){}
-      }
+      clearMetronomeMediaSession();
       if("audioSession" in navigator){
         try{ navigator.audioSession.type = "auto"; }catch(error){}
       }
@@ -9672,6 +9708,33 @@
       const needle = document.getElementById("metronomeNeedleWrap");
       if(needle) needle.style.transform = "translateX(-50%) rotate(0deg)";
       syncMetronomeRunningUi();
+    }
+
+    function disposeMetronomeMedia({closeAudioContext=false}={}){
+      stopMetronome();
+      releaseForegroundMetronomeCarrier();
+      releaseBackgroundMetronomeAudio();
+      clearMetronomeMediaSession();
+      metronomeState.playbackMode = "foreground";
+      metronomeState.foregroundContextNeedsReset = true;
+
+      const context = metronomeState.audioContext;
+      if(context && context.state !== "closed"){
+        if(closeAudioContext){
+          try{
+            const closeResult = context.close();
+            if(closeResult?.catch) closeResult.catch(()=>{});
+          }catch(error){}
+          metronomeState.audioContext = null;
+          metronomeState.audioBuffer = null;
+          metronomeState.audioLoadPromise = null;
+        }else if(context.state === "running"){
+          try{
+            const suspendResult = context.suspend();
+            if(suspendResult?.catch) suspendResult.catch(()=>{});
+          }catch(error){}
+        }
+      }
     }
 
     function restartMetronomeIfRunning(){
@@ -9835,7 +9898,10 @@
 
       document.addEventListener("visibilitychange",()=>{
         if(document.visibilityState !== "visible"){
-          if(!metronomeState.backgroundEnabled) stopMetronome();
+          const metronomePageIsOpen = document.body.classList.contains("metronome-active");
+          if(!metronomeState.backgroundEnabled || !metronomePageIsOpen){
+            disposeMetronomeMedia();
+          }
           return;
         }
 
@@ -9854,7 +9920,11 @@
     }
 
     window.addEventListener("pagehide",()=>{
-      if(!metronomeState.backgroundEnabled) stopMetronome();
+      disposeMetronomeMedia({closeAudioContext:true});
+    });
+
+    window.addEventListener("beforeunload",()=>{
+      disposeMetronomeMedia({closeAudioContext:true});
     });
 
     const depthProfiles = {
@@ -9927,11 +9997,8 @@
 
     function switchPage(pageName,options={}){
       if(pageName === "story" && !options.allowLockedStory) return;
-      if(
-        pageName !== "metronome"
-        && !(metronomeState.running && metronomeState.backgroundEnabled && metronomeState.playbackMode === "background")
-      ){
-        stopMetronome();
+      if(pageName !== "metronome"){
+        disposeMetronomeMedia();
       }
       if(!options.skipGeoCheck && geoRestrictionApplies(pageName) && !readGeoSession()){
         openLocationGate(pageName);
