@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v44" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v44" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v44" />
-  <meta name="app-build" content="20260630-v44" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v45" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v45" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v45" />
+  <meta name="app-build" content="20260630-v45" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4274,7 +4274,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v44";
+    const APP_BUILD_VERSION = "20260630-v45";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7245,7 +7245,7 @@
         const day = activeAdminScheduleMonth === currentMonthKey ? now.getDate() : 1;
         date = `${activeAdminScheduleMonth}-${String(day).padStart(2,"0")}`;
       }
-      adminWorkingHome.schedule.push({id,date,title:"",startTime:"",endTime:"",note:""});
+      adminWorkingHome.schedule.push({id,date,title:"通常練習",startTime:"15:45",endTime:"17:45",note:""});
       renderAdminScheduleItems({focusId:id});
     }
 
