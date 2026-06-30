@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v37" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v37" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v37" />
-  <meta name="app-build" content="20260630-v37" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v38" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v38" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v38" />
+  <meta name="app-build" content="20260630-v38" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3512,29 +3512,6 @@
       box-shadow:0 0 0 5px rgba(9,15,17,.82);
     }
 
-    .metronome-device-readout{
-      position:absolute;
-      left:50%;
-      bottom:3.8%;
-      transform:translateX(-50%);
-      display:flex;
-      align-items:baseline;
-      gap:7px;
-      color:var(--gold);
-      white-space:nowrap;
-    }
-
-    .metronome-device-readout strong{
-      font-size:34px;
-      line-height:1;
-      font-variant-numeric:tabular-nums;
-    }
-
-    .metronome-device-readout span{
-      font-size:11px;
-      letter-spacing:.12em;
-    }
-
     .metronome-status{
       position:absolute;
       top:6%;
@@ -3828,10 +3805,6 @@
                 <span class="metronome-weight"></span>
               </div>
               <span class="metronome-pivot" aria-hidden="true"></span>
-              <div class="metronome-device-readout">
-                <strong id="metronomeDeviceTempo">120</strong>
-                <span>BPM</span>
-              </div>
             </div>
 
             <div class="metronome-bpm-controls">
@@ -4278,7 +4251,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v37";
+    const APP_BUILD_VERSION = "20260630-v38";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8691,8 +8664,8 @@
     const metronomeBpmStorageKey = "underground-utopia-metronome-bpm-v1";
 
     // iPhone側で音が実際に聞こえるまでのわずかな遅延に合わせ、
-    // 針の表示だけ40ミリ秒遅らせる。音声再生処理そのものは変更しない。
-    const METRONOME_VISUAL_DELAY = 0.040;
+    // 針の表示だけ60ミリ秒遅らせる。音声再生処理そのものは変更しない。
+    const METRONOME_VISUAL_DELAY = 0.060;
 
     const metronomeState = {
       selectedSongTitle:localStorage.getItem(metronomeSelectedSongStorageKey) || "",
@@ -8750,14 +8723,12 @@
     function updateMetronomeReadout(){
       const baseElement = document.getElementById("metronomeBaseTempo");
       const currentElement = document.getElementById("metronomeCurrentTempo");
-      const deviceElement = document.getElementById("metronomeDeviceTempo");
       const input = document.getElementById("metronomeBpmInput");
 
       if(baseElement){
         baseElement.textContent = metronomeState.baseBpm ? `${metronomeState.baseBpm} BPM` : "未登録";
       }
       if(currentElement) currentElement.textContent = String(metronomeState.bpm);
-      if(deviceElement) deviceElement.textContent = String(metronomeState.bpm);
       if(input && document.activeElement !== input) input.value = String(metronomeState.bpm);
       updateMetronomeRateButtons();
     }
