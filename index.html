@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v43" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v43" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v43" />
-  <meta name="app-build" content="20260630-v43" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v44" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v44" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v44" />
+  <meta name="app-build" content="20260630-v44" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -2302,6 +2302,47 @@
       margin-top:12px;
     }
 
+    .admin-schedule-month-tabs{
+      display:flex;
+      gap:7px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      margin:10px 0 4px;
+      padding:2px 1px 5px;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior-x:contain;
+      touch-action:pan-x;
+    }
+
+    .admin-schedule-month-tabs::-webkit-scrollbar{display:none}
+
+    .admin-schedule-month-tab{
+      flex:0 0 auto;
+      min-width:62px;
+      border:1px solid rgba(217,179,122,.32);
+      border-radius:999px;
+      padding:8px 13px;
+      background:rgba(9,15,17,.46);
+      color:var(--muted);
+      font-family:inherit;
+      font-weight:800;
+      letter-spacing:.04em;
+      white-space:nowrap;
+    }
+
+    .admin-schedule-month-tab.active{
+      border-color:rgba(224,185,126,.78);
+      background:linear-gradient(180deg,rgba(183,124,77,.34),rgba(85,58,39,.30));
+      color:var(--ivory);
+      box-shadow:inset 0 0 0 1px rgba(255,226,173,.08);
+    }
+
+    .admin-schedule-month-tab:focus-visible{
+      outline:2px solid rgba(224,185,126,.72);
+      outline-offset:2px;
+    }
+
     .admin-schedule-editor{
       max-height:min(52vh,560px);
       overflow-y:auto;
@@ -3046,6 +3087,18 @@
       .admin-timeline-editor{
         gap:6px;
         margin-top:6px;
+      }
+
+      .admin-schedule-month-tabs{
+        gap:6px;
+        margin:2px 0 1px;
+        padding:2px 0 5px;
+      }
+
+      .admin-schedule-month-tab{
+        min-width:56px;
+        padding:7px 11px;
+        font-size:11px;
       }
 
       .admin-simple-row{
@@ -3937,10 +3990,11 @@
               <div class="admin-setlist-head">
                 <div>
                   <div class="admin-field-label">予定表</div>
-                  <div class="admin-hint">ホームには予定がある直近3日分を表示します。</div>
+                  <div class="admin-hint">月タブを切り替えて予定を編集します。ホームも同じ月別表示です。</div>
                 </div>
                 <button id="adminAddSchedule" class="admin-btn compact" type="button">＋ 予定を追加</button>
               </div>
+              <div id="adminScheduleMonths" class="admin-schedule-month-tabs" role="tablist" aria-label="管理画面の予定月"></div>
               <div id="adminScheduleItems" class="admin-schedule-editor" data-scroll-handoff></div>
             </section>
 
@@ -4220,7 +4274,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v43";
+    const APP_BUILD_VERSION = "20260630-v44";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -5554,6 +5608,7 @@
     let homeData = buildDefaultHomeData();
     let adminWorkingHome = buildDefaultHomeData();
     let activeScheduleMonth = "";
+    let activeAdminScheduleMonth = "";
     let adminAuthorized = false;
 
     function makeLocalId(prefix="item"){
@@ -6803,44 +6858,166 @@
       renderAdminGeoAccess();
     }
 
+    function getAdminSchedulePeriodStartYear(){
+      const now = new Date();
+      const currentPeriodYear = now.getMonth() >= 5 ? now.getFullYear() : now.getFullYear() - 1;
+      const dateValues = [
+        ...(Array.isArray(adminWorkingHome?.schedule) ? adminWorkingHome.schedule.map(item=>item?.date) : []),
+        ...(Array.isArray(adminWorkingCatalog) ? adminWorkingCatalog.map(item=>item?.date) : [])
+      ].filter(value=>/^\d{4}-\d{2}-\d{2}$/.test(String(value || "")));
+
+      if(!dateValues.length) return currentPeriodYear;
+
+      const periodYears = dateValues.map(value=>{
+        const [year,month] = String(value).split("-").map(Number);
+        return month >= 6 ? year : year - 1;
+      });
+
+      return periodYears.sort((a,b)=>{
+        const distance = Math.abs(a-currentPeriodYear) - Math.abs(b-currentPeriodYear);
+        return distance || a-b;
+      })[0];
+    }
+
+    function buildAdminScheduleMonthKeys(){
+      const startYear = getAdminSchedulePeriodStartYear();
+      const fixedKeys = Array.from({length:12},(_,index)=>{
+        const date = new Date(startYear,5+index,1);
+        return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+      });
+      const existingKeys = (Array.isArray(adminWorkingHome?.schedule) ? adminWorkingHome.schedule : [])
+        .map(item=>scheduleMonthKey(item?.date))
+        .filter(Boolean);
+      return [...new Set([...fixedKeys,...existingKeys])].sort();
+    }
+
+    function formatAdminScheduleMonthLabel(monthKey,index,monthKeys){
+      if(monthKey === "__unset__") return "未設定";
+      const [year,month] = String(monthKey || "").split("-");
+      const monthNumber = Number(month);
+      if(!year || !Number.isFinite(monthNumber)) return monthKey;
+      const previousYear = index > 0 ? String(monthKeys[index-1] || "").slice(0,4) : year;
+      return index > 0 && previousYear !== year
+        ? `${year}年${monthNumber}月`
+        : `${monthNumber}月`;
+    }
+
+    function resolveAdminScheduleMonth(monthKeys){
+      const hasUnset = (adminWorkingHome.schedule || []).some(item=>!scheduleMonthKey(item?.date));
+      const availableKeys = hasUnset ? [...monthKeys,"__unset__"] : monthKeys;
+      if(availableKeys.includes(activeAdminScheduleMonth)) return activeAdminScheduleMonth;
+
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+      activeAdminScheduleMonth = availableKeys.includes(currentMonthKey)
+        ? currentMonthKey
+        : (monthKeys.find(key=>key >= currentMonthKey) || monthKeys[0] || (hasUnset ? "__unset__" : ""));
+      return activeAdminScheduleMonth;
+    }
+
     function renderAdminScheduleItems(options = {}){
       const root = document.getElementById("adminScheduleItems");
-      if(!root) return;
+      const tabsRoot = document.getElementById("adminScheduleMonths");
+      const addButton = document.getElementById("adminAddSchedule");
+      if(!root || !tabsRoot) return;
+
       const previousScrollTop = root.scrollTop;
-      const items = adminWorkingHome.schedule;
-      root.innerHTML = items.length ? items.map((item,index)=>`
+      const previousTabsScrollLeft = tabsRoot.scrollLeft;
+      const monthKeys = buildAdminScheduleMonthKeys();
+      const hasUnset = adminWorkingHome.schedule.some(item=>!scheduleMonthKey(item?.date));
+      resolveAdminScheduleMonth(monthKeys);
+      const tabKeys = hasUnset ? [...monthKeys,"__unset__"] : monthKeys;
+
+      tabsRoot.innerHTML = tabKeys.map((monthKey,index)=>`
+        <button
+          class="admin-schedule-month-tab ${monthKey===activeAdminScheduleMonth ? "active" : ""}"
+          type="button"
+          role="tab"
+          aria-selected="${monthKey===activeAdminScheduleMonth ? "true" : "false"}"
+          data-admin-schedule-month="${escapeHtml(monthKey)}"
+        >${escapeHtml(formatAdminScheduleMonthLabel(monthKey,index,monthKeys))}</button>
+      `).join("");
+
+      const visibleItems = adminWorkingHome.schedule
+        .map((item,index)=>({item,index}))
+        .filter(({item})=>activeAdminScheduleMonth === "__unset__"
+          ? !scheduleMonthKey(item.date)
+          : scheduleMonthKey(item.date) === activeAdminScheduleMonth
+        )
+        .sort((a,b)=>{
+          const dateCompare = scheduleDateKey(a.item).localeCompare(scheduleDateKey(b.item));
+          const timeCompare = String(a.item.startTime || "").localeCompare(String(b.item.startTime || ""));
+          return dateCompare || timeCompare || String(a.item.title || "").localeCompare(String(b.item.title || ""),"ja");
+        });
+
+      const currentLabel = activeAdminScheduleMonth === "__unset__"
+        ? "未設定"
+        : formatScheduleMonthLabel(activeAdminScheduleMonth,false);
+      if(addButton){
+        addButton.textContent = activeAdminScheduleMonth === "__unset__" ? "＋ 予定を追加" : `＋ ${currentLabel}に追加`;
+        addButton.title = activeAdminScheduleMonth === "__unset__"
+          ? "日付未設定の予定を追加"
+          : `${currentLabel}の予定を追加`;
+      }
+
+      root.innerHTML = visibleItems.length ? visibleItems.map(({item,index})=>`
         <div class="admin-schedule-row" data-admin-schedule-id="${escapeHtml(item.id)}">
           <label class="admin-schedule-field schedule-date">
             <span class="admin-field-label">日時</span>
-            <input class="admin-input" type="date" value="${escapeHtml(item.date)}" data-schedule-field="date" data-schedule-index="${index}">
+            <input class="admin-input" type="date" value="${escapeHtml(item.date)}" data-schedule-field="date" data-schedule-index="${index}" data-schedule-id="${escapeHtml(item.id)}">
           </label>
           <label class="admin-schedule-field schedule-title">
             <span class="admin-field-label">予定名</span>
-            <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="例：通常練習" data-schedule-field="title" data-schedule-index="${index}">
+            <input class="admin-input" value="${escapeHtml(item.title)}" placeholder="例：通常練習" data-schedule-field="title" data-schedule-index="${index}" data-schedule-id="${escapeHtml(item.id)}">
           </label>
           <label class="admin-schedule-field schedule-start">
             <span class="admin-field-label">開始時間</span>
-            <input class="admin-input" type="time" value="${escapeHtml(item.startTime || "")}" data-schedule-field="startTime" data-schedule-index="${index}">
+            <input class="admin-input" type="time" value="${escapeHtml(item.startTime || "")}" data-schedule-field="startTime" data-schedule-index="${index}" data-schedule-id="${escapeHtml(item.id)}">
           </label>
           <label class="admin-schedule-field schedule-end">
             <span class="admin-field-label">終了時間</span>
-            <input class="admin-input" type="time" value="${escapeHtml(item.endTime || "")}" data-schedule-field="endTime" data-schedule-index="${index}">
+            <input class="admin-input" type="time" value="${escapeHtml(item.endTime || "")}" data-schedule-field="endTime" data-schedule-index="${index}" data-schedule-id="${escapeHtml(item.id)}">
           </label>
           <label class="admin-schedule-field schedule-note">
             <span class="admin-field-label">補足</span>
-            <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="任意" data-schedule-field="note" data-schedule-index="${index}">
+            <input class="admin-input" value="${escapeHtml(item.note)}" placeholder="任意" data-schedule-field="note" data-schedule-index="${index}" data-schedule-id="${escapeHtml(item.id)}">
           </label>
           <div class="admin-row-actions">
             <button class="admin-icon-btn" type="button" data-delete-schedule="${index}" title="削除">×</button>
           </div>
         </div>
-      `).join("") : `<div class="admin-empty">予定はまだ登録されていません。</div>`;
+      `).join("") : `<div class="admin-empty">${escapeHtml(currentLabel)}の予定はまだ登録されていません。</div>`;
+
+      tabsRoot.querySelectorAll("[data-admin-schedule-month]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          activeAdminScheduleMonth = button.dataset.adminScheduleMonth || activeAdminScheduleMonth;
+          renderAdminScheduleItems();
+          requestAnimationFrame(()=>{
+            tabsRoot.querySelector(".admin-schedule-month-tab.active")?.scrollIntoView({
+              behavior:"smooth",
+              block:"nearest",
+              inline:"center"
+            });
+          });
+        });
+      });
 
       root.querySelectorAll("[data-schedule-field]").forEach(input=>{
         input.addEventListener("input",()=>{
-          adminWorkingHome.schedule[Number(input.dataset.scheduleIndex)][input.dataset.scheduleField] = input.value;
+          const item = adminWorkingHome.schedule[Number(input.dataset.scheduleIndex)];
+          if(item) item[input.dataset.scheduleField] = input.value;
         });
+        if(input.dataset.scheduleField === "date"){
+          input.addEventListener("change",()=>{
+            const item = adminWorkingHome.schedule[Number(input.dataset.scheduleIndex)];
+            if(!item) return;
+            item.date = input.value;
+            activeAdminScheduleMonth = scheduleMonthKey(item.date) || "__unset__";
+            renderAdminScheduleItems({focusId:item.id});
+          });
+        }
       });
+
       root.querySelectorAll("[data-delete-schedule]").forEach(button=>{
         button.addEventListener("click",()=>{
           adminWorkingHome.schedule.splice(Number(button.dataset.deleteSchedule),1);
@@ -6849,7 +7026,15 @@
       });
 
       window.requestAnimationFrame(()=>{
-        if(options.scrollToEnd){
+        tabsRoot.scrollLeft = previousTabsScrollLeft;
+        const activeTab = tabsRoot.querySelector(".admin-schedule-month-tab.active");
+        activeTab?.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+        if(options.focusId){
+          const row = [...root.querySelectorAll("[data-admin-schedule-id]")]
+            .find(candidate=>candidate.dataset.adminScheduleId===options.focusId);
+          row?.scrollIntoView({behavior:"smooth",block:"nearest"});
+          row?.querySelector('input[type="date"]')?.focus();
+        }else if(options.scrollToEnd){
           root.scrollTop = root.scrollHeight;
           const lastRow = root.querySelector(".admin-schedule-row:last-child");
           lastRow?.querySelector("input")?.focus();
@@ -7052,8 +7237,16 @@
     }
 
     function addAdminScheduleItem(){
-      adminWorkingHome.schedule.push({id:makeLocalId("schedule"),date:"",title:"",startTime:"",endTime:"",note:""});
-      renderAdminScheduleItems({scrollToEnd:true});
+      const id = makeLocalId("schedule");
+      let date = "";
+      if(activeAdminScheduleMonth && activeAdminScheduleMonth !== "__unset__"){
+        const now = new Date();
+        const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+        const day = activeAdminScheduleMonth === currentMonthKey ? now.getDate() : 1;
+        date = `${activeAdminScheduleMonth}-${String(day).padStart(2,"0")}`;
+      }
+      adminWorkingHome.schedule.push({id,date,title:"",startTime:"",endTime:"",note:""});
+      renderAdminScheduleItems({focusId:id});
     }
 
     function addAdminTimelineItem(){
