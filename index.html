@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v51" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v51" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v51" />
-  <meta name="app-build" content="20260630-v51" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260630-v52" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260630-v52" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260630-v52" />
+  <meta name="app-build" content="20260630-v52" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3500,6 +3500,10 @@
       margin-top:0;
     }
 
+    .metronome-song-select > .label{
+      margin-top:7px;
+    }
+
     .metronome-multipliers{
       display:grid;
       grid-template-columns:repeat(6,minmax(0,1fr));
@@ -4387,7 +4391,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260630-v51";
+    const APP_BUILD_VERSION = "20260630-v52";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -9066,10 +9070,10 @@
     function getBackgroundMetronomeProfile(){
       if(isMobileBackgroundMetronomeDevice()){
         return {
-          key:"mobile-long-10m-16bit-44100",
+          key:"mobile-long-7m-16bit-44100",
           sampleRate:44100,
           bitsPerSample:16,
-          targetDurationSeconds:10 * 60
+          targetDurationSeconds:7 * 60
         };
       }
 
