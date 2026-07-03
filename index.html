@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v57" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v57" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v57" />
-  <meta name="app-build" content="20260701-v57" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v58" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v58" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v58" />
+  <meta name="app-build" content="20260701-v58" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3153,41 +3153,55 @@
         height:36px;
       }
 
-      .admin-schedule-row{
-        grid-template-columns:minmax(132px,1.05fr) minmax(72px,.68fr) minmax(0,1fr) 36px;
-        grid-template-areas:
-          "date title title delete"
-          "start end note note";
-        gap:6px;
-        padding:7px;
+      .admin-schedule-editor{
+        max-height:none;
+        overflow:visible;
+        padding-right:0;
+        scrollbar-gutter:auto;
       }
 
-      .admin-schedule-row .schedule-date{grid-area:date}
+      .admin-schedule-row{
+        position:relative;
+        grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+        grid-template-areas:
+          "date date"
+          "title title"
+          "start end"
+          "note note";
+        gap:9px 8px;
+        padding:10px;
+      }
+
+      .admin-schedule-row .schedule-date{
+        grid-area:date;
+        padding-right:44px;
+      }
       .admin-schedule-row .schedule-title{grid-area:title}
       .admin-schedule-row .schedule-start{grid-area:start}
       .admin-schedule-row .schedule-end{grid-area:end}
       .admin-schedule-row .schedule-note{grid-area:note}
-      .admin-schedule-row .admin-row-actions{grid-area:delete}
+      .admin-schedule-row .admin-row-actions{
+        position:absolute;
+        top:10px;
+        right:10px;
+        justify-content:flex-end;
+      }
 
       .admin-schedule-row .admin-input,
       .admin-schedule-row .admin-schedule-title-textarea{
-        min-height:36px;
-        padding:6px 7px;
-        font-size:12px;
+        min-height:44px;
+        padding:9px 10px;
+        font-size:16px;
       }
 
       .admin-schedule-row .admin-schedule-title-textarea{
-        height:44px;
-        line-height:1.35;
+        height:56px;
+        line-height:1.4;
       }
 
       .admin-schedule-row .admin-field-label{
-        margin-bottom:3px;
-        font-size:8px;
-      }
-
-      .admin-schedule-row .admin-row-actions{
-        justify-content:flex-end;
+        margin-bottom:4px;
+        font-size:10px;
       }
 
       .admin-global-footer{
@@ -3241,7 +3255,7 @@
       }
       .admin-head-actions{gap:4px}
       .admin-schedule-row{
-        grid-template-columns:minmax(88px,.9fr) minmax(70px,.75fr) minmax(0,1fr) 34px;
+        grid-template-columns:minmax(0,1fr) minmax(0,1fr);
       }
       .admin-standalone-meta{
         grid-template-columns:1fr;
@@ -4664,7 +4678,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260701-v57";
+    const APP_BUILD_VERSION = "20260701-v58";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
