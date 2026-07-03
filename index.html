@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v56" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v56" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v56" />
-  <meta name="app-build" content="20260701-v56" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v57" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v57" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v57" />
+  <meta name="app-build" content="20260701-v57" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4664,7 +4664,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260701-v56";
+    const APP_BUILD_VERSION = "20260701-v57";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -10926,6 +10926,12 @@
     // 針の表示だけ100ミリ秒遅らせる。音声再生処理そのものは変更しない。
     const METRONOME_VISUAL_DELAY = 0.100;
 
+    // スマホの内蔵スピーカーでも合奏中にクリックが埋もれにくいよう、
+    // モバイル端末だけ音圧の基準を引き上げる。PC版の出力は従来値を維持する。
+    const METRONOME_DESKTOP_GAIN = .92;
+    const METRONOME_MOBILE_FOREGROUND_GAIN = 1.85;
+    const METRONOME_MOBILE_BACKGROUND_DRIVE = 2.2;
+
     const metronomeState = {
       selectedSongTitle:localStorage.getItem(metronomeSelectedSongStorageKey) || "",
       baseBpm:null,
@@ -11049,7 +11055,7 @@
     function getBackgroundMetronomeProfile(){
       if(isMobileBackgroundMetronomeDevice()){
         return {
-          key:"mobile-long-7m-16bit-44100",
+          key:"mobile-long-7m-16bit-44100-loud-v2",
           sampleRate:44100,
           bitsPerSample:16,
           targetDurationSeconds:7 * 60
@@ -11080,6 +11086,12 @@
       return sample / channels.length;
     }
 
+    function boostMobileMetronomeSample(sample){
+      const drive = METRONOME_MOBILE_BACKGROUND_DRIVE;
+      const normalizedPeak = Math.tanh(drive);
+      return Math.max(-1,Math.min(1,Math.tanh(sample * drive) / normalizedPeak));
+    }
+
     function createBackgroundMetronomeWav(audioBuffer,bpm,profile=getBackgroundMetronomeProfile()){
       const secondsPerBeat = 60 / bpm;
       const channelCount = Math.max(1,audioBuffer.numberOfChannels);
@@ -11104,7 +11116,8 @@
 
           for(let sampleIndex=0;sampleIndex<available;sampleIndex+=1){
             const sourcePosition = sampleIndex * sourceStep;
-            const sample = readMonoAudioSample(channels,sourcePosition) * .96;
+            const rawSample = readMonoAudioSample(channels,sourcePosition);
+            const sample = boostMobileMetronomeSample(rawSample);
             const targetIndex = offset + sampleIndex;
             const byteOffset = 44 + targetIndex * bytesPerSample;
             const existing = view.getInt16(byteOffset,true) / 0x7fff;
@@ -11318,7 +11331,7 @@
       audio.playsInline = true;
       audio.setAttribute("playsinline","");
       audio.setAttribute("webkit-playsinline","");
-      audio.volume = .92;
+      audio.volume = isMobileBackgroundMetronomeDevice() ? 1 : METRONOME_DESKTOP_GAIN;
 
       audio.addEventListener("play",()=>{
         if("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
@@ -11422,13 +11435,31 @@
 
       const source = context.createBufferSource();
       const gain = context.createGain();
+      const isMobile = isMobileBackgroundMetronomeDevice();
       source.buffer = buffer;
-      gain.gain.setValueAtTime(.92,time);
+      gain.gain.setValueAtTime(
+        isMobile ? METRONOME_MOBILE_FOREGROUND_GAIN : METRONOME_DESKTOP_GAIN,
+        time
+      );
       source.connect(gain);
-      gain.connect(context.destination);
+
+      let outputNode = gain;
+      let compressor = null;
+      if(isMobile){
+        compressor = context.createDynamicsCompressor();
+        compressor.threshold.setValueAtTime(-18,time);
+        compressor.knee.setValueAtTime(12,time);
+        compressor.ratio.setValueAtTime(4,time);
+        compressor.attack.setValueAtTime(.003,time);
+        compressor.release.setValueAtTime(.08,time);
+        gain.connect(compressor);
+        outputNode = compressor;
+      }
+
+      outputNode.connect(context.destination);
       source.start(time);
 
-      const scheduled = {source,gain};
+      const scheduled = {source,gain,compressor};
       metronomeState.scheduledNodes.push(scheduled);
       source.addEventListener("ended",()=>{
         metronomeState.scheduledNodes = metronomeState.scheduledNodes.filter(item=>item!==scheduled);
