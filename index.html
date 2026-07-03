@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v58" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v58" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v58" />
-  <meta name="app-build" content="20260701-v58" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v59" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v59" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v59" />
+  <meta name="app-build" content="20260701-v59" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -2325,6 +2325,13 @@
       margin-top:12px;
     }
 
+    .admin-schedule-head-actions{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      gap:7px;
+    }
+
     .admin-schedule-month-tabs{
       display:flex;
       gap:7px;
@@ -3116,6 +3123,18 @@
       .admin-dashboard-card > .admin-setlist-head .admin-field-label{
         margin-bottom:0;
         font-size:12px;
+      }
+
+      .admin-schedule-head-actions{
+        min-width:0;
+        flex:1 1 auto;
+        justify-content:flex-end;
+        gap:5px;
+      }
+
+      .admin-schedule-head-actions .admin-btn.compact{
+        padding:7px 8px;
+        font-size:11px;
       }
 
       .admin-simple-list,
@@ -4396,7 +4415,10 @@
                   <div class="admin-field-label">予定表</div>
                   <div class="admin-hint">月タブを切り替えて予定を編集します。ホームも同じ月別表示です。</div>
                 </div>
-                <button id="adminAddSchedule" class="admin-btn compact" type="button">＋ 予定を追加</button>
+                <div class="admin-schedule-head-actions">
+                  <button id="adminGenerateMonthSchedule" class="admin-btn compact secondary" type="button">この月を一括生成</button>
+                  <button id="adminAddSchedule" class="admin-btn compact" type="button">＋ 予定を追加</button>
+                </div>
               </div>
               <div id="adminScheduleMonths" class="admin-schedule-month-tabs" role="tablist" aria-label="管理画面の予定月"></div>
               <div id="adminScheduleItems" class="admin-schedule-editor" data-scroll-handoff></div>
@@ -4678,7 +4700,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260701-v58";
+    const APP_BUILD_VERSION = "20260701-v59";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8962,6 +8984,7 @@
       const root = document.getElementById("adminScheduleItems");
       const tabsRoot = document.getElementById("adminScheduleMonths");
       const addButton = document.getElementById("adminAddSchedule");
+      const generateButton = document.getElementById("adminGenerateMonthSchedule");
       if(!root || !tabsRoot) return;
 
       const previousScrollTop = root.scrollTop;
@@ -9001,6 +9024,13 @@
         addButton.title = activeAdminScheduleMonth === "__unset__"
           ? "日付未設定の予定を追加"
           : `${currentLabel}の予定を追加`;
+      }
+      if(generateButton){
+        const canGenerate = /^\d{4}-\d{2}$/.test(activeAdminScheduleMonth || "");
+        generateButton.disabled = !canGenerate;
+        generateButton.title = canGenerate
+          ? `${currentLabel}の未登録日に「通常練習」を一括生成`
+          : "月を選択すると一括生成できます";
       }
 
       root.innerHTML = visibleItems.length ? visibleItems.map(({item,index})=>`
@@ -9277,6 +9307,48 @@
         const inputs = document.querySelectorAll(`[data-home-simple-field="${field}"]`);
         inputs[inputs.length-1]?.focus();
       });
+    }
+
+    function generateAdminMonthSchedule(){
+      if(!adminWorkingHome || !Array.isArray(adminWorkingHome.schedule)) return;
+      if(!/^\d{4}-\d{2}$/.test(activeAdminScheduleMonth || "")){
+        alert("一括生成する月を選択してください。");
+        return;
+      }
+
+      const [yearText,monthText] = activeAdminScheduleMonth.split("-");
+      const year = Number(yearText);
+      const month = Number(monthText);
+      const monthLabel = `${year}年${month}月`;
+      if(!confirm(`${monthLabel}の未登録日に「通常練習」を一括生成しますか？`)) return;
+
+      const existingDates = new Set(
+        adminWorkingHome.schedule
+          .map(item=>String(item?.date || ""))
+          .filter(date=>date.startsWith(`${activeAdminScheduleMonth}-`))
+      );
+      const lastDay = new Date(year,month,0).getDate();
+      let addedCount = 0;
+
+      for(let day=1; day<=lastDay; day+=1){
+        const date = `${activeAdminScheduleMonth}-${String(day).padStart(2,"0")}`;
+        if(existingDates.has(date)) continue;
+        adminWorkingHome.schedule.push({
+          id:makeLocalId("schedule"),
+          date,
+          title:"通常練習",
+          startTime:"15:45",
+          endTime:"17:45",
+          note:""
+        });
+        addedCount += 1;
+      }
+
+      renderAdminScheduleItems();
+      alert(addedCount
+        ? `${monthLabel}に通常練習を${addedCount}件追加しました。既存の日付は変更していません。`
+        : `${monthLabel}はすべての日付が登録済みです。`
+      );
     }
 
     function addAdminScheduleItem(){
@@ -9724,6 +9796,7 @@
       document.getElementById("adminExport").addEventListener("click",exportPerformanceCatalog);
       document.getElementById("adminAddPracticeSong").addEventListener("click",()=>addAdminPracticeEntry("songs"));
       document.getElementById("adminAddPracticeTask").addEventListener("click",()=>addAdminPracticeEntry("tasks"));
+      document.getElementById("adminGenerateMonthSchedule")?.addEventListener("click",generateAdminMonthSchedule);
       document.getElementById("adminAddSchedule").addEventListener("click",addAdminScheduleItem);
       document.getElementById("adminAddStandaloneTimeline")?.addEventListener("click",addAdminStandaloneTimeline);
       document.getElementById("adminAddTimelineItem").addEventListener("click",addAdminTimelineItem);
