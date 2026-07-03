@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v59" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v59" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v59" />
-  <meta name="app-build" content="20260701-v59" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v60" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v60" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v60" />
+  <meta name="app-build" content="20260701-v60" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3286,6 +3286,57 @@
 
 
     /* =========================================
+       v60：スマホ予定カードの横はみ出し防止
+       ========================================= */
+    @media (max-width:780px){
+      .admin-main,
+      .admin-dashboard-grid,
+      .admin-dashboard-card,
+      .admin-schedule-editor,
+      .admin-schedule-row,
+      .admin-schedule-field{
+        width:100%;
+        min-width:0;
+        max-width:100%;
+      }
+
+      .admin-schedule-row{
+        overflow:hidden;
+      }
+
+      .admin-schedule-row .admin-input,
+      .admin-schedule-row .admin-schedule-title-textarea{
+        display:block;
+        width:100%;
+        min-width:0;
+        max-width:100%;
+        inline-size:100%;
+        min-inline-size:0;
+        max-inline-size:100%;
+      }
+
+      .admin-schedule-row input[type="date"],
+      .admin-schedule-row input[type="time"]{
+        min-width:0;
+        max-width:100%;
+        overflow:hidden;
+        font-variant-numeric:tabular-nums;
+      }
+    }
+
+    @media (max-width:520px){
+      .admin-schedule-row{
+        grid-template-columns:minmax(0,1fr);
+        grid-template-areas:
+          "date"
+          "title"
+          "start"
+          "end"
+          "note";
+      }
+    }
+
+    /* =========================================
        v27：コンパクト認証ヘッダー／物語編集
        ========================================= */
     .topbar{
@@ -4700,7 +4751,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260701-v59";
+    const APP_BUILD_VERSION = "20260701-v60";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
