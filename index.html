@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v61" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v61" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v61" />
-  <meta name="app-build" content="20260701-v61" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v62" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v62" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v62" />
+  <meta name="app-build" content="20260701-v62" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4751,7 +4751,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260701-v61";
+    const APP_BUILD_VERSION = "20260701-v62";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -11065,10 +11065,11 @@
     const METRONOME_VISUAL_DELAY = 0.100;
 
     // スマホの内蔵スピーカーでも合奏中にクリックが埋もれにくいよう、
-    // モバイル端末だけ音圧の基準を引き上げる。PC版の出力は従来値を維持する。
+    // モバイル端末だけ音圧の基準を引き上げる。v62では前版からさらに約16%増幅。
+    // PC版の出力は従来値を維持する。
     const METRONOME_DESKTOP_GAIN = .92;
-    const METRONOME_MOBILE_FOREGROUND_GAIN = 1.85;
-    const METRONOME_MOBILE_BACKGROUND_DRIVE = 2.2;
+    const METRONOME_MOBILE_FOREGROUND_GAIN = 2.15;
+    const METRONOME_MOBILE_BACKGROUND_DRIVE = 2.55;
 
     const metronomeState = {
       selectedSongTitle:localStorage.getItem(metronomeSelectedSongStorageKey) || "",
@@ -11193,7 +11194,7 @@
     function getBackgroundMetronomeProfile(){
       if(isMobileBackgroundMetronomeDevice()){
         return {
-          key:"mobile-long-7m-16bit-44100-loud-v2",
+          key:"mobile-long-7m-16bit-44100-loud-v3",
           sampleRate:44100,
           bitsPerSample:16,
           targetDurationSeconds:7 * 60
