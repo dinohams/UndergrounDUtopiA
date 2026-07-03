@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v60" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v60" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v60" />
-  <meta name="app-build" content="20260701-v60" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v61" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v61" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v61" />
+  <meta name="app-build" content="20260701-v61" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -3183,8 +3183,7 @@
         position:relative;
         grid-template-columns:minmax(0,1fr) minmax(0,1fr);
         grid-template-areas:
-          "date date"
-          "title title"
+          "date title"
           "start end"
           "note note";
         gap:9px 8px;
@@ -3193,9 +3192,12 @@
 
       .admin-schedule-row .schedule-date{
         grid-area:date;
+        padding-right:0;
+      }
+      .admin-schedule-row .schedule-title{
+        grid-area:title;
         padding-right:44px;
       }
-      .admin-schedule-row .schedule-title{grid-area:title}
       .admin-schedule-row .schedule-start{grid-area:start}
       .admin-schedule-row .schedule-end{grid-area:end}
       .admin-schedule-row .schedule-note{grid-area:note}
@@ -3286,7 +3288,7 @@
 
 
     /* =========================================
-       v60：スマホ予定カードの横はみ出し防止
+       v61：スマホ予定カードを3段へ圧縮
        ========================================= */
     @media (max-width:780px){
       .admin-main,
@@ -3326,13 +3328,11 @@
 
     @media (max-width:520px){
       .admin-schedule-row{
-        grid-template-columns:minmax(0,1fr);
+        grid-template-columns:minmax(0,1fr) minmax(0,1fr);
         grid-template-areas:
-          "date"
-          "title"
-          "start"
-          "end"
-          "note";
+          "date title"
+          "start end"
+          "note note";
       }
     }
 
@@ -4751,7 +4751,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260701-v60";
+    const APP_BUILD_VERSION = "20260701-v61";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
