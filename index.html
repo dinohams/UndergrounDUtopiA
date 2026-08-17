@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v68" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v68" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v68" />
-  <meta name="app-build" content="20260817-v68" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v69" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v69" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v69" />
+  <meta name="app-build" content="20260817-v69" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4891,7 +4891,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v68";
+    const APP_BUILD_VERSION = "20260817-v69";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7981,10 +7981,7 @@
     }
 
     function normalizeSongReleaseYear(value){
-      const input = String(value ?? "").trim();
-      if(!input) return "";
-      const year = Number(input);
-      return Number.isInteger(year) && year >= 1900 && year <= 2100 ? String(year) : "";
+      return String(value ?? "").trim();
     }
 
     function buildDefaultSongDetails(){
@@ -9951,7 +9948,6 @@
           fields = `
             <div class="admin-item-fields single">
               <input class="admin-input" data-item-field="title" data-item-id="${escapeHtml(item.id)}" value="${escapeHtml(item.title)}" placeholder="MC1">
-              <textarea class="admin-textarea" data-item-field="body" data-item-id="${escapeHtml(item.id)}" placeholder="MC本文">${escapeHtml(item.body)}</textarea>
             </div>
           `;
         }else if(item.type==="medley"){
@@ -11105,7 +11101,7 @@
           <span class="label">アーティスト名</span>
           <p class="detail-copy">${detail.artist ? escapeHtml(detail.artist) : "未登録です。"}</p>
           <span class="label">リリース年</span>
-          <p class="detail-copy">${detail.releaseYear ? `${escapeHtml(detail.releaseYear)}年` : "未登録です。"}</p>
+          <p class="detail-copy">${detail.releaseYear ? escapeHtml(detail.releaseYear) : "未登録です。"}</p>
           <span class="label">音源（楽譜）</span>
           ${renderYouTubeSource(detail.scoreAudioUrl)}
           <span class="label">音源（原曲）</span>
@@ -11134,7 +11130,7 @@
 
           <label class="admin-field" style="display:block;margin-top:12px">
             <span class="admin-field-label">リリース年</span>
-            <input id="sharedSongReleaseYear" class="admin-input" type="number" min="1900" max="2100" step="1" inputmode="numeric" value="${escapeHtml(detail.releaseYear)}" placeholder="例：1975">
+            <input id="sharedSongReleaseYear" class="admin-input" type="text" value="${escapeHtml(detail.releaseYear)}" placeholder="例：1975年／不明／再録版">
           </label>
 
           <label class="admin-field" style="display:block;margin-top:12px">
@@ -11180,10 +11176,6 @@
         const rawBaseBpm = document.getElementById("sharedSongBaseBpm").value.trim();
         const rawScoreAudioUrl = document.getElementById("sharedSongScoreAudioUrl").value.trim();
         const rawOriginalAudioUrl = document.getElementById("sharedSongOriginalAudioUrl").value.trim();
-        if(rawReleaseYear && !normalizeSongReleaseYear(rawReleaseYear)){
-          alert("リリース年は1900〜2100年の範囲で入力してください。");
-          return;
-        }
         if(rawBaseBpm && normalizeSongBaseBpm(rawBaseBpm) === null){
           alert("メトロノーム基準BPMは30〜300の範囲で入力してください。");
           return;
