@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260701-v63" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260701-v63" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260701-v63" />
-  <meta name="app-build" content="20260701-v63" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v64" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v64" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v64" />
+  <meta name="app-build" content="20260817-v64" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -2936,32 +2936,6 @@
       overflow-wrap:anywhere;
     }
 
-    .song-progress-block{
-      margin-top:8px;
-    }
-
-    .song-progress-score{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .song-progress-score strong{
-      color:var(--gold);
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:22px;
-      font-weight:600;
-      font-variant-numeric:tabular-nums;
-    }
-
-    .song-detail-info-card .card-title{
-      overflow-wrap:anywhere;
-    }
-
     .youtube-editor-preview{
       margin-top:9px;
     }
@@ -2989,9 +2963,6 @@
         width:108px;
       }
 
-      .song-progress-block .select-grid{
-        grid-template-columns:repeat(2,minmax(0,1fr));
-      }
     }
 
     @media (max-width:360px){
@@ -4751,7 +4722,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260701-v63";
+    const APP_BUILD_VERSION = "20260817-v64";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7763,15 +7734,22 @@
       return rounded >= 30 && rounded <= 300 ? rounded : null;
     }
 
+    function normalizeSongReleaseYear(value){
+      const input = String(value ?? "").trim();
+      if(!input) return "";
+      const year = Number(input);
+      return Number.isInteger(year) && year >= 1900 && year <= 2100 ? String(year) : "";
+    }
+
     function buildDefaultSongDetails(){
       return songs.map(song=>({
         id:song.id || makeLocalId("song-detail"),
         title:String(song.title || "").trim(),
-        youtubeUrl:"",
-        baseBpm:normalizeSongBaseBpm(song.baseBpm ?? song.bpm),
-        infoTitle:"この曲の役割",
-        infoBody:String(song.role || "").trim(),
-        stage:normalizeStringList(song.stage)
+        artist:String(song.artist || "").trim(),
+        releaseYear:normalizeSongReleaseYear(song.releaseYear ?? song.year),
+        scoreAudioUrl:String(song.scoreAudioUrl ?? song.youtubeUrl ?? "").trim(),
+        originalAudioUrl:String(song.originalAudioUrl ?? "").trim(),
+        baseBpm:normalizeSongBaseBpm(song.baseBpm ?? song.bpm)
       }));
     }
 
@@ -7791,11 +7769,11 @@
           byTitle.set(key,{
             id:raw.id || existing.id || makeLocalId("song-detail"),
             title,
-            youtubeUrl:String(raw.youtubeUrl ?? existing.youtubeUrl ?? "").trim(),
-            baseBpm:normalizeSongBaseBpm(raw.baseBpm ?? raw.bpm ?? existing.baseBpm),
-            infoTitle:String(raw.infoTitle ?? existing.infoTitle ?? "この曲の役割").trim() || "この曲の役割",
-            infoBody:String(raw.infoBody ?? raw.role ?? existing.infoBody ?? "").trim(),
-            stage:normalizeStringList(raw.stage ?? existing.stage)
+            artist:String(raw.artist ?? existing.artist ?? "").trim(),
+            releaseYear:normalizeSongReleaseYear(raw.releaseYear ?? raw.year ?? existing.releaseYear),
+            scoreAudioUrl:String(raw.scoreAudioUrl ?? raw.sheetAudioUrl ?? raw.youtubeUrl ?? existing.scoreAudioUrl ?? "").trim(),
+            originalAudioUrl:String(raw.originalAudioUrl ?? raw.originalUrl ?? existing.originalAudioUrl ?? "").trim(),
+            baseBpm:normalizeSongBaseBpm(raw.baseBpm ?? raw.bpm ?? existing.baseBpm)
           });
         });
       }
@@ -7833,11 +7811,11 @@
       const detail = {
         id:makeLocalId("song-detail"),
         title:cleanTitle,
-        youtubeUrl:"",
-        baseBpm:null,
-        infoTitle:"この曲の役割",
-        infoBody:"",
-        stage:[]
+        artist:"",
+        releaseYear:"",
+        scoreAudioUrl:"",
+        originalAudioUrl:"",
+        baseBpm:null
       };
       songDetailsCatalog.push(detail);
       return detail;
@@ -7850,11 +7828,11 @@
       const next = {
         id:existing?.id || makeLocalId("song-detail"),
         title:cleanTitle,
-        youtubeUrl:String(patch.youtubeUrl || "").trim(),
-        baseBpm:normalizeSongBaseBpm(patch.baseBpm),
-        infoTitle:String(patch.infoTitle || "この曲の役割").trim() || "この曲の役割",
-        infoBody:String(patch.infoBody || "").trim(),
-        stage:normalizeStringList(patch.stage)
+        artist:String(patch.artist ?? existing?.artist ?? "").trim(),
+        releaseYear:normalizeSongReleaseYear(patch.releaseYear ?? existing?.releaseYear),
+        scoreAudioUrl:String(patch.scoreAudioUrl ?? existing?.scoreAudioUrl ?? "").trim(),
+        originalAudioUrl:String(patch.originalAudioUrl ?? existing?.originalAudioUrl ?? "").trim(),
+        baseBpm:normalizeSongBaseBpm(patch.baseBpm ?? existing?.baseBpm)
       };
       songDetailsCatalog = songDetailsCatalog.filter(detail=>normalizeSongTitleKey(detail.title)!==key);
       songDetailsCatalog.push(next);
@@ -10702,84 +10680,26 @@
       renderSharedSongDetail(item,performance,context);
     }
 
-    function renderSongProgressControls(progressId){
-      const entry = ensureProgressEntry(progressId);
-      return `
-        <div class="song-progress-block">
-          <div class="song-progress-score">
-            <span>この曲の総合進捗</span>
-            <strong data-detail-progress-score>${songScore(progressId)}%</strong>
-          </div>
-          <div class="select-grid">
-            ${Object.entries(progressLabels).map(([key,label])=>`
-              <div class="select-wrap">
-                <label>${escapeHtml(label)}</label>
-                <select data-detail-progress-id="${escapeHtml(progressId)}" data-detail-progress-key="${escapeHtml(key)}">
-                  ${progressOptions[key].map((option,index)=>`
-                    <option value="${index}" ${entry[key]===index?"selected":""}>${escapeHtml(option)}</option>
-                  `).join("")}
-                </select>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      `;
-    }
-
-    function bindSongProgressControls(){
-      document.querySelectorAll("[data-detail-progress-id]").forEach(select=>{
-        select.addEventListener("change",()=>{
-          const progressId = select.dataset.detailProgressId;
-          const key = select.dataset.detailProgressKey;
-          const entry = ensureProgressEntry(progressId);
-          entry[key] = Number(select.value);
-          saveProgress();
-          const score = document.querySelector("[data-detail-progress-score]");
-          if(score) score.textContent = `${songScore(progressId)}%`;
-          renderAllProgress();
-          renderSongs();
-        });
-      });
-    }
-
     function renderSharedSongDetail(item,performance,context){
       const detail = ensureSharedSongDetail(item.title);
-      const progressId = getProgressIdForItem(item);
-      ensureProgressEntry(progressId);
-      const medleyContents = item.type === "medley" && Array.isArray(item.medley) && item.medley.length
-        ? `<span class="label">メドレー構成</span><ul class="clean-list">${item.medley.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
-        : "";
-      const stageContents = detail.stage.length
-        ? `<ul class="clean-list">${detail.stage.map(text=>`<li>${escapeHtml(text)}</li>`).join("")}</ul>`
-        : `<div class="home-empty">ステージ演出は未登録です。</div>`;
 
       document.getElementById("detailHeading").textContent = item.title || "曲名未設定";
       document.getElementById("detailContent").innerHTML = `
         <div class="card">
           <span class="section-badge">M-${context.songNumber}${context.section ? `｜${escapeHtml(context.section.label)} ${escapeHtml(context.section.title)}` : ""}</span>
-          <span class="label">本番</span>
-          <p class="detail-copy">${escapeHtml(performance.title)}</p>
-          <span class="label">音源</span>
-          ${renderYouTubeSource(detail.youtubeUrl)}
-          <span class="label">進捗</span>
-          ${renderSongProgressControls(progressId)}
-          ${medleyContents}
+          <span class="label">アーティスト名</span>
+          <p class="detail-copy">${detail.artist ? escapeHtml(detail.artist) : "未登録です。"}</p>
+          <span class="label">リリース年</span>
+          <p class="detail-copy">${detail.releaseYear ? `${escapeHtml(detail.releaseYear)}年` : "未登録です。"}</p>
+          <span class="label">音源（楽譜）</span>
+          ${renderYouTubeSource(detail.scoreAudioUrl)}
+          <span class="label">音源（原曲）</span>
+          ${renderYouTubeSource(detail.originalAudioUrl)}
         </div>
 
-        <div class="card song-detail-info-card">
-          <h3 class="card-title">${escapeHtml(detail.infoTitle || "この曲の役割")}</h3>
-          <p class="detail-copy">${detail.infoBody ? nl2br(detail.infoBody) : "未登録です。"}</p>
-        </div>
-
-        <div class="card">
-          <h3 class="card-title">ステージ演出</h3>
-          ${stageContents}
-        </div>
-
-        ${adminAuthorized ? `<button id="editSharedSongDetail" class="btn secondary" type="button">共通楽曲詳細を編集</button>` : ""}
+        ${adminAuthorized ? `<button id="editSharedSongDetail" class="btn secondary" type="button">楽曲情報を編集</button>` : ""}
       `;
 
-      bindSongProgressControls();
       document.getElementById("editSharedSongDetail")?.addEventListener("click",()=>{
         renderSharedSongDetailEditor(item,performance,context,detail);
       });
@@ -10792,31 +10712,27 @@
         <div class="card admin-detail-editor">
           <p class="song-detail-edit-note">同じ曲名の楽曲は、すべての本番でこの内容を共有します。この端末へ保存後、管理画面の「全員へ反映」で全端末へ公開できます。</p>
 
-          <label class="admin-field">
-            <span class="admin-field-label">YouTube音源URL</span>
-            <input id="sharedSongYoutubeUrl" class="admin-input" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=..." value="${escapeHtml(detail.youtubeUrl)}">
-          </label>
-          <div id="sharedSongYoutubePreview" class="youtube-editor-preview">${renderYouTubeSource(detail.youtubeUrl,{editor:true})}</div>
-
-          <label class="admin-field" style="display:block;margin-top:12px">
-            <span class="admin-field-label">基準テンポ（BPM）</span>
-            <input id="sharedSongBaseBpm" class="admin-input" type="number" min="30" max="300" step="1" inputmode="numeric" value="${detail.baseBpm ?? ""}" placeholder="例：150">
+          <label class="admin-field" style="display:block">
+            <span class="admin-field-label">アーティスト名</span>
+            <input id="sharedSongArtist" class="admin-input" type="text" value="${escapeHtml(detail.artist)}" placeholder="例：シュガー・ベイブ">
           </label>
 
           <label class="admin-field" style="display:block;margin-top:12px">
-            <span class="admin-field-label">2番目のカードのタイトル</span>
-            <input id="sharedSongInfoTitle" class="admin-input" value="${escapeHtml(detail.infoTitle || "この曲の役割")}" placeholder="例：この曲の役割">
+            <span class="admin-field-label">リリース年</span>
+            <input id="sharedSongReleaseYear" class="admin-input" type="number" min="1900" max="2100" step="1" inputmode="numeric" value="${escapeHtml(detail.releaseYear)}" placeholder="例：1975">
           </label>
 
           <label class="admin-field" style="display:block;margin-top:12px">
-            <span class="admin-field-label">2番目のカードの本文</span>
-            <textarea id="sharedSongInfoBody" class="admin-textarea">${escapeHtml(detail.infoBody)}</textarea>
+            <span class="admin-field-label">音源（楽譜）のYouTube URL</span>
+            <input id="sharedSongScoreAudioUrl" class="admin-input" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=..." value="${escapeHtml(detail.scoreAudioUrl)}">
           </label>
+          <div id="sharedSongScoreAudioPreview" class="youtube-editor-preview">${renderYouTubeSource(detail.scoreAudioUrl,{editor:true})}</div>
 
           <label class="admin-field" style="display:block;margin-top:12px">
-            <span class="admin-field-label">ステージ演出（1行につき1つ）</span>
-            <textarea id="sharedSongStage" class="admin-textarea">${escapeHtml(detail.stage.join("\n"))}</textarea>
+            <span class="admin-field-label">音源（原曲）のYouTube URL</span>
+            <input id="sharedSongOriginalAudioUrl" class="admin-input" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=..." value="${escapeHtml(detail.originalAudioUrl)}">
           </label>
+          <div id="sharedSongOriginalAudioPreview" class="youtube-editor-preview">${renderYouTubeSource(detail.originalAudioUrl,{editor:true})}</div>
 
           <div class="song-detail-edit-actions">
             <button id="cancelSharedSongDetail" class="btn ghost" type="button">編集をやめる</button>
@@ -10825,35 +10741,43 @@
         </div>
       `;
 
-      const youtubeInput = document.getElementById("sharedSongYoutubeUrl");
-      const youtubePreview = document.getElementById("sharedSongYoutubePreview");
-      youtubeInput?.addEventListener("input",()=>{
-        youtubePreview.innerHTML = renderYouTubeSource(youtubeInput.value,{editor:true});
-      });
+      const bindYoutubePreview = (inputId,previewId)=>{
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        input?.addEventListener("input",()=>{
+          preview.innerHTML = renderYouTubeSource(input.value,{editor:true});
+        });
+      };
+      bindYoutubePreview("sharedSongScoreAudioUrl","sharedSongScoreAudioPreview");
+      bindYoutubePreview("sharedSongOriginalAudioUrl","sharedSongOriginalAudioPreview");
 
       document.getElementById("cancelSharedSongDetail")?.addEventListener("click",()=>{
         renderSharedSongDetail(item,performance,context);
       });
       document.getElementById("saveSharedSongDetail")?.addEventListener("click",()=>{
-        const rawYoutubeUrl = document.getElementById("sharedSongYoutubeUrl").value.trim();
-        if(rawYoutubeUrl && !extractYouTubeVideoId(rawYoutubeUrl)){
-          alert("YouTubeのURLを確認してください。通常動画・短縮URL・ShortsのURLに対応しています。");
+        const rawReleaseYear = document.getElementById("sharedSongReleaseYear").value.trim();
+        const rawScoreAudioUrl = document.getElementById("sharedSongScoreAudioUrl").value.trim();
+        const rawOriginalAudioUrl = document.getElementById("sharedSongOriginalAudioUrl").value.trim();
+        if(rawReleaseYear && !normalizeSongReleaseYear(rawReleaseYear)){
+          alert("リリース年は1900〜2100年の範囲で入力してください。");
           return;
         }
-        const rawBaseBpm = document.getElementById("sharedSongBaseBpm").value.trim();
-        if(rawBaseBpm && !normalizeSongBaseBpm(rawBaseBpm)){
-          alert("基準テンポは30〜300 BPMの範囲で入力してください。");
+        if(rawScoreAudioUrl && !extractYouTubeVideoId(rawScoreAudioUrl)){
+          alert("音源（楽譜）のYouTube URLを確認してください。通常動画・短縮URL・ShortsのURLに対応しています。");
+          return;
+        }
+        if(rawOriginalAudioUrl && !extractYouTubeVideoId(rawOriginalAudioUrl)){
+          alert("音源（原曲）のYouTube URLを確認してください。通常動画・短縮URL・ShortsのURLに対応しています。");
           return;
         }
         upsertSharedSongDetail(item.title,{
-          youtubeUrl:normalizeYouTubeUrl(rawYoutubeUrl),
-          baseBpm:rawBaseBpm,
-          infoTitle:document.getElementById("sharedSongInfoTitle").value,
-          infoBody:document.getElementById("sharedSongInfoBody").value,
-          stage:document.getElementById("sharedSongStage").value
+          artist:document.getElementById("sharedSongArtist").value,
+          releaseYear:rawReleaseYear,
+          scoreAudioUrl:normalizeYouTubeUrl(rawScoreAudioUrl),
+          originalAudioUrl:normalizeYouTubeUrl(rawOriginalAudioUrl)
         });
         renderMetronomeSongOptions();
-        alert("共通楽曲詳細をこの端末に保存しました。全員へ公開する場合は、管理画面から「全員へ反映」を押してください。");
+        alert("楽曲情報をこの端末に保存しました。全員へ公開する場合は、管理画面から「全員へ反映」を押してください。");
         renderSharedSongDetail(item,performance,context);
       });
     }
