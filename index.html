@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v70" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v70" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v70" />
-  <meta name="app-build" content="20260817-v70" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v71" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v71" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v71" />
+  <meta name="app-build" content="20260817-v71" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -984,6 +984,7 @@
     .story-song-description{
       padding:0 12px 12px;
       border-top:1px solid rgba(174,185,185,.12);
+      cursor:pointer;
     }
     .story-song-description p{
       margin:10px 0 0;
@@ -4914,7 +4915,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v70";
+    const APP_BUILD_VERSION = "20260817-v71";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8625,7 +8626,7 @@
       {
         id:"encore",
         no:"Encore",
-        title:"夢を見ていた子ども時代",
+        title:"",
         story:"物語を演じていた高校生たちが、自分自身として戻ってくる。子どもの頃に見た夢を、今の自分たちの音で未来へ渡す。"
       }
     ];
@@ -8737,7 +8738,7 @@
         return {
           id:isEncore ? "encore" : section?.id || fallback?.id || makeLocalId("story-section"),
           no:isEncore ? "Encore" : normalizeStoryChapterNo(section?.no ?? section?.label,fallback?.no,index),
-          title:migrateStorySectionTitle(section,fallback),
+          title:isEncore ? "" : migrateStorySectionTitle(section,fallback),
           story:migrateStorySectionBody(section,fallback),
           songs:normalizeStorySongs(Array.isArray(section?.songs) ? section.songs : null,fallback?.songs || [])
         };
@@ -9793,10 +9794,10 @@
               <span class="admin-field-label">章番号</span>
               <input class="admin-input" value="${escapeHtml(section.no)}" data-story-field="no" data-story-index="${index}">
             </label>`}
-            <label class="admin-field ${isEncore ? "wide" : ""}">
-              <span class="admin-field-label">${isEncore ? "アンコール見出し" : "章タイトル"}</span>
+            ${isEncore ? "" : `<label class="admin-field">
+              <span class="admin-field-label">章タイトル</span>
               <input class="admin-input" value="${escapeHtml(section.title)}" data-story-field="title" data-story-index="${index}">
-            </label>
+            </label>`}
             <label class="admin-field wide">
               <span class="admin-field-label">${isEncore ? "アンコール本文" : "章本文"}</span>
               <textarea class="admin-textarea" rows="7" data-story-field="story" data-story-index="${index}">${escapeHtml(section.story)}</textarea>
@@ -10932,6 +10933,23 @@
       document.querySelector(".app-shell > main")?.addEventListener("scroll",queueStoryScrollGimmick,{passive:true});
     }
 
+    function bindStorySongAccordions(map){
+      const items = [...map.querySelectorAll(".story-song-item")];
+      items.forEach(item=>{
+        item.addEventListener("toggle",()=>{
+          if(item.open){
+            items.forEach(other=>{
+              if(other !== item && other.open) other.open = false;
+            });
+          }
+          queueStoryScrollGimmick();
+        });
+        item.querySelector(".story-song-description")?.addEventListener("click",()=>{
+          if(item.open) item.open = false;
+        });
+      });
+    }
+
     function renderStories(){
       const data = normalizeStoryData(storyData);
       const title = document.getElementById("storyPageTitle");
@@ -10958,7 +10976,7 @@
         }).join("");
         return `
           <article class="card story-card${isEncore ? " story-encore-card" : ""}" data-story-section="${escapeHtml(section.id)}" data-story-index="${index}">
-            <h3>${isEncore ? `Encore「${escapeHtml(section.title)}」` : `第${escapeHtml(chapterNo)}章「${escapeHtml(section.title)}」`}</h3>
+            <h3>${isEncore ? "Encore" : `第${escapeHtml(chapterNo)}章「${escapeHtml(section.title)}」`}</h3>
             <p>${section.story ? nl2br(section.story) : (isEncore ? "アンコール本文は未登録です。" : "章本文は未登録です。")}</p>
             ${songList ? `
               <span class="label">楽曲</span>
@@ -10967,6 +10985,7 @@
           </article>
         `;
       }).join("");
+      bindStorySongAccordions(map);
       activeStorySectionIndex = -1;
       map.style.setProperty("--story-progress","0%");
       queueStoryScrollGimmick();
