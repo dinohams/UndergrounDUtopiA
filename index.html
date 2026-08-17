@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v71" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v71" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v71" />
-  <meta name="app-build" content="20260817-v71" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v72" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v72" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v72" />
+  <meta name="app-build" content="20260817-v72" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -943,6 +943,13 @@
       display:grid;
       gap:8px;
       margin-top:9px;
+    }
+    #page-story{--story-scroll-room:0px}
+    #page-story::after{
+      content:"";
+      display:block;
+      height:var(--story-scroll-room);
+      pointer-events:none;
     }
     .story-song-item{
       overflow:hidden;
@@ -4915,7 +4922,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v71";
+    const APP_BUILD_VERSION = "20260817-v72";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -10933,9 +10940,54 @@
       document.querySelector(".app-shell > main")?.addEventListener("scroll",queueStoryScrollGimmick,{passive:true});
     }
 
+    let storySongScrollFrame = 0;
+
+    function scrollStorySongToTop(item){
+      window.cancelAnimationFrame(storySongScrollFrame);
+      storySongScrollFrame = window.requestAnimationFrame(()=>{
+        storySongScrollFrame = window.requestAnimationFrame(()=>{
+          storySongScrollFrame = 0;
+          if(!item?.isConnected) return;
+          const page = document.getElementById("page-story");
+          const host = getPrimaryScrollHost();
+          const gap = 10;
+          let target = 0;
+          let maxScroll = 0;
+
+          if(host === window){
+            const topbar = document.querySelector(".topbar");
+            const topbarHeight = topbar ? topbar.getBoundingClientRect().height : 0;
+            target = Math.max(0,window.scrollY + item.getBoundingClientRect().top - topbarHeight - gap);
+            maxScroll = Math.max(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight) - window.innerHeight);
+          }else{
+            const hostRect = host.getBoundingClientRect();
+            target = Math.max(0,host.scrollTop + item.getBoundingClientRect().top - hostRect.top - gap);
+            maxScroll = Math.max(0,host.scrollHeight - host.clientHeight);
+          }
+
+          if(page && target > maxScroll){
+            const currentRoom = Number.parseFloat(page.style.getPropertyValue("--story-scroll-room")) || 0;
+            page.style.setProperty("--story-scroll-room",`${Math.ceil(currentRoom + target - maxScroll + 16)}px`);
+          }
+
+          storySongScrollFrame = window.requestAnimationFrame(()=>{
+            storySongScrollFrame = 0;
+            if(host === window){
+              window.scrollTo({top:target,behavior:"smooth"});
+            }else{
+              host.scrollTo({top:target,behavior:"smooth"});
+            }
+          });
+        });
+      });
+    }
+
     function bindStorySongAccordions(map){
       const items = [...map.querySelectorAll(".story-song-item")];
       items.forEach(item=>{
+        item.querySelector("summary")?.addEventListener("click",()=>{
+          scrollStorySongToTop(item);
+        });
         item.addEventListener("toggle",()=>{
           if(item.open){
             items.forEach(other=>{
@@ -10946,6 +10998,7 @@
         });
         item.querySelector(".story-song-description")?.addEventListener("click",()=>{
           if(item.open) item.open = false;
+          scrollStorySongToTop(item);
         });
       });
     }
@@ -10985,6 +11038,7 @@
           </article>
         `;
       }).join("");
+      document.getElementById("page-story")?.style.setProperty("--story-scroll-room","0px");
       bindStorySongAccordions(map);
       activeStorySectionIndex = -1;
       map.style.setProperty("--story-progress","0%");
