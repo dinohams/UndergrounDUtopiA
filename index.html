@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v64" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v64" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v64" />
-  <meta name="app-build" content="20260817-v64" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v65" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v65" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v65" />
+  <meta name="app-build" content="20260817-v65" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -893,6 +893,57 @@
       color:#d4dddd;
       line-height:1.85;
       margin:9px 0;
+    }
+    .story-song-list{
+      display:grid;
+      gap:8px;
+      margin-top:9px;
+    }
+    .story-song-item{
+      overflow:hidden;
+      border:1px solid rgba(111,135,145,.32);
+      border-radius:12px;
+      background:rgba(9,15,17,.42);
+    }
+    .story-song-item[open]{
+      border-color:rgba(217,179,122,.48);
+      background:rgba(19,29,33,.70);
+    }
+    .story-song-item > summary{
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto;
+      align-items:center;
+      gap:10px;
+      min-height:52px;
+      padding:10px 12px;
+      cursor:pointer;
+      list-style:none;
+      color:var(--ivory);
+      font-weight:800;
+      line-height:1.45;
+    }
+    .story-song-item > summary::-webkit-details-marker{display:none}
+    .story-song-item > summary::after{
+      content:"＋";
+      color:var(--copper);
+      font-size:18px;
+      font-weight:400;
+    }
+    .story-song-item[open] > summary::after{content:"−"}
+    .story-song-number{
+      color:var(--gold);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:11px;
+      letter-spacing:.08em;
+    }
+    .story-song-description{
+      padding:0 12px 12px;
+      border-top:1px solid rgba(174,185,185,.12);
+    }
+    .story-song-description p{
+      margin:10px 0 0;
+      color:#d4dddd;
+      line-height:1.85;
     }
     .label{
       display:block;
@@ -3368,6 +3419,55 @@
 
     .admin-story-fields .wide{grid-column:1 / -1}
 
+    .admin-story-songs{
+      grid-column:1 / -1;
+      margin-top:4px;
+      padding-top:12px;
+      border-top:1px solid rgba(174,185,185,.14);
+    }
+
+    .admin-story-songs-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:9px;
+    }
+
+    .admin-story-song-list{
+      display:grid;
+      gap:9px;
+    }
+
+    .admin-story-song-item{
+      padding:10px;
+      border:1px solid rgba(111,135,145,.28);
+      border-radius:12px;
+      background:rgba(7,13,15,.38);
+    }
+
+    .admin-story-song-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+
+    .admin-story-song-label{
+      color:var(--copper);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.08em;
+    }
+
+    .admin-story-song-fields{
+      display:grid;
+      gap:9px;
+    }
+
+    .admin-story-song-fields .admin-textarea{min-height:92px}
+
     @media (max-width:650px){
       .topbar{
         margin-bottom:8px;
@@ -4337,7 +4437,7 @@
     <button class="nav-btn active" data-page="home"><span>⌂</span>ホーム</button>
     <button class="nav-btn" data-page="songs"><span>♫</span>セットリスト</button>
     <button class="nav-btn" data-page="metronome"><span class="metronome-nav-symbol" aria-hidden="true"></span>メトロノーム</button>
-    <button class="nav-btn locked" data-page="story" type="button" disabled aria-disabled="true" title="物語記録は現在封鎖されています"><span>▣</span>物語</button>
+    <button class="nav-btn" data-page="story" type="button"><span>▣</span>物語</button>
     <button class="nav-btn" data-page="progress"><span>▥</span>進捗</button>
   </nav>
 
@@ -4673,7 +4773,7 @@
             <div class="admin-setlist-head">
               <div>
                 <div class="admin-field-label">物語ページ</div>
-                <div class="admin-hint">現在、利用者側の物語タブは封鎖中です。公開前に内容を編集できます。</div>
+                <div class="admin-hint">章本文と、曲名をタップしたときに表示する解説文を編集できます。</div>
               </div>
               <button id="adminAddStorySection" class="admin-btn compact" type="button">＋ セクション</button>
             </div>
@@ -4722,7 +4822,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v64";
+    const APP_BUILD_VERSION = "20260817-v65";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8349,18 +8449,123 @@
       })) : [];
     }
 
+    const storySectionBlueprints = [
+      {
+        id:"reality-1",
+        no:"1",
+        title:"現実",
+        story:"ここは、何者にもなれなかった人たちが流れ着く地下。\n\n夢を諦めた者。\n誰かに置いていかれた者。\n自分だけが、あの日のまま立ち止まっている者。\n\n彼らは「もし、あの時に戻れたなら」と願いながら、変わらない日々を生きていた。\n\nけれど、どれだけ願っても時間は戻らない。\n暗闇の中に残されていたのは、消せない後悔と、ずっと見ないふりをしてきた現実だけだった。"
+      },
+      {
+        id:"club",
+        no:"2",
+        title:"あの日の部室",
+        story:"放課後の音楽室に流れていた曲、友人、恋、夢。地下の住民たちは、かつて音楽に夢中だった時間を思い出す。"
+      },
+      {
+        id:"road",
+        no:"3",
+        title:"理想郷への道中",
+        story:"理想郷を目指す道は、美しくも危うい。愛、善悪、革命への衝動が交錯し、人々は少しずつ現実から離れていく。"
+      },
+      {
+        id:"utopia",
+        no:"4",
+        title:"混沌の楽園",
+        story:"ついに理想郷へ着いたように見える。だが、祝祭と混乱の中で、それが救いなのか幻想なのか分からなくなっていく。"
+      },
+      {
+        id:"reality-2",
+        no:"5",
+        title:"それでも、明日へ",
+        story:"夢から覚めると、現実は大きく変わっていない。それでも、誰かと音楽を共有した時間が今日を少しだけ違うものにする。"
+      }
+    ];
+
+    const storySongBlueprints = {
+      "reality-1":[
+        {songId:"time-machine",title:"タイムマシン"},
+        {songId:"sazanka",title:"サザンカ"}
+      ],
+      "club":[
+        {songId:"downtown",title:"DOWNTOWN"},
+        {songId:"chiisana-koi",title:"小さな恋のうた"},
+        {songId:"star-marker",title:"スターマーカー"},
+        {songId:"calc",title:"Calc."},
+        {songId:"seishun-medley",title:"Blue Medley"},
+        {songId:"velvet",title:"ベルベットの詩"},
+        {songId:"yozakura-haiiro",title:"夜桜～灰色と青"}
+      ],
+      "road":[
+        {songId:"angel-devil",title:"天使と悪魔"},
+        {songId:"kyouai",title:"狂愛"},
+        {songId:"kakumei-douchuu",title:"革命道中"},
+        {songId:"woman-w",title:"Woman “Wの悲劇”より"},
+        {songId:"gurenge",title:"紅蓮華"}
+      ],
+      "utopia":[
+        {songId:"chaos",title:"カオスが極まる"},
+        {songId:"aizo-inferno",title:"AIZO"},
+        {songId:"peace-sign",title:"ピースサイン"},
+        {songId:"fukkatsu",title:"ふっかつのじゅもん"}
+      ],
+      "reality-2":[
+        {songId:"kirakira",title:"きらきら"},
+        {songId:"tomorrow-never-knows",title:"Tomorrow never knows"}
+      ]
+    };
+
+    function buildDefaultStorySongs(sectionId){
+      return (storySongBlueprints[sectionId] || []).map(item=>{
+        const sourceSong = songs.find(song=>song.id===item.songId);
+        return {
+          id:item.songId || makeLocalId("story-song"),
+          title:String(item.title || sourceSong?.title || "曲名未設定").trim() || "曲名未設定",
+          description:String(sourceSong?.role || "").trim()
+        };
+      });
+    }
+
+    function normalizeStorySongs(value,defaults=[]){
+      const source = Array.isArray(value) ? value : defaults;
+      return source.map(song=>({
+        id:song?.id || makeLocalId("story-song"),
+        title:String(song?.title || "曲名未設定").trim() || "曲名未設定",
+        description:String(song?.description ?? song?.explanation ?? song?.body ?? "").trim()
+      }));
+    }
+
+    function normalizeStoryChapterNo(value,fallback,index){
+      const input = String(value ?? "").normalize("NFKC").trim();
+      const match = input.match(/\d+/);
+      return match?.[0] || String(fallback || index+1);
+    }
+
+    function migrateStorySectionTitle(section,fallback){
+      const title = String(section?.title ?? fallback?.title ?? "新しいセクション").trim() || "新しいセクション";
+      const legacyTitles = {
+        club:"或る日の音楽部",
+        utopia:"理想郷へ到達？",
+        "reality-2":"現実"
+      };
+      return legacyTitles[section?.id] === title ? fallback.title : title;
+    }
+
+    function migrateStorySectionBody(section,fallback){
+      if(!section || !Object.prototype.hasOwnProperty.call(section,"story")) return fallback?.story || "";
+      const body = String(section.story || "").trim();
+      const legacy = sections.find(item=>item.id===section.id)?.story;
+      return legacy && body === String(legacy).trim() ? fallback?.story || body : body;
+    }
+
     function buildDefaultStoryData(){
       return {
         pageTitle:"物語を知る",
         eyebrow:"THE STORY OF UNDERGROUND UTOPIA",
         intro:"ここは、何者にもなれなかった人たちが流れ着く地下。かつて夢を見ていた彼らは、どこかにあるはずのユートピアを目指して歩き始める。\nしかし、たどり着いた先でも現実は簡単には変わらない。それでも、誰かが隣にいることで、今日が少しだけ良い日になる。\nこれは、何者にもなれなかった人たちが、もう一度自分の人生へ帰っていく物語。",
-        sections:sections.map(section=>({
-          id:section.id || makeLocalId("story-section"),
-          no:String(section.no || ""),
-          title:String(section.title || ""),
-          story:String(section.story || ""),
-          keywords:normalizeStringList(section.keywords),
-          direction:String(section.direction || "")
+        sections:storySectionBlueprints.map(section=>({
+          ...section,
+          songs:buildDefaultStorySongs(section.id)
         }))
       };
     }
@@ -8368,19 +8573,23 @@
     function normalizeStoryData(value){
       const defaults = buildDefaultStoryData();
       const source = value && typeof value === "object" ? value : {};
-      const sourceSections = Array.isArray(source.sections) ? source.sections : defaults.sections;
+      const sourceSections = Array.isArray(source.sections)
+        ? source.sections.filter(section=>section?.id!=="encore")
+        : defaults.sections;
       return {
         pageTitle:String(source.pageTitle ?? defaults.pageTitle).trim() || defaults.pageTitle,
         eyebrow:String(source.eyebrow ?? defaults.eyebrow).trim() || defaults.eyebrow,
         intro:String(source.intro ?? defaults.intro).trim(),
-        sections:sourceSections.map((section,index)=>({
-          id:section?.id || makeLocalId("story-section"),
-          no:String(section?.no ?? section?.label ?? `${index+1}`).trim(),
-          title:String(section?.title || "新しいセクション").trim() || "新しいセクション",
-          story:String(section?.story || "").trim(),
-          keywords:normalizeStringList(section?.keywords),
-          direction:String(section?.direction || "").trim()
-        }))
+        sections:sourceSections.map((section,index)=>{
+          const fallback = defaults.sections.find(item=>item.id===section?.id) || defaults.sections[index] || null;
+          return {
+            id:section?.id || fallback?.id || makeLocalId("story-section"),
+            no:normalizeStoryChapterNo(section?.no ?? section?.label,fallback?.no,index),
+            title:migrateStorySectionTitle(section,fallback),
+            story:migrateStorySectionBody(section,fallback),
+            songs:normalizeStorySongs(Array.isArray(section?.songs) ? section.songs : null,fallback?.songs || [])
+          };
+        })
       };
     }
 
@@ -9418,7 +9627,7 @@
       root.innerHTML = adminWorkingStory.sections.length ? adminWorkingStory.sections.map((section,index)=>`
         <article class="admin-story-item" data-story-section-index="${index}">
           <div class="admin-story-item-head">
-            <span class="admin-story-item-title">SECTION ${escapeHtml(section.no || String(index+1))}</span>
+            <span class="admin-story-item-title">第${escapeHtml(section.no || String(index+1))}章</span>
             <div class="admin-row-actions">
               <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="-1" ${index===0?"disabled":""}>↑</button>
               <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="1" ${index===adminWorkingStory.sections.length-1?"disabled":""}>↓</button>
@@ -9427,25 +9636,48 @@
           </div>
           <div class="admin-story-fields">
             <label class="admin-field">
-              <span class="admin-field-label">番号・ラベル</span>
+              <span class="admin-field-label">章番号</span>
               <input class="admin-input" value="${escapeHtml(section.no)}" data-story-field="no" data-story-index="${index}">
             </label>
             <label class="admin-field">
-              <span class="admin-field-label">タイトル</span>
+              <span class="admin-field-label">章タイトル</span>
               <input class="admin-input" value="${escapeHtml(section.title)}" data-story-field="title" data-story-index="${index}">
             </label>
             <label class="admin-field wide">
-              <span class="admin-field-label">物語本文</span>
-              <textarea class="admin-textarea" data-story-field="story" data-story-index="${index}">${escapeHtml(section.story)}</textarea>
+              <span class="admin-field-label">章本文</span>
+              <textarea class="admin-textarea" rows="7" data-story-field="story" data-story-index="${index}">${escapeHtml(section.story)}</textarea>
             </label>
-            <label class="admin-field wide">
-              <span class="admin-field-label">キーワード（1行につき1つ）</span>
-              <textarea class="admin-textarea" data-story-field="keywords" data-story-index="${index}">${escapeHtml(section.keywords.join("\n"))}</textarea>
-            </label>
-            <label class="admin-field wide">
-              <span class="admin-field-label">演奏者の意識</span>
-              <textarea class="admin-textarea" data-story-field="direction" data-story-index="${index}">${escapeHtml(section.direction)}</textarea>
-            </label>
+
+            <div class="admin-story-songs">
+              <div class="admin-story-songs-head">
+                <span class="admin-field-label">楽曲解説</span>
+                <button class="admin-btn compact" type="button" data-add-story-song="${index}">＋ 曲を追加</button>
+              </div>
+              <div class="admin-story-song-list">
+                ${section.songs.length ? section.songs.map((song,songIndex)=>`
+                  <article class="admin-story-song-item" data-story-song-index="${songIndex}">
+                    <div class="admin-story-song-head">
+                      <span class="admin-story-song-label">楽曲 ${songIndex+1}</span>
+                      <div class="admin-row-actions">
+                        <button class="admin-icon-btn" type="button" data-move-story-song="${songIndex}" data-story-section="${index}" data-direction="-1" ${songIndex===0?"disabled":""} aria-label="曲を上へ移動">↑</button>
+                        <button class="admin-icon-btn" type="button" data-move-story-song="${songIndex}" data-story-section="${index}" data-direction="1" ${songIndex===section.songs.length-1?"disabled":""} aria-label="曲を下へ移動">↓</button>
+                        <button class="admin-icon-btn" type="button" data-delete-story-song="${songIndex}" data-story-section="${index}" aria-label="曲を削除">×</button>
+                      </div>
+                    </div>
+                    <div class="admin-story-song-fields">
+                      <label class="admin-field">
+                        <span class="admin-field-label">曲名</span>
+                        <input class="admin-input" value="${escapeHtml(song.title)}" data-story-song-field="title" data-story-section="${index}" data-story-song="${songIndex}">
+                      </label>
+                      <label class="admin-field">
+                        <span class="admin-field-label">タップしたときに表示する解説文</span>
+                        <textarea class="admin-textarea" data-story-song-field="description" data-story-section="${index}" data-story-song="${songIndex}">${escapeHtml(song.description)}</textarea>
+                      </label>
+                    </div>
+                  </article>
+                `).join("") : `<div class="admin-empty">この章には楽曲がありません。</div>`}
+              </div>
+            </div>
           </div>
         </article>
       `).join("") : `<div class="admin-empty">物語セクションはまだありません。</div>`;
@@ -9454,8 +9686,16 @@
         input.addEventListener("input",()=>{
           const section = adminWorkingStory.sections[Number(input.dataset.storyIndex)];
           if(!section) return;
-          if(input.dataset.storyField === "keywords") section.keywords = normalizeStringList(input.value);
-          else section[input.dataset.storyField] = input.value;
+          section[input.dataset.storyField] = input.value;
+        });
+      });
+
+      root.querySelectorAll("[data-story-song-field]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          const section = adminWorkingStory.sections[Number(input.dataset.storySection)];
+          const song = section?.songs?.[Number(input.dataset.storySong)];
+          if(!song) return;
+          song[input.dataset.storySongField] = input.value;
         });
       });
 
@@ -9475,6 +9715,39 @@
           renderAdminStoryEditor();
         });
       });
+
+      root.querySelectorAll("[data-add-story-song]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const sectionIndex = Number(button.dataset.addStorySong);
+          const section = adminWorkingStory.sections[sectionIndex];
+          if(!section) return;
+          section.songs.push({id:makeLocalId("story-song"),title:"新しい曲",description:""});
+          renderAdminStoryEditor();
+          requestAnimationFrame(()=>{
+            document.querySelector(`[data-story-section-index="${sectionIndex}"] [data-story-song-index]:last-child`)?.scrollIntoView({behavior:"smooth",block:"center"});
+          });
+        });
+      });
+
+      root.querySelectorAll("[data-move-story-song]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const section = adminWorkingStory.sections[Number(button.dataset.storySection)];
+          const index = Number(button.dataset.moveStorySong);
+          const next = index + Number(button.dataset.direction);
+          if(!section || next < 0 || next >= section.songs.length) return;
+          [section.songs[index],section.songs[next]] = [section.songs[next],section.songs[index]];
+          renderAdminStoryEditor();
+        });
+      });
+
+      root.querySelectorAll("[data-delete-story-song]").forEach(button=>{
+        button.addEventListener("click",()=>{
+          const section = adminWorkingStory.sections[Number(button.dataset.storySection)];
+          if(!section) return;
+          section.songs.splice(Number(button.dataset.deleteStorySong),1);
+          renderAdminStoryEditor();
+        });
+      });
     }
 
     function addAdminStorySection(){
@@ -9484,8 +9757,7 @@
         no:String(adminWorkingStory.sections.length+1),
         title:"新しいセクション",
         story:"",
-        keywords:[],
-        direction:""
+        songs:[]
       });
       renderAdminStoryEditor();
       requestAnimationFrame(()=>{
@@ -10525,24 +10797,34 @@
       if(eyebrow) eyebrow.textContent = data.eyebrow;
       if(intro) intro.innerHTML = nl2br(data.intro);
       if(!map) return;
-      map.innerHTML = data.sections.map(section=>`
-        <article class="card story-card">
-          <span class="section-badge">SECTION ${escapeHtml(section.no)}</span>
-          <h3>${escapeHtml(section.title)}</h3>
-          <span class="label">STORY</span>
-          <p>${nl2br(section.story)}</p>
-          ${section.keywords.length ? `
-            <span class="label">KEYWORDS</span>
-            <div class="keywords">
-              ${section.keywords.map(word=>`<span class="keyword">${escapeHtml(word)}</span>`).join("")}
-            </div>
-          ` : ""}
-          ${section.direction ? `
-            <span class="label">演奏者の意識</span>
-            <p>${nl2br(section.direction)}</p>
-          ` : ""}
-        </article>
-      `).join("");
+      let songNumber = 0;
+      map.innerHTML = data.sections.map((section,index)=>{
+        const chapterNo = section.no || String(index+1);
+        const songList = section.songs.map(song=>{
+          songNumber += 1;
+          return `
+            <details class="story-song-item">
+              <summary>
+                <span class="story-song-number">M-${songNumber}</span>
+                <span>${escapeHtml(song.title)}</span>
+              </summary>
+              <div class="story-song-description">
+                <p>${song.description ? nl2br(song.description) : "解説文は未登録です。"}</p>
+              </div>
+            </details>
+          `;
+        }).join("");
+        return `
+          <article class="card story-card">
+            <h3>第${escapeHtml(chapterNo)}章「${escapeHtml(section.title)}」</h3>
+            <p>${section.story ? nl2br(section.story) : "章本文は未登録です。"}</p>
+            ${songList ? `
+              <span class="label">楽曲</span>
+              <div class="story-song-list">${songList}</div>
+            ` : ""}
+          </article>
+        `;
+      }).join("");
     }
 
     function getChronologicalPerformances(){
