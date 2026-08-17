@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v65" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v65" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v65" />
-  <meta name="app-build" content="20260817-v65" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v66" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v66" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v66" />
+  <meta name="app-build" content="20260817-v66" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -138,8 +138,7 @@
 
     body.home-active #page-home .card-title,
     body.home-active #page-home .today-song,
-    body.home-active #page-home .date-line,
-    body.home-active #page-home .progress-row{
+    body.home-active #page-home .date-line{
       text-shadow:0 2px 8px rgba(0,0,0,.88);
     }
 
@@ -189,7 +188,7 @@
       font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
     }
 
-    .countdown-number,.percent,.big-score,.song-score{
+    .countdown-number,.big-score{
       font-family:Georgia,"Times New Roman","Yu Mincho",serif;
     }
 
@@ -792,59 +791,6 @@
       margin:0;
     }
 
-    .progress-list{
-      display:grid;
-      gap:13px;
-    }
-    .progress-row{
-      display:grid;
-      grid-template-columns:72px 1fr 44px;
-      align-items:center;
-      gap:10px;
-      font-size:13px;
-    }
-    .bar{
-      position:relative;
-      height:9px;
-      background:rgba(8,14,16,.82);
-      border:1px solid rgba(174,185,185,.22);
-      border-radius:999px;
-      overflow:visible;
-      box-shadow:inset 0 1px 4px rgba(0,0,0,.55);
-    }
-    .bar-fill{
-      position:relative;
-      display:block;
-      height:100%;
-      min-width:0;
-      background:linear-gradient(90deg,#6d8790,#c18a59);
-      border-radius:999px;
-      width:0;
-      transition:width .35s ease;
-    }
-    .gear-marker{
-      position:absolute;
-      right:-10px;
-      top:50%;
-      z-index:2;
-      display:grid;
-      place-items:center;
-      width:21px;
-      height:21px;
-      transform:translateY(-50%);
-      color:var(--gold);
-      font-family:"Segoe UI Symbol","Arial Unicode MS",sans-serif;
-      font-size:20px;
-      line-height:1;
-      font-weight:400;
-      text-shadow:0 2px 4px rgba(0,0,0,.95),0 0 7px rgba(217,179,122,.42);
-    }
-    .percent{
-      text-align:right;
-      color:var(--gold);
-      font-variant-numeric:tabular-nums;
-    }
-
     .page-title{
       margin:8px 2px 16px;
       font-size:24px;
@@ -1020,13 +966,6 @@
       font-size:12px;
       margin-top:6px;
     }
-    .song-score{
-      color:var(--gold);
-      font-size:14px;
-      font-weight:800;
-      white-space:nowrap;
-    }
-
     .setlist-section-header{
       margin:14px 0 2px;
       padding:14px 15px;
@@ -1230,10 +1169,6 @@
       font-size:14px;
     }
 
-    .progress-summary{
-      text-align:center;
-      padding:22px 10px;
-    }
     .big-score{
       font-size:54px;
       font-weight:900;
@@ -1241,14 +1176,6 @@
       line-height:1;
     }
 
-    .progress-song{
-      margin-top:13px;
-    }
-    .progress-song h3{
-      margin:0 0 4px;
-      font-size:18px;
-    }
-    .progress-song .song-meta{margin-bottom:13px}
     .select-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
@@ -1343,7 +1270,6 @@
     body.home-active .mc-title,
     body.home-active .lead,
     body.home-active .detail-copy,
-    body.home-active .progress-row,
     body.home-active .story-card p{
       text-shadow:0 2px 8px rgba(0,0,0,.88);
     }
@@ -1351,7 +1277,6 @@
     body.home-active .hero,
     body.home-active .card,
     body.home-active .song-card,
-    body.home-active .progress-song,
     body.home-active .story-card{
       background:linear-gradient(180deg,rgba(10,17,20,.62),rgba(9,15,17,.48));
       border-color:rgba(217,179,122,.48);
@@ -2652,6 +2577,65 @@
       text-underline-offset:3px;
     }
 
+    .maintenance-gate{
+      position:fixed;
+      inset:0;
+      z-index:85;
+      display:none;
+      place-items:center;
+      padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+      background:
+        linear-gradient(180deg,rgba(3,7,9,.92),rgba(3,7,9,.97)),
+        var(--home-poster-url) center top / cover no-repeat;
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+    }
+
+    .maintenance-gate.open{display:grid}
+
+    .maintenance-gate-card{
+      width:min(100%,520px);
+      border:1px solid rgba(217,179,122,.56);
+      border-radius:22px;
+      padding:26px 22px;
+      background:linear-gradient(180deg,rgba(13,22,25,.97),rgba(7,13,15,.97));
+      box-shadow:0 24px 60px rgba(0,0,0,.52);
+      text-align:center;
+    }
+
+    .maintenance-gate-mark{
+      width:66px;
+      height:66px;
+      display:grid;
+      place-items:center;
+      margin:0 auto 14px;
+      border:1px solid rgba(217,179,122,.44);
+      border-radius:50%;
+      color:var(--gold);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:24px;
+    }
+
+    .maintenance-gate-title{margin:0;font-size:24px;line-height:1.45}
+
+    .maintenance-gate-copy{
+      margin:12px 0 0;
+      color:#c9d1d1;
+      font-size:14px;
+      line-height:1.85;
+      white-space:pre-line;
+    }
+
+    .maintenance-gate-admin{
+      margin-top:20px;
+      border:0;
+      background:transparent;
+      color:#9ba8aa;
+      font-size:12px;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+
     .geo-admin-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
@@ -2800,7 +2784,6 @@
     body.home-active .hero,
     body.home-active .card,
     body.home-active .song-card,
-    body.home-active .progress-song,
     body.home-active .story-card{
       background:linear-gradient(180deg,rgba(22,34,38,.72),rgba(13,23,26,.60));
     }
@@ -4143,6 +4126,8 @@
 
     .message-archive-overview{
       margin-bottom:13px;
+      padding:22px 10px;
+      text-align:center;
     }
 
     .message-archive-overview .big-score{
@@ -4399,19 +4384,8 @@
         <div id="songList" class="song-list"></div>
       </section>
 
-      <section id="page-progress" class="page">
-        <h2 class="page-title">自分の進捗</h2>
-        <div class="card progress-summary">
-          <div class="eyebrow">TOTAL PROGRESS</div>
-          <div id="totalScore" class="big-score">0%</div>
-          <p class="song-meta">この端末に自動保存されます</p>
-        </div>
-
-        <div class="card">
-          <h2 class="card-title">項目別</h2>
-          <div id="progressSummary" class="progress-list"></div>
-        </div>
-
+      <section id="page-messages" class="page">
+        <h2 class="page-title">戯言</h2>
         <div class="card message-archive-card">
           <div class="message-archive-head">
             <div>
@@ -4427,8 +4401,8 @@
           <div id="messageArchiveCategorySummary" class="message-archive-summary"></div>
         </div>
 
-        <button id="resetProgress" class="btn ghost">この端末の進捗をリセット</button>
-        <p class="footer-note">保存先はこの端末のブラウザ内です。ブラウザのデータを削除すると進捗も消えます。</p>
+        <button id="resetMessageArchive" class="btn ghost">この端末の戯言記録をリセット</button>
+        <p class="footer-note">保存先はこの端末のブラウザ内です。ブラウザのデータを削除すると発見記録も消えます。</p>
       </section>
     </main>
   </div>
@@ -4438,8 +4412,18 @@
     <button class="nav-btn" data-page="songs"><span>♫</span>セットリスト</button>
     <button class="nav-btn" data-page="metronome"><span class="metronome-nav-symbol" aria-hidden="true"></span>メトロノーム</button>
     <button class="nav-btn" data-page="story" type="button"><span>▣</span>物語</button>
-    <button class="nav-btn" data-page="progress"><span>▥</span>進捗</button>
+    <button class="nav-btn" data-page="messages"><span>▥</span>戯言</button>
   </nav>
+
+  <aside id="appMaintenanceGate" class="maintenance-gate" aria-hidden="true">
+    <div class="maintenance-gate-card">
+      <div class="maintenance-gate-mark" aria-hidden="true">U</div>
+      <div class="eyebrow">UNDERGROUND UTOPIA</div>
+      <h2 id="maintenanceGateTitle" class="maintenance-gate-title">現在ご利用いただけません</h2>
+      <p id="maintenanceGateCopy" class="maintenance-gate-copy">管理者が端末を更新しています。公開までしばらくお待ちください。</p>
+      <button id="maintenanceAdminButton" class="maintenance-gate-admin" type="button">管理者ログイン・設定</button>
+    </div>
+  </aside>
 
 
 
@@ -4509,6 +4493,29 @@
 
         <section id="adminTabHome" class="admin-tab-panel active" data-admin-panel="home">
           <div class="admin-dashboard-grid">
+            <section class="admin-dashboard-card wide">
+              <div class="admin-setlist-head">
+                <div>
+                  <div class="admin-field-label">アプリの公開設定</div>
+                  <div class="admin-hint">オフにして全員へ反映すると、管理者以外には更新中画面だけを表示します。</div>
+                </div>
+              </div>
+              <label class="admin-checkbox-field">
+                <input id="adminAppPublic" type="checkbox">
+                <span>アプリをメンバーへ公開する</span>
+              </label>
+              <div class="geo-admin-grid">
+                <label class="admin-field">
+                  <span class="admin-field-label">非公開時の見出し</span>
+                  <input id="adminMaintenanceTitle" class="admin-input" type="text">
+                </label>
+                <label class="admin-field wide">
+                  <span class="admin-field-label">非公開時の説明文</span>
+                  <textarea id="adminMaintenanceText" class="admin-textarea" rows="3"></textarea>
+                </label>
+              </div>
+            </section>
+
             <section class="admin-dashboard-card">
               <div class="admin-setlist-head">
                 <div>
@@ -4575,7 +4582,7 @@
                   <span class="admin-field-label">制限する範囲</span>
                   <select id="adminGeoMode" class="admin-select">
                     <option value="all">アプリ全体</option>
-                    <option value="progress">進捗ページのみ</option>
+                    <option value="messages">戯言ページのみ</option>
                   </select>
                 </label>
 
@@ -4738,6 +4745,11 @@
               <input id="adminPerformanceShowTimeline" type="checkbox">
               <span>ホームのタイムスケジュールに表示する</span>
             </label>
+
+            <label class="admin-checkbox-field wide">
+              <input id="adminPerformanceShowSetlist" type="checkbox">
+              <span>セットリストとメトロノームに表示する</span>
+            </label>
           </div>
 
           <div class="admin-setlist-head admin-timeline-head">
@@ -4822,7 +4834,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v65";
+    const APP_BUILD_VERSION = "20260817-v66";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7792,8 +7804,11 @@
     let adminSelectedPerformanceId = defaultPerformanceId;
 
     const homeStorageKey = "underground-utopia-home-dashboard-v1";
+    const appSettingsStorageKey = "underground-utopia-app-settings-v1";
     let homeData = buildDefaultHomeData();
     let adminWorkingHome = buildDefaultHomeData();
+    let appSettings = buildDefaultAppSettings();
+    let adminWorkingAppSettings = buildDefaultAppSettings();
     let activeScheduleMonth = "";
     let activeAdminScheduleMonth = "";
     let adminAuthorized = false;
@@ -7807,6 +7822,80 @@
 
     function cloneData(value){
       return JSON.parse(JSON.stringify(value));
+    }
+
+    function buildDefaultAppSettings(){
+      return {
+        publicEnabled:true,
+        maintenanceTitle:"現在ご利用いただけません",
+        maintenanceText:"管理者が端末を更新しています。公開までしばらくお待ちください。"
+      };
+    }
+
+    function normalizeAppSettings(value){
+      const source = value && typeof value === "object" ? value : {};
+      const defaults = buildDefaultAppSettings();
+      return {
+        publicEnabled:source.publicEnabled !== false,
+        maintenanceTitle:String(source.maintenanceTitle ?? defaults.maintenanceTitle).trim() || defaults.maintenanceTitle,
+        maintenanceText:String(source.maintenanceText ?? defaults.maintenanceText).trim() || defaults.maintenanceText
+      };
+    }
+
+    function initializeAppSettings(){
+      try{
+        const local = localStorage.getItem(appSettingsStorageKey);
+        appSettings = local ? normalizeAppSettings(JSON.parse(local)) : buildDefaultAppSettings();
+      }catch(error){
+        console.warn("端末内の公開設定を読み込めませんでした",error);
+        appSettings = buildDefaultAppSettings();
+      }
+      applyAppAvailability();
+    }
+
+    function saveAppSettings(){
+      appSettings = normalizeAppSettings(appSettings);
+      localStorage.setItem(appSettingsStorageKey,JSON.stringify(appSettings));
+    }
+
+    function applyAppAvailability(){
+      const gate = document.getElementById("appMaintenanceGate");
+      if(!gate) return;
+      const locked = appSettings.publicEnabled === false && !adminAuthorized;
+      const title = document.getElementById("maintenanceGateTitle");
+      const copy = document.getElementById("maintenanceGateCopy");
+      if(title) title.textContent = appSettings.maintenanceTitle;
+      if(copy) copy.textContent = appSettings.maintenanceText;
+      gate.classList.toggle("open",locked);
+      gate.setAttribute("aria-hidden",locked ? "false" : "true");
+      document.body.classList.toggle("app-maintenance-active",locked);
+      if(locked){
+        document.body.style.overflow = "hidden";
+      }else if(
+        !document.getElementById("adminPanel")?.classList.contains("open")
+        && !document.getElementById("locationGate")?.classList.contains("open")
+        && !document.getElementById("detailPanel")?.classList.contains("open")
+      ){
+        document.body.style.overflow = "";
+      }
+    }
+
+    function renderAdminAppSettings(){
+      adminWorkingAppSettings = normalizeAppSettings(adminWorkingAppSettings);
+      const publicInput = document.getElementById("adminAppPublic");
+      const titleInput = document.getElementById("adminMaintenanceTitle");
+      const textInput = document.getElementById("adminMaintenanceText");
+      if(publicInput) publicInput.checked = adminWorkingAppSettings.publicEnabled;
+      if(titleInput) titleInput.value = adminWorkingAppSettings.maintenanceTitle;
+      if(textInput) textInput.value = adminWorkingAppSettings.maintenanceText;
+    }
+
+    function syncAdminAppSettings(){
+      adminWorkingAppSettings = normalizeAppSettings({
+        publicEnabled:document.getElementById("adminAppPublic")?.checked,
+        maintenanceTitle:document.getElementById("adminMaintenanceTitle")?.value,
+        maintenanceText:document.getElementById("adminMaintenanceText")?.value
+      });
     }
 
     function normalizeSongTitleKey(value){
@@ -7941,32 +8030,6 @@
       return next;
     }
 
-    function getProgressSongForItem(item){
-      const titleKey = normalizeSongTitleKey(item?.title);
-      return songs.find(song=>normalizeSongTitleKey(song.title)===titleKey)
-        || songs.find(song=>song.id===item?.detailId)
-        || null;
-    }
-
-    function getProgressIdForItem(item){
-      const knownSong = getProgressSongForItem(item);
-      if(knownSong) return knownSong.id;
-      const key = normalizeSongTitleKey(item?.title);
-      return key ? `title:${key}` : `item:${item?.id || "unknown"}`;
-    }
-
-    function ensureProgressEntry(progressId){
-      if(!progress[progressId] || typeof progress[progressId] !== "object"){
-        progress[progressId] = {play:0,memory:0,stage:0,story:0,checks:{}};
-      }
-      Object.keys(progressLabels).forEach(key=>{
-        const value = Number(progress[progressId][key]);
-        progress[progressId][key] = Number.isFinite(value) ? Math.max(0,Math.min(3,value)) : 0;
-      });
-      if(!progress[progressId].checks) progress[progressId].checks = {};
-      return progress[progressId];
-    }
-
     function extractYouTubeVideoId(value){
       const input = String(value || "").trim();
       if(!input) return "";
@@ -8024,7 +8087,7 @@
       const text = (value,fallback)=>String(value ?? fallback).trim() || fallback;
       return {
         enabled:Boolean(source.enabled),
-        mode:source.mode === "all" ? "all" : "progress",
+        mode:source.mode === "all" ? "all" : "messages",
         placeName:String(source.placeName || "指定場所").trim() || "指定場所",
         latitude:Number.isFinite(latitude) ? latitude : "",
         longitude:Number.isFinite(longitude) ? longitude : "",
@@ -8081,7 +8144,7 @@
       const config = getGeoConfig();
       if(!hasUsableGeoConfig(config)) return false;
       if(adminAuthorized) return false;
-      return config.mode === "all" || pageName === "progress";
+      return config.mode === "all" || pageName === "messages";
     }
 
     function readGeoSession(){
@@ -8636,7 +8699,7 @@
         timelines:[],
         geoAccess:{
           enabled:false,
-          mode:"progress",
+          mode:"messages",
           placeName:"学校",
           latitude:"",
           longitude:"",
@@ -8756,6 +8819,7 @@
         venue:"栃木県立益子芳星高等学校 体育館／開場13:30",
         showCountdownOnHome:true,
         showTimelineOnHome:true,
+        showSetlist:true,
         timeline:[],
         items
       };
@@ -8775,6 +8839,7 @@
         showTimelineOnHome:Object.prototype.hasOwnProperty.call(performance,"showTimelineOnHome")
           ? performance.showTimelineOnHome !== false
           : legacyShow,
+        showSetlist:performance.showSetlist !== false,
         timeline:normalizeTimelineItems(performance.timeline),
         items:Array.isArray(performance.items) ? performance.items : []
       };
@@ -8855,8 +8920,13 @@
       localStorage.setItem(activePerformanceStorageKey, activePerformanceId);
     }
 
-    function getActivePerformance(){
-      return performanceCatalog.find(item=>item.id===activePerformanceId) || performanceCatalog[0];
+    function getPublicPerformances(){
+      return getChronologicalPerformances().filter(performance=>performance.showSetlist !== false);
+    }
+
+    function getActivePublicPerformance(){
+      const visiblePerformances = getPublicPerformances();
+      return visiblePerformances.find(item=>item.id===activePerformanceId) || visiblePerformances[0] || null;
     }
 
     function getPerformanceById(id){
@@ -8903,12 +8973,12 @@
     }
 
     function renderPerformanceSelector(){
-      const performance = getActivePerformance();
+      const performance = getActivePublicPerformance();
       const title = document.getElementById("performanceTitle");
       const date = document.getElementById("performanceDate");
       const venue = document.getElementById("performanceVenue");
 
-      if(title) title.textContent = performance?.title || "本番未登録";
+      if(title) title.textContent = performance?.title || "現在公開中の本番なし";
       if(date) date.textContent = performance ? formatPerformanceHeaderDate(performance) : "";
       if(venue) venue.textContent = performance?.venue || "";
     }
@@ -9003,7 +9073,8 @@
     }
 
     function openPerformanceItem(itemId){
-      const performance = getActivePerformance();
+      const performance = getActivePublicPerformance();
+      if(!performance) return;
       const context = getItemContext(performance,itemId);
       if(!context) return;
 
@@ -9024,6 +9095,7 @@
       adminWorkingHome = cloneData(homeData);
       adminWorkingSongDetails = cloneData(songDetailsCatalog);
       adminWorkingStory = cloneData(storyData);
+      adminWorkingAppSettings = cloneData(appSettings);
       adminSelectedPerformanceId = activePerformanceId;
       if(!adminWorkingCatalog.some(item=>item.id===adminSelectedPerformanceId)){
         adminSelectedPerformanceId = adminWorkingCatalog[0]?.id || "";
@@ -9031,6 +9103,7 @@
       renderAdminPerformanceSelect();
       renderAdminEditor();
       renderAdminHomeEditor();
+      renderAdminAppSettings();
       renderAdminStoryEditor();
       switchAdminTab("home");
 
@@ -9045,6 +9118,7 @@
       panel.classList.remove("open");
       panel.setAttribute("aria-hidden","true");
       document.body.style.overflow = "";
+      applyAppAvailability();
     }
 
     function getAdminPerformance(){
@@ -9055,7 +9129,7 @@
       const select = document.getElementById("adminPerformanceSelect");
       select.innerHTML = adminWorkingCatalog.map(performance=>`
         <option value="${escapeHtml(performance.id)}" ${performance.id===adminSelectedPerformanceId?"selected":""}>
-          ${escapeHtml(performance.title || "名称未設定")}
+          ${escapeHtml(performance.title || "名称未設定")}${performance.showSetlist === false ? "（セットリスト非表示）" : ""}
         </option>
       `).join("");
 
@@ -9076,6 +9150,7 @@
       document.getElementById("adminPerformanceVenue").disabled = disabled;
       document.getElementById("adminPerformanceShowCountdown").disabled = disabled;
       document.getElementById("adminPerformanceShowTimeline").disabled = disabled;
+      document.getElementById("adminPerformanceShowSetlist").disabled = disabled;
       document.getElementById("adminDeletePerformance").disabled = disabled || adminWorkingCatalog.length<=1;
       document.getElementById("adminAddTimelineItem").disabled = disabled;
 
@@ -9086,6 +9161,7 @@
         document.getElementById("adminPerformanceVenue").value = "";
         document.getElementById("adminPerformanceShowCountdown").checked = false;
         document.getElementById("adminPerformanceShowTimeline").checked = false;
+        document.getElementById("adminPerformanceShowSetlist").checked = false;
         document.getElementById("adminTimelineItems").innerHTML = `<div class="admin-empty">本番を追加してください。</div>`;
         document.getElementById("adminItems").innerHTML = `<div class="admin-empty">本番を追加してください。</div>`;
         return;
@@ -9097,6 +9173,7 @@
       document.getElementById("adminPerformanceVenue").value = performance.venue || "";
       document.getElementById("adminPerformanceShowCountdown").checked = performance.showCountdownOnHome !== false;
       document.getElementById("adminPerformanceShowTimeline").checked = performance.showTimelineOnHome !== false;
+      document.getElementById("adminPerformanceShowSetlist").checked = performance.showSetlist !== false;
 
       renderAdminTimelineItems();
       renderAdminItems();
@@ -9111,6 +9188,7 @@
       performance.venue = document.getElementById("adminPerformanceVenue").value.trim();
       performance.showCountdownOnHome = document.getElementById("adminPerformanceShowCountdown").checked;
       performance.showTimelineOnHome = document.getElementById("adminPerformanceShowTimeline").checked;
+      performance.showSetlist = document.getElementById("adminPerformanceShowSetlist").checked;
     }
 
     function switchAdminTab(tabName){
@@ -9768,6 +9846,7 @@
     function setAdminAuthorized(value){
       adminAuthorized = Boolean(value);
       document.getElementById("adminPanel")?.classList.toggle("admin-authorized",adminAuthorized);
+      applyAppAvailability();
       refreshGeoRestriction();
     }
 
@@ -9917,6 +9996,7 @@
         venue:"",
         showCountdownOnHome:true,
         showTimelineOnHome:true,
+        showSetlist:true,
         timeline:[],
         items:[
           {
@@ -9950,6 +10030,7 @@
     function validateAdminData(){
       syncAdminPerformanceFields();
       syncAdminGeoAccess();
+      syncAdminAppSettings();
       const geoConfig = normalizeGeoAccessConfig(adminWorkingHome.geoAccess);
       if(geoConfig.enabled && (!Number.isFinite(Number(geoConfig.latitude)) || !Number.isFinite(Number(geoConfig.longitude)))){
         throw new Error("位置情報制限を有効にする場合は、緯度と経度を設定してください。");
@@ -9960,7 +10041,8 @@
         catalog:cloneData(normalizeCatalog(adminWorkingCatalog)),
         home:cloneData(normalizeHomeData(adminWorkingHome)),
         songDetails:cloneData(normalizeSongDetails(adminWorkingSongDetails.length ? adminWorkingSongDetails : songDetailsCatalog)),
-        story:cloneData(normalizeStoryData(adminWorkingStory || storyData))
+        story:cloneData(normalizeStoryData(adminWorkingStory || storyData)),
+        settings:cloneData(normalizeAppSettings(adminWorkingAppSettings))
       };
     }
 
@@ -9977,19 +10059,21 @@
       homeData = data.home;
       songDetailsCatalog = data.songDetails;
       storyData = data.story;
+      appSettings = data.settings;
       activePerformanceId = adminSelectedPerformanceId || performanceCatalog[0].id;
       savePerformanceCatalog();
       saveHomeData();
       saveSongDetails();
       saveStoryData();
+      saveAppSettings();
 
-      activeFilter = "all";
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
       renderHomeDashboard();
       renderStories();
       renderMetronomeSongOptions();
+      applyAppAvailability();
       closeAdmin();
     }
 
@@ -10003,10 +10087,12 @@
       const incomingHome = Array.isArray(data) ? null : data?.home;
       const incomingSongDetails = Array.isArray(data) ? null : data?.songDetails;
       const incomingStory = Array.isArray(data) ? null : data?.story;
+      const incomingSettings = Array.isArray(data) ? null : data?.settings;
       if(Array.isArray(catalog)) performanceCatalog = normalizeCatalog(catalog);
       if(incomingHome) homeData = normalizeHomeData(incomingHome);
       if(Array.isArray(incomingSongDetails)) songDetailsCatalog = normalizeSongDetails(incomingSongDetails);
       if(incomingStory) storyData = normalizeStoryData(incomingStory);
+      if(incomingSettings) appSettings = normalizeAppSettings(incomingSettings);
       if(!performanceCatalog.some(item=>item.id===activePerformanceId)){
         activePerformanceId = performanceCatalog[0]?.id || defaultPerformanceId;
       }
@@ -10014,13 +10100,14 @@
       saveHomeData();
       saveSongDetails();
       saveStoryData();
-      activeFilter = "all";
+      saveAppSettings();
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
       renderHomeDashboard();
       renderStories();
       renderMetronomeSongOptions();
+      applyAppAvailability();
       if(previousGeoSignature !== geoConfigSignature()){
         clearGeoSession();
       }
@@ -10032,10 +10119,12 @@
         adminWorkingHome = cloneData(homeData);
         adminWorkingSongDetails = cloneData(songDetailsCatalog);
         adminWorkingStory = cloneData(storyData);
+        adminWorkingAppSettings = cloneData(appSettings);
         adminSelectedPerformanceId = activePerformanceId;
         renderAdminPerformanceSelect();
         renderAdminEditor();
         renderAdminHomeEditor();
+        renderAdminAppSettings();
         renderAdminStoryEditor();
       }
     }
@@ -10047,6 +10136,7 @@
       getCurrentHome:()=>cloneData(homeData),
       getCurrentSongDetails:()=>cloneData(songDetailsCatalog),
       getCurrentStory:()=>cloneData(storyData),
+      getCurrentSettings:()=>cloneData(appSettings),
       applyPublishedPortalData,
       applyPublishedCatalog:catalog=>applyPublishedPortalData({catalog}),
       setAdminAuthorized,
@@ -10126,6 +10216,7 @@
         localStorage.removeItem(homeStorageKey);
         localStorage.removeItem(songDetailsStorageKey);
         localStorage.removeItem(storyStorageKey);
+        localStorage.removeItem(appSettingsStorageKey);
         location.reload();
       });
 
@@ -10141,6 +10232,15 @@
       });
       document.getElementById("adminPerformanceShowCountdown").addEventListener("change",syncAdminPerformanceFields);
       document.getElementById("adminPerformanceShowTimeline").addEventListener("change",syncAdminPerformanceFields);
+      document.getElementById("adminPerformanceShowSetlist").addEventListener("change",()=>{
+        syncAdminPerformanceFields();
+        renderAdminPerformanceSelect();
+      });
+
+      ["adminAppPublic","adminMaintenanceTitle","adminMaintenanceText"].forEach(id=>{
+        document.getElementById(id)?.addEventListener("input",syncAdminAppSettings);
+        document.getElementById(id)?.addEventListener("change",syncAdminAppSettings);
+      });
 
       [
         "adminGeoEnabled","adminGeoMode","adminGeoPlaceName","adminGeoLatitude","adminGeoLongitude","adminGeoRadius",
@@ -10163,6 +10263,7 @@
         closeLocationGate();
         openAdmin();
       });
+      document.getElementById("maintenanceAdminButton")?.addEventListener("click",openAdmin);
 
     }
 
@@ -10355,88 +10456,8 @@
       });
     }
 
-    const progressOptions = {
-      play:["未着手","練習中","だいたいできる","できる"],
-      memory:["未着手","練習中","だいたいできる","できる"],
-      stage:["未確認","確認中","だいたい覚えた","覚えた"],
-      story:["分からない","少し分かる","だいたい説明できる","説明できる"]
-    };
-
-    const progressLabels = {
-      play:"演奏",
-      memory:"暗譜",
-      stage:"演出",
-      story:"物語理解"
-    };
-
-    const storageKey = "underground-utopia-progress-v2";
-    let activeFilter = "all";
-    let progress = loadProgress();
-
-    function loadProgress(){
-      try{
-        const saved = JSON.parse(localStorage.getItem(storageKey));
-        if(saved && typeof saved === "object") return saved;
-      }catch(e){}
-      const initial = {};
-      songs.forEach(song=>{
-        initial[song.id] = {play:0,memory:0,stage:0,story:0,checks:{}};
-      });
-      return initial;
-    }
-
-    function getProgressIdsForSummary(){
-      const ids = [];
-      const seen = new Set();
-      const add = id=>{
-        if(!id || seen.has(id)) return;
-        seen.add(id);
-        ids.push(id);
-      };
-
-      performanceCatalog.forEach(performance=>{
-        (performance.items || []).forEach(item=>{
-          if(item.type === "song" || item.type === "medley") add(getProgressIdForItem(item));
-        });
-      });
-
-      if(!ids.length) songs.forEach(song=>add(song.id));
-      return ids;
-    }
-
-    function normalizeProgress(){
-      songs.forEach(song=>ensureProgressEntry(song.id));
-      performanceCatalog.forEach(performance=>{
-        (performance.items || []).forEach(item=>{
-          if(item.type === "song" || item.type === "medley") ensureProgressEntry(getProgressIdForItem(item));
-        });
-      });
-    }
-
-    function saveProgress(){
-      localStorage.setItem(storageKey, JSON.stringify(progress));
-    }
-
     function sectionById(id){
       return sections.find(section=>section.id===id);
-    }
-
-    function songScore(progressId){
-      const p = ensureProgressEntry(progressId);
-      const total = Object.keys(progressLabels).reduce((sum,key)=>sum + Number(p[key] || 0),0);
-      return Math.round(total / (Object.keys(progressLabels).length * 3) * 100);
-    }
-
-    function categoryScore(key){
-      const ids = getProgressIdsForSummary();
-      if(!ids.length) return 0;
-      const total = ids.reduce((sum,id)=>sum + Number(ensureProgressEntry(id)[key] || 0),0);
-      return Math.round(total / (ids.length * 3) * 100);
-    }
-
-    function totalProgress(){
-      const values = Object.keys(progressLabels).map(categoryScore);
-      return values.length ? Math.round(values.reduce((a,b)=>a+b,0) / values.length) : 0;
     }
 
     function formatHomePerformanceDate(performance){
@@ -10766,27 +10787,6 @@
     }
 
 
-    function renderProgressBars(targetId){
-      const target = document.getElementById(targetId);
-      if(!target) return;
-      target.innerHTML = "";
-      Object.entries(progressLabels).forEach(([key,label])=>{
-        const score = categoryScore(key);
-        const row = document.createElement("div");
-        row.className = "progress-row";
-        row.innerHTML = `
-          <span>${label}</span>
-          <div class="bar">
-            <span class="bar-fill" style="width:${score}%">
-              <span class="gear-marker" aria-hidden="true">⚙︎</span>
-            </span>
-          </div>
-          <span class="percent">${score}%</span>
-        `;
-        target.appendChild(row);
-      });
-    }
-
     function renderStories(){
       const data = normalizeStoryData(storyData);
       const title = document.getElementById("storyPageTitle");
@@ -10851,10 +10851,12 @@
     function renderFilters(){
       const root = document.getElementById("songFilters");
       if(!root) return;
+      const visiblePerformances = getPublicPerformances();
+      const currentPerformance = getActivePublicPerformance();
 
-      root.innerHTML = getChronologicalPerformances().map(performance=>`
+      root.innerHTML = visiblePerformances.map(performance=>`
         <button
-          class="filter-btn ${performance.id===activePerformanceId?"active":""}"
+          class="filter-btn ${performance.id===currentPerformance?.id?"active":""}"
           data-performance-tab="${escapeHtml(performance.id)}"
         >
           ${escapeHtml(performance.title)}
@@ -10864,7 +10866,6 @@
       root.querySelectorAll("[data-performance-tab]").forEach(button=>{
         button.addEventListener("click",()=>{
           activePerformanceId = button.dataset.performanceTab;
-          activeFilter = "all";
           localStorage.setItem(activePerformanceStorageKey, activePerformanceId);
           renderPerformanceSelector();
           renderFilters();
@@ -10884,15 +10885,12 @@
     }
 
     function renderSongCard(item,performance,songNumber){
-      const progressId = getProgressIdForItem(item);
       const medleyTitles = item.type === "medley" && Array.isArray(item.medley)
         ? item.medley
         : [];
       const medley = medleyTitles.length
         ? `<ul class="medley-list">${medleyTitles.map(title=>`<li>${escapeHtml(title)}</li>`).join("")}</ul>`
         : "";
-      const score = `<div class="song-score">${songScore(progressId)}%</div>`;
-
       return `
         <button class="song-card" data-open-performance-item="${escapeHtml(item.id)}">
           <div class="song-card-top">
@@ -10903,7 +10901,6 @@
               </div>
               ${medley}
             </div>
-            ${score}
           </div>
         </button>
       `;
@@ -10922,9 +10919,9 @@
 
     function renderSongs(){
       const root = document.getElementById("songList");
-      const performance = getActivePerformance();
+      const performance = getActivePublicPerformance();
       if(!performance){
-        root.innerHTML = `<div class="empty">本番が登録されていません。</div>`;
+        root.innerHTML = `<div class="empty">現在公開中の本番はありません。</div>`;
         return;
       }
 
@@ -10957,7 +10954,7 @@
       if(!song) return;
       const section = sectionById(song.section);
       const item = {id:`song-${song.id}`,type:Array.isArray(song.medley)&&song.medley.length?"medley":"song",title:song.title,detailId:song.id,medley:song.medley||[]};
-      const performance = getActivePerformance() || buildDefaultPerformance();
+      const performance = getActivePublicPerformance() || buildDefaultPerformance();
       const context = {item,section:{label:section?.no||"",title:section?.title||""},songNumber:song.order};
       renderSharedSongDetail(item,performance,context);
     }
@@ -11223,7 +11220,7 @@
       const percent = stats.total ? Math.round(stats.unlocked / stats.total * 100) : 0;
       document.getElementById("detailHeading").textContent = category.label;
       document.getElementById("detailContent").innerHTML = `
-        <div class="card progress-summary message-archive-overview">
+        <div class="card message-archive-overview">
           <div class="eyebrow">MESSAGE ARCHIVE</div>
           <div class="big-score">${stats.unlocked}<span style="font-size:.38em;color:var(--muted)"> / ${stats.total}</span></div>
           <p class="song-meta">収集率 ${percent}%｜端末に表示されたMESSAGEだけが解放されます</p>
@@ -11245,14 +11242,6 @@
       openDetailPanel();
       const detailInner = document.querySelector("#detailPanel .detail-inner");
       if(detailInner) detailInner.scrollTop = 0;
-    }
-
-    function renderAllProgress(){
-      normalizeProgress();
-      renderProgressBars("progressSummary");
-      renderMessageArchiveSummary();
-      const total = document.getElementById("totalScore");
-      if(total) total.textContent = `${totalProgress()}%`;
     }
 
     function bindSetlistButtons(){
@@ -11308,7 +11297,7 @@
       const seen = new Set();
       const result = [];
 
-      getChronologicalPerformances().forEach(performance=>{
+      getPublicPerformances().forEach(performance=>{
         (performance.items || []).forEach(item=>{
           if(item.type !== "song" && item.type !== "medley") return;
           const title = String(item.title || "").trim();
@@ -12158,7 +12147,7 @@
             const tempoLabel = song.baseBpm ? `${song.baseBpm} BPM` : "未登録";
             return `<option value="${escapeHtml(song.title)}">${escapeHtml(song.title)}（${tempoLabel}）</option>`;
           }).join("")
-        : `<option value="">楽曲が登録されていません</option>`;
+        : `<option value="">${getPublicPerformances().length ? "楽曲が登録されていません" : "現在公開中の本番はありません"}</option>`;
 
       const validTitle = songsForMetronome.some(song=>song.title===metronomeState.selectedSongTitle)
         ? metronomeState.selectedSongTitle
@@ -12291,7 +12280,7 @@
       songs:{depth:-240,sector:"SECTOR S-24",angle:-6},
       metronome:{depth:-220,sector:"SECTOR M-22",angle:-14},
       story:{depth:-480,sector:"SECTOR A-48",angle:52},
-      progress:{depth:-310,sector:"SECTOR P-31",angle:18}
+      messages:{depth:-310,sector:"SECTOR G-31",angle:18}
     };
 
     let currentDepthValue = -135;
@@ -12355,7 +12344,6 @@
     }
 
     function switchPage(pageName,options={}){
-      if(pageName === "story" && !options.allowLockedStory) return;
       if(pageName !== "metronome"){
         disposeMetronomeMedia();
       }
@@ -12372,8 +12360,8 @@
       document.querySelector(`.nav-btn[data-page="${pageName}"]`).classList.add("active");
       updateDepthPanel(pageName,true);
       scrollPrimaryToTop("smooth");
-      if(pageName==="progress"){
-        renderAllProgress();
+      if(pageName==="messages"){
+        renderMessageArchiveSummary();
       }
       if(pageName==="songs"){
         renderPerformanceSelector();
@@ -12405,16 +12393,12 @@
     });
     bindDetailEdgeSwipe();
 
-    document.getElementById("resetProgress").addEventListener("click",()=>{
-      const ok = confirm("この端末に保存されている進捗とMESSAGE収集記録をすべてリセットします。よろしいですか？");
+    document.getElementById("resetMessageArchive").addEventListener("click",()=>{
+      const ok = confirm("この端末に保存されている戯言の発見記録をリセットします。よろしいですか？");
       if(!ok) return;
-      localStorage.removeItem(storageKey);
       localStorage.removeItem(messageArchiveStorageKey);
       seenTerminalMessageIds = new Set();
-      progress = loadProgress();
-      normalizeProgress();
-      renderAllProgress();
-      renderSongs();
+      renderMessageArchiveSummary();
     });
 
     function applyPosterBackground(){
@@ -12446,18 +12430,20 @@
     async function initializeApp(){
       applyPosterBackground();
       initializeTerminalIdentity();
+      localStorage.removeItem("underground-utopia-progress-v1");
+      localStorage.removeItem("underground-utopia-progress-v2");
       updateDepthPanel("home",false);
+      initializeAppSettings();
       initializeHomeData();
       initializeSongDetails();
       initializeStoryData();
       await initializePerformanceCatalog();
-      normalizeProgress();
       renderHomeDashboard();
       renderStories();
       renderPerformanceSelector();
       renderFilters();
       renderSongs();
-      renderAllProgress();
+      renderMessageArchiveSummary();
       renderMetronomeSongOptions();
       bindMetronomeControls();
       bindSetlistButtons();
@@ -12541,7 +12527,7 @@
         signOutButton.hidden = false;
         copyUidButton.hidden = false;
         publishButton.disabled = false;
-        publishButton.title = "ホーム情報・タイムスケジュール・セットリスト・楽曲詳細を全員へ反映";
+        publishButton.title = "公開設定・ホーム・セットリスト・楽曲詳細・物語を全員へ反映";
         statusDot.classList.add("online");
       }else if(user){
         authStatus.textContent = "このGoogleアカウントには編集権限がありません";
@@ -12647,12 +12633,13 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:9,
+          version:10,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
           songDetails:portalData.songDetails,
           story:portalData.story,
+          settings:portalData.settings,
           updatedAt:serverTimestamp(),
           updatedBy:{
             uid:currentFirebaseUser.uid,
@@ -12690,7 +12677,7 @@
 
         bridge.applyPublishedPortalData(portalData);
         setDataStatus("全員への反映が完了しました。", "online");
-        alert("ホーム情報・タイムスケジュール・セットリスト・楽曲詳細を全員へ反映しました。");
+        alert("公開設定・ホーム・セットリスト・楽曲詳細・物語を全員へ反映しました。");
       }catch(error){
         console.error("Firebase publish error",error);
         const message = firebaseErrorMessage(error);
@@ -12715,7 +12702,7 @@
         const data = snapshot.data() || {};
         const catalog = data.catalog;
         if(Array.isArray(catalog) && window.utopiaSetlistApp){
-          window.utopiaSetlistApp.applyPublishedPortalData({catalog,home:data.home,songDetails:data.songDetails,story:data.story});
+          window.utopiaSetlistApp.applyPublishedPortalData({catalog,home:data.home,songDetails:data.songDetails,story:data.story,settings:data.settings});
           setDataStatus("Firebaseの公開情報を表示しています。", "online");
         }else{
           setDataStatus("Firebaseの公開データ形式を確認できませんでした。", "warning");
