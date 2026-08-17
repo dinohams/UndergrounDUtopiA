@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v69" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v69" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v69" />
-  <meta name="app-build" content="20260817-v69" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v70" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v70" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v70" />
+  <meta name="app-build" content="20260817-v70" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -370,9 +370,39 @@
       box-shadow:0 0 10px rgba(217,179,122,.75);
     }
 
+    body.story-signal-unstable .depth-panel{
+      border-color:rgba(226,91,57,.72);
+      background:linear-gradient(180deg,rgba(49,24,21,.82),rgba(18,15,16,.72));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 24px rgba(0,0,0,.28),0 0 22px rgba(226,91,57,.18);
+    }
+    body.story-signal-unstable .depth-sector,
+    body.story-signal-unstable .depth-signal{
+      color:#ef7a54;
+    }
+    body.story-signal-unstable .depth-arc{
+      background:repeating-conic-gradient(from 222deg,rgba(239,91,58,.82) 0deg 2deg,transparent 2deg 13deg);
+      filter:drop-shadow(0 0 3px rgba(239,91,58,.38));
+    }
+    body.story-signal-unstable .depth-needle-arm{
+      background:linear-gradient(180deg,#ffac74,#d74831);
+      box-shadow:0 0 9px rgba(239,91,58,.55);
+    }
+    body.story-signal-unstable .depth-signal i{
+      background:#ef5b3a;
+      box-shadow:0 0 10px rgba(239,91,58,.88);
+      animation:depthSignalUnstable .92s steps(1,end) infinite;
+    }
+
     @keyframes depthSignalPulse{
       0%,100%{opacity:.45;transform:scale(.88)}
       50%{opacity:1;transform:scale(1)}
+    }
+
+    @keyframes depthSignalUnstable{
+      0%,18%,62%,100%{opacity:1;transform:scale(1.05)}
+      19%,31%{opacity:.16;transform:scale(.75)}
+      32%,48%{opacity:.82;transform:scale(.94)}
+      49%,61%{opacity:.28;transform:scale(.82)}
     }
 
     @media (max-width:560px){
@@ -1133,10 +1163,7 @@
       color:var(--muted);
       font-size:11px;
     }
-    .mc-arrow{
-      color:var(--copper);
-      font-size:18px;
-    }
+    .mc-card-static{cursor:default}
 
     .detail-panel{
       position:fixed;
@@ -1475,11 +1502,7 @@
       letter-spacing:0;
     }
 
-    body.home-active .mc-arrow{
-      color:var(--copper);
-    }
 
-  
     /* =========================================
        複数本番・隠し管理画面
        ========================================= */
@@ -4326,7 +4349,7 @@
             <span class="depth-label">DEPTH</span>
             <strong id="depthValue">-135 m</strong>
             <span id="depthSector" class="depth-sector">SECTOR U-13</span>
-            <span class="depth-signal"><i></i>SIGNAL ONLINE</span>
+            <span class="depth-signal"><i></i><span id="depthSignalText">SIGNAL ONLINE</span></span>
           </div>
         </div>
       </div>
@@ -4891,7 +4914,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v69";
+    const APP_BUILD_VERSION = "20260817-v70";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -9114,22 +9137,6 @@
       openDetailPanel();
     }
 
-    function renderPerformanceMcDetail(item, performance, context){
-      document.getElementById("detailHeading").textContent = item.title || "MC";
-      document.getElementById("detailContent").innerHTML = `
-        <div class="card">
-          <span class="section-badge">${context.section ? `${escapeHtml(context.section.label)} ${escapeHtml(context.section.title)}` : escapeHtml(performance.title)}</span>
-          <span class="label">本番</span>
-          <p class="detail-copy">${escapeHtml(performance.title)}</p>
-        </div>
-        <div class="card">
-          <h3 class="card-title">MC本文</h3>
-          <p class="detail-copy">${item.body ? nl2br(item.body) : "MC本文は未登録です。"}</p>
-        </div>
-      `;
-      openDetailPanel();
-    }
-
     function resetDetailSwipePosition(){
       const inner = document.querySelector("#detailPanel .detail-inner");
       if(!inner) return;
@@ -9155,9 +9162,6 @@
         renderSharedSongDetail(context.item,performance,context);
       }
 
-      if(context.item.type==="mc"){
-        renderPerformanceMcDetail(context.item,performance,context);
-      }
     }
 
     // ----------------------------
@@ -10901,9 +10905,18 @@
         activeStorySectionIndex = nextActiveIndex;
         const activeCard = cards[nextActiveIndex];
         const isEncore = activeCard?.dataset.storySection === "encore";
+        const isUnstable = activeCard?.dataset.storySection === "utopia";
         document.body.classList.toggle("story-encore-active",isEncore);
+        setDepthSignalState(isUnstable ? "unstable" : "online");
         updateDepthPanel(isEncore ? storyEncoreDepthProfile : (storyDepthProfiles[nextActiveIndex] || depthProfiles.story),true);
       }
+    }
+
+    function setDepthSignalState(state="online"){
+      const isUnstable = state === "unstable";
+      document.body.classList.toggle("story-signal-unstable",isUnstable);
+      const text = document.getElementById("depthSignalText");
+      if(text) text.textContent = isUnstable ? "SIGNAL UNSTABLE" : "SIGNAL ONLINE";
     }
 
     function queueStoryScrollGimmick(){
@@ -11040,12 +11053,11 @@
 
     function renderMcCard(item){
       return `
-        <button class="mc-card" data-open-performance-item="${escapeHtml(item.id)}">
+        <div class="mc-card mc-card-static" role="note">
           <span class="mc-copy">
             <h3 class="mc-title">${escapeHtml(item.title || "MC")}</h3>
           </span>
-          <span class="mc-arrow" aria-hidden="true">›</span>
-        </button>
+        </div>
       `;
     }
 
@@ -11201,31 +11213,6 @@
       });
     }
 
-
-    function renderMcDetail(mcId){
-      const mc = mcs.find(item=>item.id===mcId);
-      if(!mc) return;
-      const section = sectionById(mc.section);
-      document.getElementById("detailHeading").textContent = mc.title;
-      document.getElementById("detailContent").innerHTML = `
-        <div class="card">
-          <span class="section-badge">${section.no} ${section.title}</span>
-          <span class="label">位置</span>
-          <p class="detail-copy">${mc.position}</p>
-          <span class="label">役割</span>
-          <p class="detail-copy">${mc.summary}</p>
-        </div>
-        <div class="card">
-          <h3 class="card-title">MC本文</h3>
-          <p class="detail-copy">${mc.body}</p>
-        </div>
-      `;
-
-      const panel = document.getElementById("detailPanel");
-      panel.classList.add("open");
-      panel.setAttribute("aria-hidden","false");
-      document.body.style.overflow = "hidden";
-    }
 
     function closeDetail(){
       const panel = document.getElementById("detailPanel");
@@ -12503,7 +12490,10 @@
 
       document.body.classList.add("home-active");
       document.body.classList.toggle("metronome-active",pageName === "metronome");
-      if(pageName !== "story") document.body.classList.remove("story-encore-active");
+      if(pageName !== "story"){
+        document.body.classList.remove("story-encore-active");
+        setDepthSignalState("online");
+      }
       document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.remove("active"));
       document.getElementById(`page-${pageName}`).classList.add("active");
@@ -12515,6 +12505,8 @@
       }
       if(pageName==="story"){
         activeStorySectionIndex = -1;
+        document.body.classList.remove("story-encore-active");
+        setDepthSignalState("online");
         document.getElementById("storyMap")?.style.setProperty("--story-progress","0%");
         document.querySelectorAll("#storyMap .story-card").forEach(card=>card.classList.remove("is-current","is-reached"));
         window.requestAnimationFrame(queueStoryScrollGimmick);
