@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v66" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v66" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v66" />
-  <meta name="app-build" content="20260817-v66" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v67" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v67" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v67" />
+  <meta name="app-build" content="20260817-v67" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -208,6 +208,7 @@
         0 8px 20px rgba(0,0,0,.20);
       backdrop-filter:blur(8px) saturate(.85);
       -webkit-backdrop-filter:blur(8px) saturate(.85);
+      transition:border-color .4s ease,box-shadow .4s ease,background .4s ease;
     }
 
     .depth-gauge{
@@ -357,6 +358,16 @@
       background:#7fa37f;
       box-shadow:0 0 7px rgba(127,163,127,.55);
       animation:depthSignalPulse 2.4s ease-in-out infinite;
+    }
+
+    body.story-encore-active .depth-panel{
+      border-color:rgba(217,179,122,.72);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 24px rgba(0,0,0,.25),0 0 22px rgba(217,179,122,.12);
+    }
+    body.story-encore-active .depth-signal{color:var(--gold)}
+    body.story-encore-active .depth-signal i{
+      background:var(--gold);
+      box-shadow:0 0 10px rgba(217,179,122,.75);
     }
 
     @keyframes depthSignalPulse{
@@ -795,6 +806,12 @@
       margin:8px 2px 16px;
       font-size:24px;
     }
+    #storyPageTitle{
+      font-family:Georgia,"Times New Roman","Yu Mincho",serif;
+      font-size:clamp(22px,3.2vw,30px);
+      letter-spacing:.015em;
+      overflow-wrap:anywhere;
+    }
     .lead{
       color:#d7dede;
       line-height:1.9;
@@ -802,9 +819,10 @@
     }
 
     .story-map{
+      --story-progress:0%;
       position:relative;
       padding-left:28px;
-      margin-top:16px;
+      margin-top:4px;
     }
     .story-map::before{
       content:"";
@@ -813,11 +831,20 @@
       top:7px;
       bottom:16px;
       width:2px;
-      background:linear-gradient(var(--copper),var(--blue));
+      background:linear-gradient(
+        to bottom,
+        var(--gold) 0 var(--story-progress),
+        rgba(111,135,145,.34) var(--story-progress) 100%
+      );
+      box-shadow:0 0 10px rgba(217,179,122,.16);
+      transition:background .45s ease;
     }
     .story-card{
       position:relative;
       margin-bottom:14px;
+      opacity:.78;
+      transform:translateX(0);
+      transition:opacity .35s ease,transform .35s ease,border-color .35s ease,box-shadow .35s ease,background .35s ease;
     }
     .story-card::before{
       content:"";
@@ -827,9 +854,23 @@
       width:12px;
       height:12px;
       border-radius:50%;
-      background:var(--gold);
+      background:#28383d;
       border:3px solid #10181b;
-      box-shadow:0 0 0 1px var(--copper);
+      box-shadow:0 0 0 1px rgba(111,135,145,.58);
+      transition:background .3s ease,box-shadow .3s ease,transform .3s ease;
+    }
+    .story-card.is-reached{
+      opacity:1;
+    }
+    .story-card.is-reached::before{
+      background:var(--gold);
+      box-shadow:0 0 0 1px var(--copper),0 0 14px rgba(217,179,122,.58);
+    }
+    .story-card.is-current{
+      transform:translateX(4px);
+    }
+    .story-card.is-current::before{
+      transform:scale(1.18);
     }
     .story-card h3{
       margin:10px 0 10px;
@@ -839,6 +880,41 @@
       color:#d4dddd;
       line-height:1.85;
       margin:9px 0;
+    }
+    .story-card-kicker{
+      display:block;
+      margin-bottom:5px;
+      color:var(--copper);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    body.home-active #page-story .story-card.is-current{
+      border-color:rgba(217,179,122,.78);
+      box-shadow:0 16px 38px rgba(0,0,0,.36),0 0 24px rgba(196,139,90,.11);
+    }
+    body.home-active #page-story .story-encore-card{
+      border-color:rgba(217,179,122,.58);
+      background:
+        radial-gradient(circle at 85% 12%,rgba(217,179,122,.12),transparent 36%),
+        linear-gradient(180deg,rgba(18,29,31,.70),rgba(9,17,19,.58));
+    }
+    body.home-active #page-story .story-encore-card.is-reached{
+      animation:storyEncoreAwaken 1.35s ease both;
+      box-shadow:0 18px 44px rgba(0,0,0,.40),0 0 32px rgba(217,179,122,.20);
+    }
+    @keyframes storyEncoreAwaken{
+      0%{filter:brightness(.82);transform:translateX(0)}
+      45%{filter:brightness(1.14);transform:translateX(6px)}
+      100%{filter:brightness(1);transform:translateX(4px)}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .story-card,
+      .story-card::before,
+      .story-map::before{transition:none}
+      body.home-active #page-story .story-encore-card.is-reached{animation:none}
     }
     .story-song-list{
       display:grid;
@@ -4361,11 +4437,7 @@
       </section>
 
       <section id="page-story" class="page">
-        <h2 id="storyPageTitle" class="page-title">物語を知る</h2>
-        <div class="card">
-          <div id="storyEyebrow" class="eyebrow">THE STORY OF UNDERGROUND UTOPIA</div>
-          <p id="storyIntro" class="lead"></p>
-        </div>
+        <h2 id="storyPageTitle" class="page-title">The Story of UndergrounD UtopiA</h2>
         <div id="storyMap" class="story-map"></div>
       </section>
 
@@ -4785,7 +4857,7 @@
             <div class="admin-setlist-head">
               <div>
                 <div class="admin-field-label">物語ページ</div>
-                <div class="admin-hint">章本文と、曲名をタップしたときに表示する解説文を編集できます。</div>
+                <div class="admin-hint">各章とアンコールの本文、曲名をタップしたときに表示する解説文を編集できます。</div>
               </div>
               <button id="adminAddStorySection" class="admin-btn compact" type="button">＋ セクション</button>
             </div>
@@ -4794,14 +4866,6 @@
               <label class="admin-field wide">
                 <span class="admin-field-label">ページタイトル</span>
                 <input id="adminStoryPageTitle" class="admin-input" type="text">
-              </label>
-              <label class="admin-field wide">
-                <span class="admin-field-label">英字見出し</span>
-                <input id="adminStoryEyebrow" class="admin-input" type="text">
-              </label>
-              <label class="admin-field wide">
-                <span class="admin-field-label">導入文</span>
-                <textarea id="adminStoryIntro" class="admin-textarea" rows="5"></textarea>
               </label>
             </div>
 
@@ -4834,7 +4898,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v66";
+    const APP_BUILD_VERSION = "20260817-v67";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8542,6 +8606,12 @@
         no:"5",
         title:"それでも、明日へ",
         story:"夢から覚めると、現実は大きく変わっていない。それでも、誰かと音楽を共有した時間が今日を少しだけ違うものにする。"
+      },
+      {
+        id:"encore",
+        no:"Encore",
+        title:"夢を見ていた子ども時代",
+        story:"物語を演じていた高校生たちが、自分自身として戻ってくる。子どもの頃に見た夢を、今の自分たちの音で未来へ渡す。"
       }
     ];
 
@@ -8575,6 +8645,11 @@
       "reality-2":[
         {songId:"kirakira",title:"きらきら"},
         {songId:"tomorrow-never-knows",title:"Tomorrow never knows"}
+      ],
+      "encore":[
+        {songId:"yasashisa",title:"やさしさに包まれたなら"},
+        {songId:"zenshin",title:"全力少年"},
+        {songId:"overground-utopia",title:"オーバーグラウンド・ユートピア"}
       ]
     };
 
@@ -8623,9 +8698,7 @@
 
     function buildDefaultStoryData(){
       return {
-        pageTitle:"物語を知る",
-        eyebrow:"THE STORY OF UNDERGROUND UTOPIA",
-        intro:"ここは、何者にもなれなかった人たちが流れ着く地下。かつて夢を見ていた彼らは、どこかにあるはずのユートピアを目指して歩き始める。\nしかし、たどり着いた先でも現実は簡単には変わらない。それでも、誰かが隣にいることで、今日が少しだけ良い日になる。\nこれは、何者にもなれなかった人たちが、もう一度自分の人生へ帰っていく物語。",
+        pageTitle:"The Story of UndergrounD UtopiA",
         sections:storySectionBlueprints.map(section=>({
           ...section,
           songs:buildDefaultStorySongs(section.id)
@@ -8636,23 +8709,31 @@
     function normalizeStoryData(value){
       const defaults = buildDefaultStoryData();
       const source = value && typeof value === "object" ? value : {};
-      const sourceSections = Array.isArray(source.sections)
-        ? source.sections.filter(section=>section?.id!=="encore")
-        : defaults.sections;
+      const sourceSections = Array.isArray(source.sections) ? source.sections : defaults.sections;
+      const sourceChapters = sourceSections.filter(section=>section?.id!=="encore");
+      const defaultChapters = defaults.sections.filter(section=>section.id!=="encore");
+      const defaultEncore = defaults.sections.find(section=>section.id==="encore");
+      const sourceEncore = sourceSections.find(section=>section?.id==="encore") || defaultEncore;
+      const normalizeSection = (section,index)=>{
+        const fallback = defaults.sections.find(item=>item.id===section?.id)
+          || (section?.id === "encore" ? defaultEncore : defaultChapters[index])
+          || null;
+        const isEncore = section?.id === "encore" || fallback?.id === "encore";
+        return {
+          id:isEncore ? "encore" : section?.id || fallback?.id || makeLocalId("story-section"),
+          no:isEncore ? "Encore" : normalizeStoryChapterNo(section?.no ?? section?.label,fallback?.no,index),
+          title:migrateStorySectionTitle(section,fallback),
+          story:migrateStorySectionBody(section,fallback),
+          songs:normalizeStorySongs(Array.isArray(section?.songs) ? section.songs : null,fallback?.songs || [])
+        };
+      };
+      const requestedTitle = String(source.pageTitle ?? defaults.pageTitle).trim();
       return {
-        pageTitle:String(source.pageTitle ?? defaults.pageTitle).trim() || defaults.pageTitle,
-        eyebrow:String(source.eyebrow ?? defaults.eyebrow).trim() || defaults.eyebrow,
-        intro:String(source.intro ?? defaults.intro).trim(),
-        sections:sourceSections.map((section,index)=>{
-          const fallback = defaults.sections.find(item=>item.id===section?.id) || defaults.sections[index] || null;
-          return {
-            id:section?.id || fallback?.id || makeLocalId("story-section"),
-            no:normalizeStoryChapterNo(section?.no ?? section?.label,fallback?.no,index),
-            title:migrateStorySectionTitle(section,fallback),
-            story:migrateStorySectionBody(section,fallback),
-            songs:normalizeStorySongs(Array.isArray(section?.songs) ? section.songs : null,fallback?.songs || [])
-          };
-        })
+        pageTitle:!requestedTitle || requestedTitle === "物語を知る" ? defaults.pageTitle : requestedTitle,
+        sections:[
+          ...sourceChapters.map((section,index)=>normalizeSection(section,index)),
+          normalizeSection(sourceEncore,defaults.sections.length-1)
+        ]
       };
     }
 
@@ -9690,39 +9771,38 @@
     function renderAdminStoryEditor(){
       adminWorkingStory = normalizeStoryData(adminWorkingStory);
       const pageTitle = document.getElementById("adminStoryPageTitle");
-      const eyebrow = document.getElementById("adminStoryEyebrow");
-      const intro = document.getElementById("adminStoryIntro");
       const root = document.getElementById("adminStorySections");
-      if(!pageTitle || !eyebrow || !intro || !root) return;
+      if(!pageTitle || !root) return;
 
       pageTitle.value = adminWorkingStory.pageTitle;
-      eyebrow.value = adminWorkingStory.eyebrow;
-      intro.value = adminWorkingStory.intro;
       pageTitle.oninput = ()=>adminWorkingStory.pageTitle = pageTitle.value;
-      eyebrow.oninput = ()=>adminWorkingStory.eyebrow = eyebrow.value;
-      intro.oninput = ()=>adminWorkingStory.intro = intro.value;
 
-      root.innerHTML = adminWorkingStory.sections.length ? adminWorkingStory.sections.map((section,index)=>`
+      root.innerHTML = adminWorkingStory.sections.length ? adminWorkingStory.sections.map((section,index)=>{
+        const isEncore = section.id === "encore";
+        const nextIsEncore = adminWorkingStory.sections[index+1]?.id === "encore";
+        return `
         <article class="admin-story-item" data-story-section-index="${index}">
           <div class="admin-story-item-head">
-            <span class="admin-story-item-title">第${escapeHtml(section.no || String(index+1))}章</span>
+            <span class="admin-story-item-title">${isEncore ? "Encore" : `第${escapeHtml(section.no || String(index+1))}章`}</span>
             <div class="admin-row-actions">
-              <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="-1" ${index===0?"disabled":""}>↑</button>
-              <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="1" ${index===adminWorkingStory.sections.length-1?"disabled":""}>↓</button>
-              <button class="admin-icon-btn" type="button" data-delete-story="${index}">×</button>
+              ${isEncore ? `<span class="admin-hint">最終枠として固定</span>` : `
+                <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="-1" ${index===0?"disabled":""}>↑</button>
+                <button class="admin-icon-btn" type="button" data-move-story="${index}" data-direction="1" ${nextIsEncore?"disabled":""}>↓</button>
+                <button class="admin-icon-btn" type="button" data-delete-story="${index}">×</button>
+              `}
             </div>
           </div>
           <div class="admin-story-fields">
-            <label class="admin-field">
+            ${isEncore ? "" : `<label class="admin-field">
               <span class="admin-field-label">章番号</span>
               <input class="admin-input" value="${escapeHtml(section.no)}" data-story-field="no" data-story-index="${index}">
-            </label>
-            <label class="admin-field">
-              <span class="admin-field-label">章タイトル</span>
+            </label>`}
+            <label class="admin-field ${isEncore ? "wide" : ""}">
+              <span class="admin-field-label">${isEncore ? "アンコール見出し" : "章タイトル"}</span>
               <input class="admin-input" value="${escapeHtml(section.title)}" data-story-field="title" data-story-index="${index}">
             </label>
             <label class="admin-field wide">
-              <span class="admin-field-label">章本文</span>
+              <span class="admin-field-label">${isEncore ? "アンコール本文" : "章本文"}</span>
               <textarea class="admin-textarea" rows="7" data-story-field="story" data-story-index="${index}">${escapeHtml(section.story)}</textarea>
             </label>
 
@@ -9758,7 +9838,7 @@
             </div>
           </div>
         </article>
-      `).join("") : `<div class="admin-empty">物語セクションはまだありません。</div>`;
+      `}).join("") : `<div class="admin-empty">物語セクションはまだありません。</div>`;
 
       root.querySelectorAll("[data-story-field]").forEach(input=>{
         input.addEventListener("input",()=>{
@@ -9782,6 +9862,7 @@
           const index = Number(button.dataset.moveStory);
           const next = index + Number(button.dataset.direction);
           if(next < 0 || next >= adminWorkingStory.sections.length) return;
+          if(adminWorkingStory.sections[index]?.id === "encore" || adminWorkingStory.sections[next]?.id === "encore") return;
           [adminWorkingStory.sections[index],adminWorkingStory.sections[next]] = [adminWorkingStory.sections[next],adminWorkingStory.sections[index]];
           renderAdminStoryEditor();
         });
@@ -9789,7 +9870,9 @@
 
       root.querySelectorAll("[data-delete-story]").forEach(button=>{
         button.addEventListener("click",()=>{
-          adminWorkingStory.sections.splice(Number(button.dataset.deleteStory),1);
+          const index = Number(button.dataset.deleteStory);
+          if(adminWorkingStory.sections[index]?.id === "encore") return;
+          adminWorkingStory.sections.splice(index,1);
           renderAdminStoryEditor();
         });
       });
@@ -9830,16 +9913,18 @@
 
     function addAdminStorySection(){
       adminWorkingStory = normalizeStoryData(adminWorkingStory);
-      adminWorkingStory.sections.push({
+      const encoreIndex = adminWorkingStory.sections.findIndex(section=>section.id==="encore");
+      const insertIndex = encoreIndex >= 0 ? encoreIndex : adminWorkingStory.sections.length;
+      adminWorkingStory.sections.splice(insertIndex,0,{
         id:makeLocalId("story-section"),
-        no:String(adminWorkingStory.sections.length+1),
+        no:String(insertIndex+1),
         title:"新しいセクション",
         story:"",
         songs:[]
       });
       renderAdminStoryEditor();
       requestAnimationFrame(()=>{
-        document.querySelector("[data-story-section-index]:last-child")?.scrollIntoView({behavior:"smooth",block:"center"});
+        document.querySelector(`[data-story-section-index="${insertIndex}"]`)?.scrollIntoView({behavior:"smooth",block:"center"});
       });
     }
 
@@ -10787,18 +10872,73 @@
     }
 
 
+    const storyDepthProfiles = [
+      {depth:-480,sector:"SECTOR A-48",angle:52},
+      {depth:-525,sector:"SECTOR B-52",angle:63},
+      {depth:-455,sector:"SECTOR C-45",angle:44},
+      {depth:-570,sector:"SECTOR D-57",angle:72},
+      {depth:-505,sector:"SECTOR E-50",angle:59}
+    ];
+    const storyEncoreDepthProfile = {depth:-480,sector:"SECTOR ENCORE",angle:52};
+    let storyScrollFrame = 0;
+    let activeStorySectionIndex = -1;
+    let furthestStorySectionIndex = -1;
+
+    function updateStoryScrollGimmick(){
+      storyScrollFrame = 0;
+      const storyPage = document.getElementById("page-story");
+      const map = document.getElementById("storyMap");
+      if(!storyPage?.classList.contains("active") || !map) return;
+      const cards = [...map.querySelectorAll(".story-card")];
+      if(!cards.length) return;
+
+      const markerY = Math.min(window.innerHeight * .46,520);
+      let nextActiveIndex = 0;
+      cards.forEach((card,index)=>{
+        if(card.getBoundingClientRect().top <= markerY) nextActiveIndex = index;
+      });
+
+      furthestStorySectionIndex = Math.max(furthestStorySectionIndex,nextActiveIndex);
+      cards.forEach((card,index)=>{
+        card.classList.toggle("is-current",index===nextActiveIndex);
+        card.classList.toggle("is-reached",index<=furthestStorySectionIndex);
+      });
+
+      const reachedCard = cards[Math.max(0,furthestStorySectionIndex)];
+      const progress = Math.min(100,Math.max(0,((reachedCard.offsetTop + 30) / Math.max(1,map.scrollHeight - 16)) * 100));
+      map.style.setProperty("--story-progress",`${progress}%`);
+
+      if(nextActiveIndex !== activeStorySectionIndex){
+        activeStorySectionIndex = nextActiveIndex;
+        const activeCard = cards[nextActiveIndex];
+        const isEncore = activeCard?.dataset.storySection === "encore";
+        document.body.classList.toggle("story-encore-active",isEncore);
+        updateDepthPanel(isEncore ? storyEncoreDepthProfile : (storyDepthProfiles[nextActiveIndex] || depthProfiles.story),true);
+      }
+    }
+
+    function queueStoryScrollGimmick(){
+      if(storyScrollFrame) return;
+      storyScrollFrame = window.requestAnimationFrame(updateStoryScrollGimmick);
+    }
+
+    function bindStoryScrollGimmick(){
+      if(document.documentElement.dataset.storyScrollBound === "true") return;
+      document.documentElement.dataset.storyScrollBound = "true";
+      window.addEventListener("scroll",queueStoryScrollGimmick,{passive:true});
+      window.addEventListener("resize",queueStoryScrollGimmick,{passive:true});
+      document.querySelector(".app-shell > main")?.addEventListener("scroll",queueStoryScrollGimmick,{passive:true});
+    }
+
     function renderStories(){
       const data = normalizeStoryData(storyData);
       const title = document.getElementById("storyPageTitle");
-      const eyebrow = document.getElementById("storyEyebrow");
-      const intro = document.getElementById("storyIntro");
       const map = document.getElementById("storyMap");
       if(title) title.textContent = data.pageTitle;
-      if(eyebrow) eyebrow.textContent = data.eyebrow;
-      if(intro) intro.innerHTML = nl2br(data.intro);
       if(!map) return;
       let songNumber = 0;
       map.innerHTML = data.sections.map((section,index)=>{
+        const isEncore = section.id === "encore";
         const chapterNo = section.no || String(index+1);
         const songList = section.songs.map(song=>{
           songNumber += 1;
@@ -10815,9 +10955,10 @@
           `;
         }).join("");
         return `
-          <article class="card story-card">
-            <h3>第${escapeHtml(chapterNo)}章「${escapeHtml(section.title)}」</h3>
-            <p>${section.story ? nl2br(section.story) : "章本文は未登録です。"}</p>
+          <article class="card story-card${isEncore ? " story-encore-card" : ""}" data-story-section="${escapeHtml(section.id)}" data-story-index="${index}">
+            ${isEncore ? `<span class="story-card-kicker">Final Record</span>` : ""}
+            <h3>${isEncore ? `Encore「${escapeHtml(section.title)}」` : `第${escapeHtml(chapterNo)}章「${escapeHtml(section.title)}」`}</h3>
+            <p>${section.story ? nl2br(section.story) : (isEncore ? "アンコール本文は未登録です。" : "章本文は未登録です。")}</p>
             ${songList ? `
               <span class="label">楽曲</span>
               <div class="story-song-list">${songList}</div>
@@ -10825,6 +10966,10 @@
           </article>
         `;
       }).join("");
+      activeStorySectionIndex = -1;
+      furthestStorySectionIndex = -1;
+      map.style.setProperty("--story-progress","0%");
+      queueStoryScrollGimmick();
     }
 
     function getChronologicalPerformances(){
@@ -12287,7 +12432,9 @@
     let depthAnimationFrame = 0;
 
     function updateDepthPanel(pageName,animate=true){
-      const profile = depthProfiles[pageName] || depthProfiles.home;
+      const profile = pageName && typeof pageName === "object"
+        ? pageName
+        : depthProfiles[pageName] || depthProfiles.home;
       const valueElement = document.getElementById("depthValue");
       const sectorElement = document.getElementById("depthSector");
       const needleElement = document.getElementById("depthNeedle");
@@ -12354,14 +12501,22 @@
 
       document.body.classList.add("home-active");
       document.body.classList.toggle("metronome-active",pageName === "metronome");
+      if(pageName !== "story") document.body.classList.remove("story-encore-active");
       document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
       document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.remove("active"));
       document.getElementById(`page-${pageName}`).classList.add("active");
       document.querySelector(`.nav-btn[data-page="${pageName}"]`).classList.add("active");
       updateDepthPanel(pageName,true);
-      scrollPrimaryToTop("smooth");
+      scrollPrimaryToTop(pageName === "story" ? "auto" : "smooth");
       if(pageName==="messages"){
         renderMessageArchiveSummary();
+      }
+      if(pageName==="story"){
+        activeStorySectionIndex = -1;
+        furthestStorySectionIndex = -1;
+        document.getElementById("storyMap")?.style.setProperty("--story-progress","0%");
+        document.querySelectorAll("#storyMap .story-card").forEach(card=>card.classList.remove("is-current","is-reached"));
+        window.requestAnimationFrame(queueStoryScrollGimmick);
       }
       if(pageName==="songs"){
         renderPerformanceSelector();
@@ -12449,6 +12604,7 @@
       bindSetlistButtons();
       bindAdminControls();
       bindNestedScrollHandoff();
+      bindStoryScrollGimmick();
       bindHiddenAdminCommand();
       refreshGeoRestriction();
     }
