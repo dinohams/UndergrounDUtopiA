@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v67" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v67" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v67" />
-  <meta name="app-build" content="20260817-v67" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v68" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v68" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v68" />
+  <meta name="app-build" content="20260817-v68" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -827,7 +827,7 @@
     .story-map::before{
       content:"";
       position:absolute;
-      left:10px;
+      left:4px;
       top:7px;
       bottom:16px;
       width:2px;
@@ -847,30 +847,33 @@
       transition:opacity .35s ease,transform .35s ease,border-color .35s ease,box-shadow .35s ease,background .35s ease;
     }
     .story-card::before{
-      content:"";
+      content:"⚙︎";
       position:absolute;
-      left:-24px;
-      top:24px;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      background:#28383d;
-      border:3px solid #10181b;
-      box-shadow:0 0 0 1px rgba(111,135,145,.58);
-      transition:background .3s ease,box-shadow .3s ease,transform .3s ease;
+      left:-35px;
+      top:18px;
+      width:22px;
+      height:22px;
+      display:grid;
+      place-items:center;
+      color:#405258;
+      font-family:"Segoe UI Symbol","Arial Unicode MS",sans-serif;
+      font-size:23px;
+      line-height:1;
+      text-shadow:0 2px 5px rgba(0,0,0,.92);
+      transition:color .3s ease,text-shadow .3s ease,transform .38s ease;
     }
     .story-card.is-reached{
       opacity:1;
     }
     .story-card.is-reached::before{
-      background:var(--gold);
-      box-shadow:0 0 0 1px var(--copper),0 0 14px rgba(217,179,122,.58);
+      color:var(--gold);
+      text-shadow:0 2px 5px rgba(0,0,0,.92),0 0 12px rgba(217,179,122,.72);
     }
     .story-card.is-current{
       transform:translateX(4px);
     }
     .story-card.is-current::before{
-      transform:scale(1.18);
+      transform:scale(1.16) rotate(24deg);
     }
     .story-card h3{
       margin:10px 0 10px;
@@ -880,16 +883,6 @@
       color:#d4dddd;
       line-height:1.85;
       margin:9px 0;
-    }
-    .story-card-kicker{
-      display:block;
-      margin-bottom:5px;
-      color:var(--copper);
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:11px;
-      font-weight:800;
-      letter-spacing:.18em;
-      text-transform:uppercase;
     }
     body.home-active #page-story .story-card.is-current{
       border-color:rgba(217,179,122,.78);
@@ -4898,7 +4891,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v67";
+    const APP_BUILD_VERSION = "20260817-v68";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -8085,7 +8078,9 @@
         releaseYear:normalizeSongReleaseYear(patch.releaseYear ?? existing?.releaseYear),
         scoreAudioUrl:String(patch.scoreAudioUrl ?? existing?.scoreAudioUrl ?? "").trim(),
         originalAudioUrl:String(patch.originalAudioUrl ?? existing?.originalAudioUrl ?? "").trim(),
-        baseBpm:normalizeSongBaseBpm(patch.baseBpm ?? existing?.baseBpm)
+        baseBpm:normalizeSongBaseBpm(
+          Object.prototype.hasOwnProperty.call(patch,"baseBpm") ? patch.baseBpm : existing?.baseBpm
+        )
       };
       songDetailsCatalog = songDetailsCatalog.filter(detail=>normalizeSongTitleKey(detail.title)!==key);
       songDetailsCatalog.push(next);
@@ -10874,15 +10869,14 @@
 
     const storyDepthProfiles = [
       {depth:-480,sector:"SECTOR A-48",angle:52},
-      {depth:-525,sector:"SECTOR B-52",angle:63},
-      {depth:-455,sector:"SECTOR C-45",angle:44},
-      {depth:-570,sector:"SECTOR D-57",angle:72},
-      {depth:-505,sector:"SECTOR E-50",angle:59}
+      {depth:-620,sector:"SECTOR B-62",angle:65},
+      {depth:-780,sector:"SECTOR C-78",angle:76},
+      {depth:null,displayDepth:"??? m",sector:"SECTOR D-??",angle:88},
+      {depth:-480,sector:"SECTOR E-48",angle:52}
     ];
     const storyEncoreDepthProfile = {depth:-480,sector:"SECTOR ENCORE",angle:52};
     let storyScrollFrame = 0;
     let activeStorySectionIndex = -1;
-    let furthestStorySectionIndex = -1;
 
     function updateStoryScrollGimmick(){
       storyScrollFrame = 0;
@@ -10898,13 +10892,12 @@
         if(card.getBoundingClientRect().top <= markerY) nextActiveIndex = index;
       });
 
-      furthestStorySectionIndex = Math.max(furthestStorySectionIndex,nextActiveIndex);
       cards.forEach((card,index)=>{
         card.classList.toggle("is-current",index===nextActiveIndex);
-        card.classList.toggle("is-reached",index<=furthestStorySectionIndex);
+        card.classList.toggle("is-reached",index<=nextActiveIndex);
       });
 
-      const reachedCard = cards[Math.max(0,furthestStorySectionIndex)];
+      const reachedCard = cards[nextActiveIndex];
       const progress = Math.min(100,Math.max(0,((reachedCard.offsetTop + 30) / Math.max(1,map.scrollHeight - 16)) * 100));
       map.style.setProperty("--story-progress",`${progress}%`);
 
@@ -10956,7 +10949,6 @@
         }).join("");
         return `
           <article class="card story-card${isEncore ? " story-encore-card" : ""}" data-story-section="${escapeHtml(section.id)}" data-story-index="${index}">
-            ${isEncore ? `<span class="story-card-kicker">Final Record</span>` : ""}
             <h3>${isEncore ? `Encore「${escapeHtml(section.title)}」` : `第${escapeHtml(chapterNo)}章「${escapeHtml(section.title)}」`}</h3>
             <p>${section.story ? nl2br(section.story) : (isEncore ? "アンコール本文は未登録です。" : "章本文は未登録です。")}</p>
             ${songList ? `
@@ -10967,7 +10959,6 @@
         `;
       }).join("");
       activeStorySectionIndex = -1;
-      furthestStorySectionIndex = -1;
       map.style.setProperty("--story-progress","0%");
       queueStoryScrollGimmick();
     }
@@ -11147,6 +11138,12 @@
           </label>
 
           <label class="admin-field" style="display:block;margin-top:12px">
+            <span class="admin-field-label">メトロノーム基準BPM</span>
+            <input id="sharedSongBaseBpm" class="admin-input" type="number" min="30" max="300" step="1" inputmode="numeric" value="${escapeHtml(detail.baseBpm || "")}" placeholder="例：120">
+            <span class="admin-hint">空欄にすると基準テンポ未登録になります。</span>
+          </label>
+
+          <label class="admin-field" style="display:block;margin-top:12px">
             <span class="admin-field-label">音源（楽譜）のYouTube URL</span>
             <input id="sharedSongScoreAudioUrl" class="admin-input" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=..." value="${escapeHtml(detail.scoreAudioUrl)}">
           </label>
@@ -11180,10 +11177,15 @@
       });
       document.getElementById("saveSharedSongDetail")?.addEventListener("click",()=>{
         const rawReleaseYear = document.getElementById("sharedSongReleaseYear").value.trim();
+        const rawBaseBpm = document.getElementById("sharedSongBaseBpm").value.trim();
         const rawScoreAudioUrl = document.getElementById("sharedSongScoreAudioUrl").value.trim();
         const rawOriginalAudioUrl = document.getElementById("sharedSongOriginalAudioUrl").value.trim();
         if(rawReleaseYear && !normalizeSongReleaseYear(rawReleaseYear)){
           alert("リリース年は1900〜2100年の範囲で入力してください。");
+          return;
+        }
+        if(rawBaseBpm && normalizeSongBaseBpm(rawBaseBpm) === null){
+          alert("メトロノーム基準BPMは30〜300の範囲で入力してください。");
           return;
         }
         if(rawScoreAudioUrl && !extractYouTubeVideoId(rawScoreAudioUrl)){
@@ -11197,6 +11199,7 @@
         upsertSharedSongDetail(item.title,{
           artist:document.getElementById("sharedSongArtist").value,
           releaseYear:rawReleaseYear,
+          baseBpm:rawBaseBpm ? Number(rawBaseBpm) : null,
           scoreAudioUrl:normalizeYouTubeUrl(rawScoreAudioUrl),
           originalAudioUrl:normalizeYouTubeUrl(rawOriginalAudioUrl)
         });
@@ -12446,9 +12449,16 @@
 
       window.cancelAnimationFrame(depthAnimationFrame);
 
+      const hasNumericDepth = typeof profile.depth === "number" && Number.isFinite(profile.depth);
+      if(!hasNumericDepth){
+        currentDepthValue = -900;
+        valueElement.textContent = profile.displayDepth || "??? m";
+        return;
+      }
+
       if(!animate){
         currentDepthValue = profile.depth;
-        valueElement.textContent = `${profile.depth} m`;
+        valueElement.textContent = profile.displayDepth || `${profile.depth} m`;
         return;
       }
 
@@ -12513,7 +12523,6 @@
       }
       if(pageName==="story"){
         activeStorySectionIndex = -1;
-        furthestStorySectionIndex = -1;
         document.getElementById("storyMap")?.style.setProperty("--story-progress","0%");
         document.querySelectorAll("#storyMap .story-card").forEach(card=>card.classList.remove("is-current","is-reached"));
         window.requestAnimationFrame(queueStoryScrollGimmick);
