@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260818-v74" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260818-v74" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260818-v74" />
-  <meta name="app-build" content="20260818-v74" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260818-v75" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260818-v75" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260818-v75" />
+  <meta name="app-build" content="20260818-v75" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4737,6 +4737,7 @@
     }
 
     .admin-story-quiz-editor{margin-top:14px}
+    #adminStoryQuizTestReset[hidden]{display:none}
 
     .admin-story-quiz-list{
       display:grid;
@@ -5395,6 +5396,7 @@
                 <div class="admin-field-label">最深部試験（20問固定）</div>
                 <div class="admin-hint">物語熟読度100％で挑戦できます。問題文・4つの選択肢・正解を編集してください。</div>
               </div>
+              <button id="adminStoryQuizTestReset" class="admin-btn compact secondary" type="button" hidden>テスト用：100％に戻す</button>
             </div>
 
             <div class="admin-form-grid">
@@ -5437,7 +5439,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260818-v74";
+    const APP_BUILD_VERSION = "20260818-v75";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7224,6 +7226,7 @@
     const storyReadingStorageKey = "underground-utopia-story-reading-v1";
     const storyQuizActiveStorageKey = "underground-utopia-story-quiz-active-v1";
     const storyQuizClearedStorageKey = "underground-utopia-story-quiz-cleared-v1";
+    const storyQuizAdminResetPendingKey = "underground-utopia-story-quiz-admin-reset-pending-v1";
     const storyPageReadingDurationMs = 20000;
     const storySongReadingDurationMs = 15000;
 
@@ -10848,8 +10851,14 @@
     function setAdminAuthorized(value){
       adminAuthorized = Boolean(value);
       document.getElementById("adminPanel")?.classList.toggle("admin-authorized",adminAuthorized);
+      const quizResetButton = document.getElementById("adminStoryQuizTestReset");
+      if(quizResetButton) quizResetButton.hidden = !adminAuthorized;
       applyAppAvailability();
       refreshGeoRestriction();
+      if(adminAuthorized && sessionStorage.getItem(storyQuizAdminResetPendingKey) === "1"){
+        sessionStorage.removeItem(storyQuizAdminResetPendingKey);
+        window.setTimeout(()=>resetStoryQuizForAdminTest({notify:true}),0);
+      }
     }
 
     function renderAdminItems(){
@@ -11193,6 +11202,7 @@
       document.getElementById("adminAddStandaloneTimeline")?.addEventListener("click",addAdminStandaloneTimeline);
       document.getElementById("adminAddTimelineItem").addEventListener("click",addAdminTimelineItem);
       document.getElementById("adminAddStorySection").addEventListener("click",addAdminStorySection);
+      document.getElementById("adminStoryQuizTestReset")?.addEventListener("click",()=>resetStoryQuizForAdminTest({notify:true}));
 
       document.querySelectorAll("[data-admin-tab]").forEach(button=>{
         button.addEventListener("click",()=>switchAdminTab(button.dataset.adminTab));
@@ -12468,10 +12478,12 @@
           <h3>照合失敗</h3>
           <p class="story-quiz-state-copy">${escapeHtml(message)}</p>
           <div class="story-quiz-actions">
+            ${adminAuthorized ? `<button id="storyQuizFailureAdminReset" class="story-quiz-action" type="button">管理者：100％に戻して再挑戦</button>` : ""}
             <button id="storyQuizFailureClose" class="story-quiz-action secondary" type="button">戯言へ戻る</button>
           </div>
         </section>
       `;
+      document.getElementById("storyQuizFailureAdminReset")?.addEventListener("click",()=>resetStoryQuizForAdminTest({notify:true,showIntro:true}));
       document.getElementById("storyQuizFailureClose")?.addEventListener("click",closeStoryQuizPanel);
     }
 
@@ -12526,6 +12538,30 @@
       document.getElementById("storyQuizButton")?.addEventListener("click",openStoryQuizPanel);
     }
 
+    function resetStoryQuizForAdminTest(options={}){
+      if(!adminAuthorized){
+        if(options.notify) alert("この操作には管理者ログインが必要です。");
+        return false;
+      }
+      sessionStorage.removeItem(storyQuizAdminResetPendingKey);
+      storyQuizState.active = false;
+      storyQuizState.index = 0;
+      storyQuizState.choices = [];
+      storyQuizState.answerLocked = false;
+      setStoryQuizActiveMarker(false);
+      storyQuizCleared = false;
+      localStorage.removeItem(storyQuizClearedStorageKey);
+      storyReadingPercent = 100;
+      storyQuizRecoveryNotice = "管理者テストモード：最深部試験を再挑戦できます。";
+      saveStoryReadingPercent();
+      pauseStoryPageReadingTimer();
+      pauseStorySongReadingTimer();
+      renderStoryReadingAchievement();
+      if(options.showIntro) renderStoryQuizIntro();
+      if(options.notify) alert("物語熟読度を100％に設定し、試験の達成記録を未クリアへ戻しました。");
+      return true;
+    }
+
     function bindStoryQuizAdminTestCommand(){
       const triggers = [
         document.querySelector(".story-reading-card .eyebrow"),
@@ -12534,9 +12570,8 @@
       if(!triggers.length) return;
       let taps = [];
       const handleTap = ()=>{
-        if(!adminAuthorized) return;
         const now = Date.now();
-        taps = taps.filter(time=>now-time<4000);
+        taps = taps.filter(time=>now-time<5000);
         taps.push(now);
         if(taps.length < 7) return;
         taps = [];
@@ -12546,18 +12581,19 @@
           alert("コマンドが一致しません。");
           return;
         }
-        storyQuizState.active = false;
-        storyQuizState.answerLocked = false;
-        setStoryQuizActiveMarker(false);
-        storyQuizCleared = false;
-        localStorage.removeItem(storyQuizClearedStorageKey);
-        storyReadingPercent = 100;
-        storyQuizRecoveryNotice = "管理者テストモード：最深部試験を再挑戦できます。";
-        saveStoryReadingPercent();
-        renderStoryReadingAchievement();
-        alert("物語熟読度を100％に設定し、試験の達成記録を未クリアへ戻しました。");
+        if(!adminAuthorized){
+          sessionStorage.setItem(storyQuizAdminResetPendingKey,"1");
+          alert("コマンドを受け付けました。管理者ログインが確認でき次第、100％へ戻します。");
+          openAdmin();
+          return;
+        }
+        resetStoryQuizForAdminTest({notify:true});
       };
-      triggers.forEach(trigger=>trigger.addEventListener("click",handleTap));
+      const eventName = window.PointerEvent ? "pointerup" : "click";
+      triggers.forEach(trigger=>{
+        trigger.style.touchAction = "manipulation";
+        trigger.addEventListener(eventName,handleTap);
+      });
     }
 
     window.addEventListener("pagehide",()=>{
