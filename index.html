@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260818-v76" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260818-v76" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260818-v76" />
-  <meta name="app-build" content="20260818-v76" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260818-v77" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260818-v77" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260818-v77" />
+  <meta name="app-build" content="20260818-v77" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -5481,8 +5481,8 @@
           <section class="admin-dashboard-card wide admin-story-quiz-editor">
             <div class="admin-setlist-head">
               <div>
-                <div class="admin-field-label">最深部試験（20問固定）</div>
-                <div class="admin-hint">物語熟読度100％で挑戦できます。問題文・4つの選択肢・正解を編集してください。</div>
+                <div class="admin-field-label">最深部試験（50問の問題プール）</div>
+                <div class="admin-hint">物語熟読度100％で、50問から毎回20問を抽選します。問題文・4つの選択肢・正解を編集してください。</div>
               </div>
               <button id="adminStoryQuizTestReset" class="admin-btn compact secondary" type="button" hidden>テスト用：100％に戻す</button>
             </div>
@@ -5527,7 +5527,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260818-v76";
+    const APP_BUILD_VERSION = "20260818-v77";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -7315,8 +7315,8 @@
     const storyQuizActiveStorageKey = "underground-utopia-story-quiz-active-v1";
     const storyQuizClearedStorageKey = "underground-utopia-story-quiz-cleared-v1";
     const storyQuizAdminResetPendingKey = "underground-utopia-story-quiz-admin-reset-pending-v1";
-    const storyPageReadingDurationMs = 20000;
-    const storySongReadingDurationMs = 15000;
+    const storyPageReadingDurationMs = 15000;
+    const storySongReadingDurationMs = 10000;
 
     function loadSeenTerminalMessageIds(){
       try{
@@ -7347,6 +7347,7 @@
     const storyQuizState = {
       active:false,
       index:0,
+      questions:[],
       choices:[],
       answerLocked:false
     };
@@ -9457,143 +9458,329 @@
       ],
       "encore":[
         {songId:"yasashisa",title:"やさしさに包まれたなら"},
-        {songId:"zenshin",title:"全力少年"},
+        {songId:"ao-to-natsu",title:"青と夏"},
         {songId:"overground-utopia",title:"オーバーグラウンド・ユートピア"}
       ]
     };
 
+    const storyQuizQuestionPoolSize = 50;
+    const storyQuizChallengeQuestionCount = 20;
+
     const storyQuizBlueprint = {
+      revision:"published-story-50-v1",
       specialTitle:"SPECIAL RECORD 001",
       specialBody:"全記録の解読が完了しました。\n\nここに記されていたのは、理想郷の場所ではありません。\n何者にもなれなかった者たちが、それでも誰かと音を鳴らし、今日を少しだけ変えていった記録です。\n\n物語はここで終わりません。\nこの端末を閉じたあとも、あなたの物語は続いていきます。",
       questions:[
         {
-          id:"story-quiz-01",
+          id:"story-quiz-v2-01",
+          text:"何者にもなれなかった人たちが流れ着く地下の名前は？",
+          choices:["UndergrounD UtopiA","あの日の部室","混沌の楽園","オーバーグラウンド・ユートピア"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-v2-02",
           text:"第1章の題名は？",
-          choices:["現実","あの日の部室","理想郷への道中","混沌の楽園"],
-          correctIndex:0
+          choices:["理想郷への道中","現実","あの日の部室","それでも、明日へ"],
+          correctIndex:1
         },
         {
-          id:"story-quiz-02",
-          text:"地下の住民たちが願っていたことは？",
-          choices:["あの時に戻ること","地下から逃げること","理想郷を壊すこと","有名になること"],
-          correctIndex:0
+          id:"story-quiz-v2-03",
+          text:"第1章で人々が探し始めるものは？",
+          choices:["地上の勝者になる方法","過去を完全に消す方法","「ここではないどこか」","地下を支配する力"],
+          correctIndex:2
         },
         {
-          id:"story-quiz-03",
-          text:"物語の最初に記録されている楽曲は？",
-          choices:["タイムマシン","サザンカ","DOWNTOWN","きらきら"],
-          correctIndex:0
-        },
-        {
-          id:"story-quiz-04",
+          id:"story-quiz-v2-04",
           text:"第2章の題名は？",
-          choices:["あの日の部室","現実","混沌の楽園","それでも、明日へ"],
-          correctIndex:0
-        },
-        {
-          id:"story-quiz-05",
-          text:"第2章に含まれていない楽曲は？",
-          choices:["DOWNTOWN","Calc.","Blue Medley","天使と悪魔"],
+          choices:["現実","混沌の楽園","それでも、明日へ","あの日の部室"],
           correctIndex:3
         },
         {
-          id:"story-quiz-06",
-          text:"「Blue Medley」が記録されている章は？",
-          choices:["第1章","第2章","第3章","第5章"],
-          correctIndex:1
+          id:"story-quiz-v2-05",
+          text:"第2章で青春の記憶について示される現実は？",
+          choices:["そこにはもう戻れない","望めば何度でも戻れる","記憶はすべて間違っている","青春はまだ始まっていない"],
+          correctIndex:0
         },
         {
-          id:"story-quiz-07",
+          id:"story-quiz-v2-06",
           text:"第3章の題名は？",
-          choices:["理想郷への道中","混沌の楽園","あの日の部室","それでも、明日へ"],
-          correctIndex:0
+          choices:["混沌の楽園","理想郷への道中","現実","あの日の部室"],
+          correctIndex:1
         },
         {
-          id:"story-quiz-08",
-          text:"第3章の最初に記録されている楽曲は？",
-          choices:["天使と悪魔","狂愛","革命道中","紅蓮華"],
-          correctIndex:0
-        },
-        {
-          id:"story-quiz-09",
-          text:"愛、善悪、革命への衝動が交錯する章は？",
-          choices:["現実","あの日の部室","理想郷への道中","それでも、明日へ"],
+          id:"story-quiz-v2-07",
+          text:"第3章で問いかけられる中心的なテーマは？",
+          choices:["どうすれば有名になれるか","地下から何分で出られるか","正しさとは何か、人間とは何か","どの曲が一番人気か"],
           correctIndex:2
         },
         {
-          id:"story-quiz-10",
+          id:"story-quiz-v2-08",
           text:"第4章の題名は？",
-          choices:["混沌の楽園","理想郷への道中","現実","それでも、明日へ"],
+          choices:["あの日の部室","現実","それでも、明日へ","混沌の楽園"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-09",
+          text:"第4章でたどり着いた世界は、どのように描かれている？",
+          choices:["自由で楽しいが、完璧ではない世界","静かで何も起こらない完璧な世界","過去だけが繰り返される世界","全員が同じ考えを持つ世界"],
           correctIndex:0
         },
         {
-          id:"story-quiz-11",
-          text:"第4章で端末の深度表示はどうなる？",
-          choices:["−480 m","−960 m","??? m","0 m"],
+          id:"story-quiz-v2-10",
+          text:"第5章の題名は？",
+          choices:["混沌の楽園","それでも、明日へ","現実","理想郷への道中"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-11",
+          text:"第5章で現実へ帰った人々に起きた変化は？",
+          choices:["全員が特別な何者かになった","人生が完全に理想どおりになった","劇的には変わらないが、旅の前とは少しだけ違った","過去の記憶をすべて失った"],
           correctIndex:2
         },
         {
-          id:"story-quiz-12",
-          text:"第4章で表示される通信状態は？",
-          choices:["SIGNAL ONLINE","SIGNAL UNSTABLE","SIGNAL LOST","STANDBY"],
+          id:"story-quiz-v2-12",
+          text:"アンコールで物語がつながる先は？",
+          choices:["遠い未来の理想郷","第1章より前の過去","誰もいない別世界","この今、この瞬間"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-13",
+          text:"アンコール最初に記録されている楽曲は？",
+          choices:["やさしさに包まれたなら","青と夏","Tomorrow never knows","オーバーグラウンド・ユートピア"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-v2-14",
+          text:"「タイムマシン」は物語の中でどんな役割を担う？",
+          choices:["理想郷での祝祭を始める","何者にもなれなかったと感じる人たちの物語の出発点","アンコールを締めくくる","青春の恋愛だけを描く"],
           correctIndex:1
         },
         {
-          id:"story-quiz-13",
-          text:"第4章の最初に記録されている楽曲は？",
-          choices:["カオスが極まる","AIZO","ピースサイン","ふっかつのじゅもん"],
+          id:"story-quiz-v2-15",
+          text:"「タイムマシン」の解説で、過去を消した場合に失われる可能性が示されるものは？",
+          choices:["地下の入口","演奏会の曲順","今と同じ自分","理想郷への地図"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-16",
+          text:"「サザンカ」が描く中心人物は？",
+          choices:["最初から成功が約束された人","努力せず夢を叶えた人","夢を完全に忘れた人","何度失敗しても夢を追い続ける人"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-17",
+          text:"「サザンカ」の解説で、結果だけでは決められないとされるものは？",
+          choices:["必死に進んできた時間の価値","曲の演奏時間","理想郷までの距離","観客の人数"],
           correctIndex:0
         },
         {
-          id:"story-quiz-14",
-          text:"第4章で「AIZO」の次に記録されている楽曲は？",
-          choices:["カオスが極まる","ピースサイン","ふっかつのじゅもん","きらきら"],
+          id:"story-quiz-v2-18",
+          text:"「DOWNTOWN」が描く高揚感は、いつの街へ出かける場面？",
+          choices:["月曜日の朝","土曜日の夜","雨の日の昼","日曜日の夕方"],
           correctIndex:1
         },
         {
-          id:"story-quiz-15",
-          text:"第5章の題名は？",
-          choices:["それでも、明日へ","混沌の楽園","現実","あの日の部室"],
+          id:"story-quiz-v2-19",
+          text:"物語における「DOWNTOWN」の役割は？",
+          choices:["現実へ強制的に戻す出口","理想郷を壊す合図","過去の楽しかった時間へ戻っていく入口","本編のエンドロール"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-20",
+          text:"「小さな恋のうた」が恋愛以外にも象徴するものは？",
+          choices:["大人の打算的な判断","完全に忘れた記憶","理想郷の危うさ","若い頃のまっすぐで不器用な気持ち"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-21",
+          text:"「スターマーカー」が象徴するのは、どんな頃の自分？",
+          choices:["これから何にでもなれると思っていた頃の自分","すべてを諦めたあとの自分","理想郷から帰ったあとの自分","過去を忘れた自分"],
           correctIndex:0
         },
         {
-          id:"story-quiz-16",
-          text:"第5章の最初に記録されている楽曲は？",
-          choices:["きらきら","Tomorrow never knows","やさしさに包まれたなら","全力少年"],
+          id:"story-quiz-v2-22",
+          text:"「Calc.」では、別れをどのように考えて気持ちに折り合いをつけようとする？",
+          choices:["すべて嘘だったと考える","すべて運命だったと考える","相手の記憶を消す","別れはなかったことにする"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-23",
+          text:"「Calc.」の解説で、傷ついた記憶は最終的にどう捉えられている？",
+          choices:["青春から切り離すべき失敗","存在しなかった出来事","それも含めて自分の青春","理想郷で捨てる荷物"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-24",
+          text:"「Blue Medley」で重ね合わせるものは？",
+          choices:["成功者と失敗者の順位","現実と空想の地図","すべての曲の発売年","客席の大人たちと今の高校生の青春"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-25",
+          text:"「Blue Medley」は最後にどの曲へ戻る？",
+          choices:["青のすみか","CHE.R.RY","ロビンソン","フレンズ"],
           correctIndex:0
         },
         {
-          id:"story-quiz-17",
-          text:"本編最後に記録されている楽曲は？",
-          choices:["Tomorrow never knows","きらきら","全力少年","オーバーグラウンド・ユートピア"],
+          id:"story-quiz-v2-26",
+          text:"「ベルベットの詩」の解説で、過去が輝いて見える理由として示されるのは？",
+          choices:["失敗が一度もなかったから","何かに必死になっていた自分がいたから","未来をすべて知っていたから","全員が同じ夢を持っていたから"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-27",
+          text:"「夜桜～灰色と青」で重ねる二つの時間は？",
+          choices:["理想郷へ入る前と出たあと","幼少期と老後","今一緒に青春を過ごす二人と、未来にその時間を振り返る二人","本番前と本番後の観客"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-28",
+          text:"「天使と悪魔」が問いかけることは？",
+          choices:["音楽だけで現実を変えられるか","過去へ本当に戻れるか","理想郷は地下にあるか","正しいことと間違いを簡単に分けられるのか"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-29",
+          text:"「天使と悪魔」の解説で、理想を探す前に向き合う必要があるものは？",
+          choices:["自分自身","観客の評価","演奏会の順位","地上の権力"],
           correctIndex:0
         },
         {
-          id:"story-quiz-18",
-          text:"夢から覚めたあとの現実は、どう描かれている？",
-          choices:["大きくは変わっていない","すべて理想どおりになった","地下が消えていた","時間が巻き戻っていた"],
+          id:"story-quiz-v2-30",
+          text:"「狂愛」が描く矛盾は？",
+          choices:["忘れたいのに思い出せない","大切なものを守りたいのに、自ら壊してしまう","進みたいのに道が存在しない","正しいのに誰からも理解される"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-31",
+          text:"「革命道中」が表す前進の原動力は？",
+          choices:["誰よりも有名になりたい気持ち","失敗を隠したい気持ち","傷ついても大切なものを守りたい気持ち","過去をすべて忘れたい気持ち"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-32",
+          text:"「Woman “Wの悲劇”より」の解説で、前へ進むために必要になることがあるものは？",
+          choices:["理想郷を独占すること","すべての記憶を消すこと","誰とも関わらないこと","人や何かを手放すこと"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-33",
+          text:"「紅蓮華」の解説で示される“強さ”とは？",
+          choices:["弱さや悲しさを抱えながら、それでも立ち上がること","最初から何も恐れないこと","傷つかない場所へ逃げ続けること","誰かより上に立つこと"],
           correctIndex:0
         },
         {
-          id:"story-quiz-19",
-          text:"アンコール最初の楽曲は？",
-          choices:["やさしさに包まれたなら","全力少年","オーバーグラウンド・ユートピア","Tomorrow never knows"],
+          id:"story-quiz-v2-34",
+          text:"「カオスが極まる」で崩れ始める期待は？",
+          choices:["過去には一切戻れないという考え","理想郷に着けばすべてがうまくいくという期待","音楽は世代を越えられないという考え","現実には優しさがないという考え"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-35",
+          text:"「カオスが極まる」の解説が投げかける疑問は？",
+          choices:["理想郷には何曲必要か","地下は何メートルあるか","全員が自分の理想だけを追った先に幸せな世界はあるのか","青春は何歳で終わるのか"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-36",
+          text:"「AIZO」で入り混じるものとして解説されているのは？",
+          choices:["春夏秋冬だけ","過去と未来だけ","静けさと無音だけ","愛と憎しみ、嘘と真実、正しさと狂気"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-37",
+          text:"「AIZO」の演奏で、強烈な高揚感の中に残したいものは？",
+          choices:["少しだけの違和感","完全な安心感","青春への後悔だけ","未来の答え"],
           correctIndex:0
         },
         {
-          id:"story-quiz-20",
-          text:"物語の最後に記録されている楽曲は？",
-          choices:["オーバーグラウンド・ユートピア","全力少年","Tomorrow never knows","やさしさに包まれたなら"],
+          id:"story-quiz-v2-38",
+          text:"「ピースサイン」が描くのはどんな人？",
+          choices:["最初から特別で完璧な人","弱さを抱えながら誰かのために一歩を踏み出す人","理想郷を一人で支配する人","現実を完全に捨てた人"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-39",
+          text:"「ピースサイン」から予定されている演出は？",
+          choices:["照明をすべて消して無音にする","演奏者だけで静かに進める","客席も巻き込み、ステージと一緒に楽しむ","全員が舞台から退場する"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-40",
+          text:"「ふっかつのじゅもん」が描く姿は？",
+          choices:["一度の失敗ですべてを諦める姿","誰かに人生を任せる姿","過去の成功だけを守る姿","倒れても何度でも立ち上がる姿"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-41",
+          text:"「ふっかつのじゅもん」の熱狂が終わったあと、向き合うことになるものは？",
+          choices:["逃げてきた現実","新しい理想郷の王","消えてしまった青春","演奏会の勝敗"],
           correctIndex:0
+        },
+        {
+          id:"story-quiz-v2-42",
+          text:"物語における「きらきら」の役割は？",
+          choices:["理想郷への入口","この物語がたどり着くひとつの答え","第2章への場面転換","アンコールの大騒ぎ"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-43",
+          text:"「きらきら」で拾い集めていくものは？",
+          choices:["誰かの成功だけ","失敗を隠すための言葉","日々の中で落としてきた自分だけの「きらきら」","理想郷の宝物"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-44",
+          text:"「Tomorrow never knows」が担う位置づけは？",
+          choices:["第1章の始まり","第2章のメドレー","アンコール最初の曲","UndergrounD UtopiA本編の締めくくり"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-45",
+          text:"「Tomorrow never knows」で未来はどのように捉えられている？",
+          choices:["何が待つか分からないからこそ、物語は続いていく","すでにすべて決まっている","理想郷に着けば未来は終わる","過去とまったく同じことだけが起きる"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-v2-46",
+          text:"「やさしさに包まれたなら」がアンコールで目を向けるものは？",
+          choices:["遠い世界の完璧な理想郷","日常の中に残る小さな幸せや優しさ","誰かに勝つための強さ","青春を忘れる方法"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-v2-47",
+          text:"「青と夏」が表す、今ステージに立つ自分たちの状態は？",
+          choices:["青春をすべて終えたあと","物語とは無関係な観察者","まさに青春の真ん中にいる","理想郷から出られない"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-v2-48",
+          text:"「青と夏」の解説で、今日という一日は将来どうなると示される？",
+          choices:["完全に忘れるべき日になる","現実から消えてしまう","何度でも同じ形で繰り返す","振り返れば大切な青春になる"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-v2-49",
+          text:"「オーバーグラウンド・ユートピア」は何をもとに作られた？",
+          choices:["音楽部メンバー一人ひとりの言葉や思い","海外の古い物語","観客の人気投票だけ","演奏会とは無関係な既存曲"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-v2-50",
+          text:"物語が最後に示す「理想郷」に最も近いものは？",
+          choices:["誰も失敗しない遠い完璧な世界","今いる場所で誰かと手を取り、もう一度歩き出そうと思えること","地上へ出て成功者になること","過去を完全に消して別人になること"],
+          correctIndex:1
         }
       ]
     };
 
     function normalizeStoryQuiz(value,defaults=storyQuizBlueprint){
       const source = value && typeof value === "object" ? value : {};
-      const sourceQuestions = Array.isArray(source.questions) ? source.questions : [];
+      const sourceQuestions = source.revision === defaults.revision && Array.isArray(source.questions)
+        ? source.questions
+        : [];
       const defaultQuestions = Array.isArray(defaults.questions) ? defaults.questions : storyQuizBlueprint.questions;
-      const questions = Array.from({length:20},(_,index)=>{
+      const questions = Array.from({length:storyQuizQuestionPoolSize},(_,index)=>{
         const fallback = defaultQuestions[index] || storyQuizBlueprint.questions[index];
         const question = sourceQuestions[index] && typeof sourceQuestions[index] === "object"
           ? sourceQuestions[index]
@@ -9615,6 +9802,7 @@
         };
       });
       return {
+        revision:defaults.revision,
         specialTitle:String(source.specialTitle ?? defaults.specialTitle).trim() || defaults.specialTitle,
         specialBody:String(source.specialBody ?? defaults.specialBody).trim() || defaults.specialBody,
         questions
@@ -12452,7 +12640,7 @@
           <div class="story-quiz-state-mark" aria-hidden="true">ⅩⅩ</div>
           <div class="eyebrow">ACCESS LEVEL 100</div>
           <h3>最深部試験に挑戦する</h3>
-          <p class="story-quiz-state-copy">物語に関する20問の記録照合を開始します。\n各問、4つの選択肢から正しい答えをひとつ選んでください。</p>
+          <p class="story-quiz-state-copy">50問の記録から抽出された20問の照合を開始します。\n各問、4つの選択肢から正しい答えをひとつ選んでください。</p>
           <div class="story-quiz-warning">
             1問でも間違えると、その時点で挑戦終了となり、物語熟読度は90％に戻ります。挑戦中にページを閉じる・再読み込みする・別のページへ移動する場合も同様です。端末を一時的にバックグラウンドへ移すだけなら、同じ問題から再開できます。
           </div>
@@ -12478,14 +12666,25 @@
       return choices;
     }
 
+    function selectStoryQuizQuestions(quiz){
+      const pool = [...quiz.questions];
+      for(let index=pool.length-1;index>0;index-=1){
+        const target = secureRandomInteger(index+1);
+        [pool[index],pool[target]] = [pool[target],pool[index]];
+      }
+      return pool.slice(0,Math.min(storyQuizChallengeQuestionCount,pool.length));
+    }
+
     function startStoryQuizChallenge(){
       if(storyReadingPercent < 100 || storyQuizCleared){
         closeStoryQuizPanel();
         renderStoryReadingAchievement();
         return;
       }
+      const quiz = getStoryQuizData();
       storyQuizState.active = true;
       storyQuizState.index = 0;
+      storyQuizState.questions = selectStoryQuizQuestions(quiz);
       storyQuizState.choices = [];
       storyQuizState.answerLocked = false;
       storyQuizRecoveryNotice = "";
@@ -12494,14 +12693,13 @@
     }
 
     function renderStoryQuizQuestion(){
-      const quiz = getStoryQuizData();
-      const question = quiz.questions[storyQuizState.index];
+      const question = storyQuizState.questions[storyQuizState.index];
       const content = document.getElementById("storyQuizContent");
       if(!storyQuizState.active || !question || !content) return;
       storyQuizState.answerLocked = false;
       storyQuizState.choices = shuffleStoryQuizChoices(question);
       const displayNumber = String(storyQuizState.index+1).padStart(2,"0");
-      setStoryQuizProgress(`${displayNumber} / ${quiz.questions.length}`);
+      setStoryQuizProgress(`${displayNumber} / ${storyQuizState.questions.length}`);
       content.innerHTML = `
         <section class="story-quiz-question-card" aria-live="polite">
           <div class="story-quiz-question-number">QUESTION ${displayNumber}</div>
@@ -12545,8 +12743,7 @@
       setStoryQuizProgress("CORRECT");
       window.setTimeout(()=>{
         if(!storyQuizState.active) return;
-        const quiz = getStoryQuizData();
-        if(storyQuizState.index >= quiz.questions.length-1){
+        if(storyQuizState.index >= storyQuizState.questions.length-1){
           completeStoryQuiz();
           return;
         }
@@ -12579,6 +12776,7 @@
       if(!storyQuizState.active) return;
       storyQuizState.active = false;
       storyQuizState.answerLocked = false;
+      storyQuizState.questions = [];
       setStoryQuizActiveMarker(false);
       storyReadingPercent = 90;
       storyQuizRecoveryNotice = message;
@@ -12590,6 +12788,7 @@
     function completeStoryQuiz(){
       storyQuizState.active = false;
       storyQuizState.answerLocked = false;
+      storyQuizState.questions = [];
       setStoryQuizActiveMarker(false);
       storyQuizCleared = true;
       try{
@@ -12607,7 +12806,7 @@
       const quiz = getStoryQuizData();
       const content = document.getElementById("storyQuizContent");
       if(!content) return;
-      setStoryQuizProgress("20 / 20 · CLEARED");
+      setStoryQuizProgress(`${storyQuizChallengeQuestionCount} / ${storyQuizChallengeQuestionCount} · CLEARED`);
       content.innerHTML = `
         <section class="story-quiz-state special">
           <div class="story-quiz-state-mark" aria-hidden="true">U</div>
@@ -12634,6 +12833,7 @@
       sessionStorage.removeItem(storyQuizAdminResetPendingKey);
       storyQuizState.active = false;
       storyQuizState.index = 0;
+      storyQuizState.questions = [];
       storyQuizState.choices = [];
       storyQuizState.answerLocked = false;
       setStoryQuizActiveMarker(false);
@@ -12731,6 +12931,7 @@
       if(storedPercent > 90) return;
       storyQuizState.active = false;
       storyQuizState.answerLocked = false;
+      storyQuizState.questions = [];
       setStoryQuizActiveMarker(false);
       storyReadingPercent = 90;
       storyQuizRecoveryNotice = "挑戦中にページを離れたため、物語熟読度が90％になりました。";
