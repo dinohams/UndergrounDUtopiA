@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260818-v75" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260818-v75" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260818-v75" />
-  <meta name="app-build" content="20260818-v75" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260818-v76" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260818-v76" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260818-v76" />
+  <meta name="app-build" content="20260818-v76" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4464,6 +4464,13 @@
       box-shadow:none;
     }
 
+    .story-reading-card .eyebrow,
+    #storyReadingTitle{
+      -webkit-user-select:none;
+      user-select:none;
+      touch-action:manipulation;
+    }
+
     .story-quiz-panel{
       position:fixed;
       inset:0;
@@ -4477,6 +4484,74 @@
     }
 
     .story-quiz-panel.open{display:block}
+
+    .story-quiz-command-panel{
+      position:fixed;
+      inset:0;
+      z-index:170;
+      display:none;
+      place-items:center;
+      padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+      background:rgba(3,7,9,.88);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+
+    .story-quiz-command-panel.open{display:grid}
+
+    .story-quiz-command-card{
+      width:min(100%,460px);
+      padding:24px;
+      border:1px solid rgba(217,179,122,.58);
+      border-radius:20px;
+      background:linear-gradient(180deg,rgba(16,26,29,.99),rgba(7,13,15,.99));
+      box-shadow:0 24px 70px rgba(0,0,0,.58);
+    }
+
+    .story-quiz-command-title{
+      margin:5px 0 17px;
+      font-size:24px;
+      line-height:1.45;
+    }
+
+    .story-quiz-command-input{
+      display:block;
+      width:100%;
+      padding:13px 14px;
+      border:1px solid rgba(217,179,122,.42);
+      border-radius:12px;
+      outline:none;
+      background:rgba(4,10,12,.82);
+      color:var(--ivory);
+      font-family:"Courier New",ui-monospace,monospace;
+      font-size:16px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .story-quiz-command-input:focus{
+      border-color:rgba(217,179,122,.82);
+      box-shadow:0 0 0 3px rgba(217,179,122,.10);
+    }
+
+    .story-quiz-command-status{
+      min-height:1.7em;
+      margin:9px 0 0;
+      color:#d78b80;
+      font-size:12px;
+      line-height:1.7;
+    }
+
+    .story-quiz-command-actions{
+      display:flex;
+      gap:9px;
+      margin-top:10px;
+    }
+
+    .story-quiz-command-actions .story-quiz-action{
+      flex:1 1 0;
+      min-width:0;
+    }
 
     .story-quiz-shell{
       width:min(100%,820px);
@@ -5005,6 +5080,19 @@
     </div>
   </aside>
 
+  <aside id="storyQuizCommandPanel" class="story-quiz-command-panel" aria-hidden="true">
+    <form id="storyQuizCommandForm" class="story-quiz-command-card">
+      <div class="eyebrow">HIDDEN ADMIN COMMAND</div>
+      <h2 class="story-quiz-command-title">試験コマンドを入力</h2>
+      <input id="storyQuizCommandInput" class="story-quiz-command-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="管理者用試験コマンド">
+      <p id="storyQuizCommandStatus" class="story-quiz-command-status" aria-live="polite"></p>
+      <div class="story-quiz-command-actions">
+        <button class="story-quiz-action" type="submit">実行</button>
+        <button id="storyQuizCommandCancel" class="story-quiz-action secondary" type="button">閉じる</button>
+      </div>
+    </form>
+  </aside>
+
   <aside id="appMaintenanceGate" class="maintenance-gate" aria-hidden="true">
     <div class="maintenance-gate-card">
       <div class="maintenance-gate-mark" aria-hidden="true">U</div>
@@ -5439,7 +5527,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260818-v75";
+    const APP_BUILD_VERSION = "20260818-v76";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
@@ -12562,37 +12650,72 @@
       return true;
     }
 
+    function openStoryQuizAdminCommandPanel(){
+      const panel = document.getElementById("storyQuizCommandPanel");
+      const input = document.getElementById("storyQuizCommandInput");
+      const status = document.getElementById("storyQuizCommandStatus");
+      if(!panel || !input || !status) return;
+      input.value = "";
+      status.textContent = "";
+      panel.classList.add("open");
+      panel.setAttribute("aria-hidden","false");
+      window.requestAnimationFrame(()=>input.focus());
+    }
+
+    function closeStoryQuizAdminCommandPanel(){
+      const panel = document.getElementById("storyQuizCommandPanel");
+      panel?.classList.remove("open");
+      panel?.setAttribute("aria-hidden","true");
+    }
+
+    function executeStoryQuizAdminCommand(){
+      const input = document.getElementById("storyQuizCommandInput");
+      const status = document.getElementById("storyQuizCommandStatus");
+      if(!input || !status) return;
+      const command = input.value.normalize("NFKC").trim().toUpperCase();
+      if(command !== "DEPTH-100"){
+        status.textContent = "コマンドが一致しません。";
+        input.focus();
+        input.select();
+        return;
+      }
+      if(!adminAuthorized){
+        sessionStorage.setItem(storyQuizAdminResetPendingKey,"1");
+        closeStoryQuizAdminCommandPanel();
+        alert("コマンドを受け付けました。管理者ログインが確認でき次第、100％へ戻します。");
+        openAdmin();
+        return;
+      }
+      closeStoryQuizAdminCommandPanel();
+      resetStoryQuizForAdminTest({notify:false});
+    }
+
     function bindStoryQuizAdminTestCommand(){
-      const triggers = [
-        document.querySelector(".story-reading-card .eyebrow"),
-        document.getElementById("storyReadingTitle")
-      ].filter(Boolean);
-      if(!triggers.length) return;
+      if(document.documentElement.dataset.storyQuizAdminCommandBound === "true") return;
+      document.documentElement.dataset.storyQuizAdminCommandBound = "true";
       let taps = [];
-      const handleTap = ()=>{
+
+      document.addEventListener("click",event=>{
+        const target = event.target instanceof Element
+          ? event.target.closest(".story-reading-card .eyebrow, #storyReadingTitle")
+          : null;
+        if(!target) return;
         const now = Date.now();
         taps = taps.filter(time=>now-time<5000);
         taps.push(now);
         if(taps.length < 7) return;
         taps = [];
-        const command = prompt("管理者用試験コマンドを入力してください。");
-        if(command === null) return;
-        if(command.trim().toUpperCase() !== "DEPTH-100"){
-          alert("コマンドが一致しません。");
-          return;
-        }
-        if(!adminAuthorized){
-          sessionStorage.setItem(storyQuizAdminResetPendingKey,"1");
-          alert("コマンドを受け付けました。管理者ログインが確認でき次第、100％へ戻します。");
-          openAdmin();
-          return;
-        }
-        resetStoryQuizForAdminTest({notify:true});
-      };
-      const eventName = window.PointerEvent ? "pointerup" : "click";
-      triggers.forEach(trigger=>{
-        trigger.style.touchAction = "manipulation";
-        trigger.addEventListener(eventName,handleTap);
+        event.preventDefault();
+        openStoryQuizAdminCommandPanel();
+      });
+
+      document.getElementById("storyQuizCommandForm")?.addEventListener("submit",event=>{
+        event.preventDefault();
+        executeStoryQuizAdminCommand();
+      });
+      document.getElementById("storyQuizCommandCancel")?.addEventListener("click",closeStoryQuizAdminCommandPanel);
+      document.getElementById("storyQuizCommandPanel")?.addEventListener("click",event=>{
+        if(event.target.id === "storyQuizCommandPanel") closeStoryQuizAdminCommandPanel();
       });
     }
 
