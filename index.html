@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260817-v73" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260817-v73" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260817-v73" />
-  <meta name="app-build" content="20260817-v73" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260818-v74" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260818-v74" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260818-v74" />
+  <meta name="app-build" content="20260818-v74" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4408,6 +4408,390 @@
       }
     }
 
+    /* =========================================
+       v74：物語熟読度100％・最深部試験
+       ========================================= */
+    .story-quiz-entry{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-top:15px;
+      padding-top:14px;
+      border-top:1px solid rgba(217,179,122,.18);
+    }
+
+    .story-quiz-entry > div{
+      display:grid;
+      gap:3px;
+      min-width:0;
+    }
+
+    .story-quiz-lock-status{
+      color:#778486;
+      font-family:"Courier New",ui-monospace,monospace;
+      font-size:10px;
+      letter-spacing:.14em;
+    }
+
+    .story-quiz-lock-status.unlocked{color:var(--gold)}
+    .story-quiz-lock-status.cleared{color:#9fc09f}
+
+    .story-quiz-lock-copy{
+      color:#aeb9b9;
+      font-size:11px;
+      line-height:1.6;
+    }
+
+    .story-quiz-entry-button{
+      flex:0 0 auto;
+      min-width:172px;
+      padding:11px 14px;
+      border:1px solid rgba(217,179,122,.58);
+      border-radius:12px;
+      background:linear-gradient(135deg,rgba(111,69,41,.74),rgba(26,39,43,.94));
+      color:var(--ivory);
+      font-weight:800;
+      box-shadow:0 8px 18px rgba(0,0,0,.22);
+    }
+
+    .story-quiz-entry-button:disabled{
+      cursor:not-allowed;
+      border-color:rgba(174,185,185,.16);
+      background:rgba(18,27,30,.54);
+      color:#687476;
+      box-shadow:none;
+    }
+
+    .story-quiz-panel{
+      position:fixed;
+      inset:0;
+      z-index:150;
+      display:none;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg,rgba(3,7,9,.91),rgba(3,7,9,.97)),
+        var(--home-poster-url) center top / cover no-repeat;
+      color:var(--ivory);
+    }
+
+    .story-quiz-panel.open{display:block}
+
+    .story-quiz-shell{
+      width:min(100%,820px);
+      height:100%;
+      margin:0 auto;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      padding:calc(18px + env(safe-area-inset-top)) 18px calc(34px + env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at 88% 8%,rgba(196,139,90,.12),transparent 28%),
+        linear-gradient(180deg,rgba(10,18,21,.97),rgba(6,12,14,.98));
+      box-shadow:0 0 70px rgba(0,0,0,.48);
+    }
+
+    .story-quiz-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:4px 0 17px;
+      border-bottom:1px solid rgba(217,179,122,.28);
+    }
+
+    .story-quiz-title{
+      margin:4px 0 0;
+      font-size:clamp(20px,5vw,30px);
+      line-height:1.4;
+    }
+
+    .story-quiz-progress{
+      flex:0 0 auto;
+      padding:7px 10px;
+      border:1px solid rgba(217,179,122,.35);
+      border-radius:999px;
+      color:var(--gold);
+      font-family:"Courier New",ui-monospace,monospace;
+      font-size:10px;
+      font-variant-numeric:tabular-nums;
+      letter-spacing:.08em;
+    }
+
+    .story-quiz-content{
+      min-height:calc(100% - 88px);
+      display:grid;
+      align-content:center;
+      padding:28px 0;
+    }
+
+    .story-quiz-state{
+      width:min(100%,680px);
+      margin:0 auto;
+      padding:clamp(22px,5vw,38px);
+      border:1px solid rgba(217,179,122,.40);
+      border-radius:22px;
+      background:linear-gradient(180deg,rgba(18,29,32,.92),rgba(8,15,17,.94));
+      box-shadow:0 22px 60px rgba(0,0,0,.34);
+      text-align:center;
+    }
+
+    .story-quiz-state-mark{
+      width:76px;
+      height:76px;
+      display:grid;
+      place-items:center;
+      margin:0 auto 18px;
+      border:1px solid rgba(217,179,122,.55);
+      border-radius:50%;
+      color:var(--gold);
+      background:
+        radial-gradient(circle,rgba(196,139,90,.22) 0 16%,transparent 17%),
+        repeating-radial-gradient(circle,transparent 0 8px,rgba(217,179,122,.14) 9px 10px);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:26px;
+    }
+
+    .story-quiz-state h3{
+      margin:0;
+      font-size:clamp(23px,5vw,34px);
+      line-height:1.45;
+    }
+
+    .story-quiz-state-copy{
+      margin:15px 0 0;
+      color:#c8d0d0;
+      font-size:14px;
+      line-height:1.9;
+      white-space:pre-line;
+    }
+
+    .story-quiz-warning{
+      margin:18px 0 0;
+      padding:12px 14px;
+      border:1px solid rgba(184,109,99,.42);
+      border-radius:12px;
+      background:rgba(104,43,38,.18);
+      color:#e0b5ae;
+      font-size:12px;
+      line-height:1.75;
+      text-align:left;
+    }
+
+    .story-quiz-actions{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:9px;
+      margin-top:22px;
+    }
+
+    .story-quiz-action{
+      min-width:190px;
+      padding:12px 17px;
+      border:1px solid rgba(217,179,122,.52);
+      border-radius:12px;
+      background:linear-gradient(135deg,rgba(117,72,43,.82),rgba(33,47,51,.96));
+      color:var(--ivory);
+      font-weight:800;
+    }
+
+    .story-quiz-action.secondary{
+      min-width:130px;
+      border-color:rgba(174,185,185,.22);
+      background:rgba(20,31,34,.76);
+      color:#bfc8c8;
+    }
+
+    .story-quiz-question-card{
+      width:min(100%,700px);
+      margin:0 auto;
+    }
+
+    .story-quiz-question-number{
+      color:var(--copper);
+      font-family:"Courier New",ui-monospace,monospace;
+      font-size:11px;
+      letter-spacing:.14em;
+    }
+
+    .story-quiz-question{
+      margin:10px 0 24px;
+      font-size:clamp(22px,5vw,33px);
+      line-height:1.6;
+    }
+
+    .story-quiz-choices{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:11px;
+    }
+
+    .story-quiz-choice{
+      display:flex;
+      align-items:center;
+      gap:11px;
+      min-height:72px;
+      padding:13px 15px;
+      border:1px solid rgba(174,185,185,.24);
+      border-radius:14px;
+      background:rgba(13,23,26,.84);
+      color:#e8e4dc;
+      text-align:left;
+      line-height:1.6;
+      transition:border-color .16s ease,background .16s ease,transform .12s ease;
+    }
+
+    .story-quiz-choice:hover,
+    .story-quiz-choice:focus-visible{
+      border-color:rgba(217,179,122,.62);
+      background:rgba(31,43,46,.94);
+      outline:none;
+    }
+
+    .story-quiz-choice:active{transform:translateY(1px)}
+    .story-quiz-choice:disabled{cursor:default;opacity:.68}
+
+    .story-quiz-choice.is-correct{
+      border-color:rgba(125,157,125,.76);
+      background:rgba(48,80,55,.48);
+      opacity:1;
+    }
+
+    .story-quiz-choice.is-wrong{
+      border-color:rgba(184,109,99,.82);
+      background:rgba(105,42,39,.48);
+      opacity:1;
+    }
+
+    .story-quiz-choice-index{
+      flex:0 0 auto;
+      width:28px;
+      height:28px;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(217,179,122,.38);
+      border-radius:50%;
+      color:var(--gold);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:12px;
+    }
+
+    .story-quiz-question-footer{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:24px;
+    }
+
+    .story-quiz-abort{
+      border:0;
+      background:transparent;
+      color:#849193;
+      font-size:11px;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+
+    .story-quiz-state.failure{
+      border-color:rgba(184,109,99,.52);
+      background:linear-gradient(180deg,rgba(49,22,23,.92),rgba(13,12,14,.96));
+    }
+
+    .story-quiz-state.failure .story-quiz-state-mark{
+      border-color:rgba(184,109,99,.58);
+      color:#d78b80;
+      background:rgba(104,43,38,.22);
+    }
+
+    .story-quiz-state.special{
+      position:relative;
+      overflow:hidden;
+      border-color:rgba(228,190,125,.72);
+      background:
+        radial-gradient(circle at 50% 0%,rgba(217,179,122,.24),transparent 48%),
+        linear-gradient(180deg,rgba(39,34,25,.97),rgba(10,17,18,.98));
+      box-shadow:0 0 54px rgba(217,179,122,.16),0 24px 70px rgba(0,0,0,.42);
+    }
+
+    .story-quiz-state.special::before{
+      content:"";
+      position:absolute;
+      inset:9px;
+      pointer-events:none;
+      border:1px solid rgba(217,179,122,.18);
+      border-radius:16px;
+    }
+
+    .story-quiz-state.special .story-quiz-state-mark{
+      position:relative;
+      width:92px;
+      height:92px;
+      border-color:rgba(228,190,125,.72);
+      box-shadow:0 0 28px rgba(217,179,122,.20);
+      animation:storyQuizSealPulse 3.2s ease-in-out infinite;
+    }
+
+    @keyframes storyQuizSealPulse{
+      0%,100%{transform:scale(1);box-shadow:0 0 18px rgba(217,179,122,.16)}
+      50%{transform:scale(1.035);box-shadow:0 0 36px rgba(217,179,122,.30)}
+    }
+
+    .admin-story-quiz-editor{margin-top:14px}
+
+    .admin-story-quiz-list{
+      display:grid;
+      gap:11px;
+      margin-top:15px;
+    }
+
+    .admin-story-quiz-question{
+      padding:13px;
+      border:1px solid rgba(111,135,145,.32);
+      border-radius:14px;
+      background:rgba(8,15,17,.48);
+    }
+
+    .admin-story-quiz-question-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+      color:var(--gold);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .admin-story-quiz-choices{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin-top:9px;
+    }
+
+    .admin-story-quiz-answer{margin-top:9px}
+
+    @media (max-width:620px){
+      .story-quiz-entry{
+        align-items:stretch;
+        flex-direction:column;
+      }
+
+      .story-quiz-entry-button{width:100%;min-width:0}
+      .story-quiz-shell{padding-left:14px;padding-right:14px}
+      .story-quiz-header{align-items:center}
+      .story-quiz-progress{font-size:9px}
+      .story-quiz-choices{grid-template-columns:1fr}
+      .story-quiz-choice{min-height:62px}
+      .story-quiz-actions{display:grid}
+      .story-quiz-action{width:100%;min-width:0}
+      .admin-story-quiz-choices{grid-template-columns:1fr}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .story-quiz-state.special .story-quiz-state-mark{animation:none}
+    }
+
   </style>
 </head>
 <body class="home-active">
@@ -4570,6 +4954,13 @@
             <span id="storyReadingMeterFill"></span>
           </div>
           <p id="storyReadingCopy" class="story-reading-copy">物語と楽曲解説を読み込むことで、端末内の記録が進行します。</p>
+          <div class="story-quiz-entry">
+            <div>
+              <strong id="storyQuizLockStatus" class="story-quiz-lock-status">CHALLENGE LOCKED</strong>
+              <span id="storyQuizLockCopy" class="story-quiz-lock-copy">熟読度100％で最深部の試験が解放されます。</span>
+            </div>
+            <button id="storyQuizButton" class="story-quiz-entry-button" type="button" disabled>熟読度100％で解放</button>
+          </div>
         </div>
         <div class="card message-archive-card">
           <div class="message-archive-head">
@@ -4587,7 +4978,7 @@
         </div>
 
         <button id="resetMessageArchive" class="btn ghost">この端末の戯言記録をリセット</button>
-        <p class="footer-note">戯言の発見記録と物語熟読度は、この端末のブラウザ内に保存されます。ブラウザのデータを削除すると記録も消えます。</p>
+        <p class="footer-note">戯言の発見記録・物語熟読度・最深部試験の達成記録は、この端末のブラウザ内に保存されます。ブラウザのデータを削除すると記録も消えます。</p>
       </section>
     </main>
   </div>
@@ -4599,6 +4990,19 @@
     <button class="nav-btn" data-page="story" type="button"><span>▣</span>物語</button>
     <button class="nav-btn" data-page="messages"><span>▥</span>戯言</button>
   </nav>
+
+  <aside id="storyQuizPanel" class="story-quiz-panel" aria-hidden="true">
+    <div class="story-quiz-shell">
+      <header class="story-quiz-header">
+        <div>
+          <div class="eyebrow">DEEP RECORD EXAMINATION</div>
+          <h2 class="story-quiz-title">物語記録・最深部試験</h2>
+        </div>
+        <span id="storyQuizProgress" class="story-quiz-progress">STANDBY</span>
+      </header>
+      <div id="storyQuizContent" class="story-quiz-content"></div>
+    </div>
+  </aside>
 
   <aside id="appMaintenanceGate" class="maintenance-gate" aria-hidden="true">
     <div class="maintenance-gate-card">
@@ -4984,6 +5388,28 @@
 
             <div id="adminStorySections" class="admin-story-list"></div>
           </section>
+
+          <section class="admin-dashboard-card wide admin-story-quiz-editor">
+            <div class="admin-setlist-head">
+              <div>
+                <div class="admin-field-label">最深部試験（20問固定）</div>
+                <div class="admin-hint">物語熟読度100％で挑戦できます。問題文・4つの選択肢・正解を編集してください。</div>
+              </div>
+            </div>
+
+            <div class="admin-form-grid">
+              <label class="admin-field">
+                <span class="admin-field-label">全問正解後の見出し</span>
+                <input id="adminStoryQuizSpecialTitle" class="admin-input" type="text">
+              </label>
+              <label class="admin-field wide">
+                <span class="admin-field-label">全問正解後の特別メッセージ</span>
+                <textarea id="adminStoryQuizSpecialBody" class="admin-textarea" rows="7"></textarea>
+              </label>
+            </div>
+
+            <div id="adminStoryQuizQuestions" class="admin-story-quiz-list"></div>
+          </section>
         </section>
 
         <div class="admin-footer-actions admin-global-footer">
@@ -5011,10 +5437,11 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260817-v73";
+    const APP_BUILD_VERSION = "20260818-v74";
 
     async function checkForAppUpdate(){
       if(location.protocol === "file:") return;
+      if(document.body?.classList.contains("story-quiz-active")) return;
 
       try{
         const checkUrl = new URL("./index.html", location.href);
@@ -6795,6 +7222,8 @@
 
     const messageArchiveStorageKey = "underground-utopia-message-archive-v1";
     const storyReadingStorageKey = "underground-utopia-story-reading-v1";
+    const storyQuizActiveStorageKey = "underground-utopia-story-quiz-active-v1";
+    const storyQuizClearedStorageKey = "underground-utopia-story-quiz-cleared-v1";
     const storyPageReadingDurationMs = 20000;
     const storySongReadingDurationMs = 15000;
 
@@ -6822,6 +7251,14 @@
     }
 
     let storyReadingPercent = loadStoryReadingPercent();
+    let storyQuizCleared = localStorage.getItem(storyQuizClearedStorageKey) === "1";
+    let storyQuizRecoveryNotice = "";
+    const storyQuizState = {
+      active:false,
+      index:0,
+      choices:[],
+      answerLocked:false
+    };
     const storyReadingSession = {
       pageActive:false,
       pageAwarded:false,
@@ -6841,6 +7278,26 @@
       }catch(error){
         console.warn("物語熟読度を保存できませんでした",error);
       }
+    }
+
+    function setStoryQuizActiveMarker(active){
+      try{
+        if(active){
+          localStorage.setItem(storyQuizActiveStorageKey,"1");
+        }else{
+          localStorage.removeItem(storyQuizActiveStorageKey);
+        }
+      }catch(error){
+        console.warn("物語試験の挑戦状態を保存できませんでした",error);
+      }
+    }
+
+    function recoverInterruptedStoryQuiz(){
+      if(localStorage.getItem(storyQuizActiveStorageKey) !== "1") return;
+      setStoryQuizActiveMarker(false);
+      storyReadingPercent = 90;
+      saveStoryReadingPercent();
+      storyQuizRecoveryNotice = "前回の挑戦は途中で終了したため、熟読度が90％になりました。";
     }
 
     function canMeasureStoryReading(){
@@ -6938,6 +7395,7 @@
     function increaseStoryReadingPercent(){
       if(storyReadingPercent >= 100) return;
       storyReadingPercent = Math.min(100,storyReadingPercent + 1);
+      storyQuizRecoveryNotice = "";
       saveStoryReadingPercent();
       renderStoryReadingAchievement();
       if(storyReadingPercent >= 100){
@@ -8913,6 +9371,165 @@
       ]
     };
 
+    const storyQuizBlueprint = {
+      specialTitle:"SPECIAL RECORD 001",
+      specialBody:"全記録の解読が完了しました。\n\nここに記されていたのは、理想郷の場所ではありません。\n何者にもなれなかった者たちが、それでも誰かと音を鳴らし、今日を少しだけ変えていった記録です。\n\n物語はここで終わりません。\nこの端末を閉じたあとも、あなたの物語は続いていきます。",
+      questions:[
+        {
+          id:"story-quiz-01",
+          text:"第1章の題名は？",
+          choices:["現実","あの日の部室","理想郷への道中","混沌の楽園"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-02",
+          text:"地下の住民たちが願っていたことは？",
+          choices:["あの時に戻ること","地下から逃げること","理想郷を壊すこと","有名になること"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-03",
+          text:"物語の最初に記録されている楽曲は？",
+          choices:["タイムマシン","サザンカ","DOWNTOWN","きらきら"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-04",
+          text:"第2章の題名は？",
+          choices:["あの日の部室","現実","混沌の楽園","それでも、明日へ"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-05",
+          text:"第2章に含まれていない楽曲は？",
+          choices:["DOWNTOWN","Calc.","Blue Medley","天使と悪魔"],
+          correctIndex:3
+        },
+        {
+          id:"story-quiz-06",
+          text:"「Blue Medley」が記録されている章は？",
+          choices:["第1章","第2章","第3章","第5章"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-07",
+          text:"第3章の題名は？",
+          choices:["理想郷への道中","混沌の楽園","あの日の部室","それでも、明日へ"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-08",
+          text:"第3章の最初に記録されている楽曲は？",
+          choices:["天使と悪魔","狂愛","革命道中","紅蓮華"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-09",
+          text:"愛、善悪、革命への衝動が交錯する章は？",
+          choices:["現実","あの日の部室","理想郷への道中","それでも、明日へ"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-10",
+          text:"第4章の題名は？",
+          choices:["混沌の楽園","理想郷への道中","現実","それでも、明日へ"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-11",
+          text:"第4章で端末の深度表示はどうなる？",
+          choices:["−480 m","−960 m","??? m","0 m"],
+          correctIndex:2
+        },
+        {
+          id:"story-quiz-12",
+          text:"第4章で表示される通信状態は？",
+          choices:["SIGNAL ONLINE","SIGNAL UNSTABLE","SIGNAL LOST","STANDBY"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-13",
+          text:"第4章の最初に記録されている楽曲は？",
+          choices:["カオスが極まる","AIZO","ピースサイン","ふっかつのじゅもん"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-14",
+          text:"第4章で「AIZO」の次に記録されている楽曲は？",
+          choices:["カオスが極まる","ピースサイン","ふっかつのじゅもん","きらきら"],
+          correctIndex:1
+        },
+        {
+          id:"story-quiz-15",
+          text:"第5章の題名は？",
+          choices:["それでも、明日へ","混沌の楽園","現実","あの日の部室"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-16",
+          text:"第5章の最初に記録されている楽曲は？",
+          choices:["きらきら","Tomorrow never knows","やさしさに包まれたなら","全力少年"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-17",
+          text:"本編最後に記録されている楽曲は？",
+          choices:["Tomorrow never knows","きらきら","全力少年","オーバーグラウンド・ユートピア"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-18",
+          text:"夢から覚めたあとの現実は、どう描かれている？",
+          choices:["大きくは変わっていない","すべて理想どおりになった","地下が消えていた","時間が巻き戻っていた"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-19",
+          text:"アンコール最初の楽曲は？",
+          choices:["やさしさに包まれたなら","全力少年","オーバーグラウンド・ユートピア","Tomorrow never knows"],
+          correctIndex:0
+        },
+        {
+          id:"story-quiz-20",
+          text:"物語の最後に記録されている楽曲は？",
+          choices:["オーバーグラウンド・ユートピア","全力少年","Tomorrow never knows","やさしさに包まれたなら"],
+          correctIndex:0
+        }
+      ]
+    };
+
+    function normalizeStoryQuiz(value,defaults=storyQuizBlueprint){
+      const source = value && typeof value === "object" ? value : {};
+      const sourceQuestions = Array.isArray(source.questions) ? source.questions : [];
+      const defaultQuestions = Array.isArray(defaults.questions) ? defaults.questions : storyQuizBlueprint.questions;
+      const questions = Array.from({length:20},(_,index)=>{
+        const fallback = defaultQuestions[index] || storyQuizBlueprint.questions[index];
+        const question = sourceQuestions[index] && typeof sourceQuestions[index] === "object"
+          ? sourceQuestions[index]
+          : fallback;
+        const sourceChoices = Array.isArray(question?.choices) ? question.choices : [];
+        const choices = Array.from({length:4},(__,choiceIndex)=>{
+          const choice = String(sourceChoices[choiceIndex] ?? fallback.choices[choiceIndex] ?? "").trim();
+          return choice || String(fallback.choices[choiceIndex] || `選択肢${choiceIndex+1}`);
+        });
+        const requestedCorrectIndex = Number(question?.correctIndex);
+        const correctIndex = Number.isInteger(requestedCorrectIndex) && requestedCorrectIndex >= 0 && requestedCorrectIndex < 4
+          ? requestedCorrectIndex
+          : fallback.correctIndex;
+        return {
+          id:String(question?.id || fallback.id || `story-quiz-${String(index+1).padStart(2,"0")}`),
+          text:String(question?.text || "").trim() || fallback.text,
+          choices,
+          correctIndex
+        };
+      });
+      return {
+        specialTitle:String(source.specialTitle ?? defaults.specialTitle).trim() || defaults.specialTitle,
+        specialBody:String(source.specialBody ?? defaults.specialBody).trim() || defaults.specialBody,
+        questions
+      };
+    }
+
     function buildDefaultStorySongs(sectionId){
       return (storySongBlueprints[sectionId] || []).map(item=>{
         const sourceSong = songs.find(song=>song.id===item.songId);
@@ -8959,6 +9576,7 @@
     function buildDefaultStoryData(){
       return {
         pageTitle:"The Story of UndergrounD UtopiA",
+        quiz:normalizeStoryQuiz(null),
         sections:storySectionBlueprints.map(section=>({
           ...section,
           songs:buildDefaultStorySongs(section.id)
@@ -8990,6 +9608,7 @@
       const requestedTitle = String(source.pageTitle ?? defaults.pageTitle).trim();
       return {
         pageTitle:!requestedTitle || requestedTitle === "物語を知る" ? defaults.pageTitle : requestedTitle,
+        quiz:normalizeStoryQuiz(source.quiz,defaults.quiz),
         sections:[
           ...sourceChapters.map((section,index)=>normalizeSection(section,index)),
           normalizeSection(sourceEncore,defaults.sections.length-1)
@@ -10013,10 +10632,17 @@
       adminWorkingStory = normalizeStoryData(adminWorkingStory);
       const pageTitle = document.getElementById("adminStoryPageTitle");
       const root = document.getElementById("adminStorySections");
-      if(!pageTitle || !root) return;
+      const specialTitle = document.getElementById("adminStoryQuizSpecialTitle");
+      const specialBody = document.getElementById("adminStoryQuizSpecialBody");
+      const quizRoot = document.getElementById("adminStoryQuizQuestions");
+      if(!pageTitle || !root || !specialTitle || !specialBody || !quizRoot) return;
 
       pageTitle.value = adminWorkingStory.pageTitle;
       pageTitle.oninput = ()=>adminWorkingStory.pageTitle = pageTitle.value;
+      specialTitle.value = adminWorkingStory.quiz.specialTitle;
+      specialBody.value = adminWorkingStory.quiz.specialBody;
+      specialTitle.oninput = ()=>adminWorkingStory.quiz.specialTitle = specialTitle.value;
+      specialBody.oninput = ()=>adminWorkingStory.quiz.specialBody = specialBody.value;
 
       root.innerHTML = adminWorkingStory.sections.length ? adminWorkingStory.sections.map((section,index)=>{
         const isEncore = section.id === "encore";
@@ -10148,6 +10774,56 @@
           if(!section) return;
           section.songs.splice(Number(button.dataset.deleteStorySong),1);
           renderAdminStoryEditor();
+        });
+      });
+
+      quizRoot.innerHTML = adminWorkingStory.quiz.questions.map((question,index)=>`
+        <article class="admin-story-quiz-question" data-admin-story-quiz-index="${index}">
+          <div class="admin-story-quiz-question-head">
+            <span>QUESTION ${String(index+1).padStart(2,"0")}</span>
+            <span>4択・正解は1つ</span>
+          </div>
+          <label class="admin-field">
+            <span class="admin-field-label">問題文</span>
+            <textarea class="admin-textarea" rows="2" data-story-quiz-question="${index}">${escapeHtml(question.text)}</textarea>
+          </label>
+          <div class="admin-story-quiz-choices">
+            ${question.choices.map((choice,choiceIndex)=>`
+              <label class="admin-field">
+                <span class="admin-field-label">選択肢 ${choiceIndex+1}</span>
+                <input class="admin-input" type="text" value="${escapeHtml(choice)}" data-story-quiz-choice="${choiceIndex}" data-story-quiz-index="${index}">
+              </label>
+            `).join("")}
+          </div>
+          <label class="admin-field admin-story-quiz-answer">
+            <span class="admin-field-label">正解</span>
+            <select class="admin-select" data-story-quiz-correct="${index}">
+              ${question.choices.map((_,choiceIndex)=>`
+                <option value="${choiceIndex}" ${choiceIndex===question.correctIndex?"selected":""}>選択肢 ${choiceIndex+1}</option>
+              `).join("")}
+            </select>
+          </label>
+        </article>
+      `).join("");
+
+      quizRoot.querySelectorAll("[data-story-quiz-question]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          const question = adminWorkingStory.quiz.questions[Number(input.dataset.storyQuizQuestion)];
+          if(question) question.text = input.value;
+        });
+      });
+
+      quizRoot.querySelectorAll("[data-story-quiz-choice]").forEach(input=>{
+        input.addEventListener("input",()=>{
+          const question = adminWorkingStory.quiz.questions[Number(input.dataset.storyQuizIndex)];
+          if(question) question.choices[Number(input.dataset.storyQuizChoice)] = input.value;
+        });
+      });
+
+      quizRoot.querySelectorAll("[data-story-quiz-correct]").forEach(select=>{
+        select.addEventListener("change",()=>{
+          const question = adminWorkingStory.quiz.questions[Number(select.dataset.storyQuizCorrect)];
+          if(question) question.correctIndex = Number(select.value);
         });
       });
     }
@@ -10758,6 +11434,7 @@
 
 
     function bindHiddenAdminCommand(){
+      bindStoryQuizAdminTestCommand();
       document.addEventListener("keydown",event=>{
         const modifier = event.ctrlKey || event.metaKey;
         if(modifier && event.shiftKey && event.key.toLowerCase()==="e"){
@@ -11628,11 +12305,288 @@
       return {unlocked,total:categoryMessages.length};
     }
 
+    let storyQuizPreviousBodyOverflow = "";
+
+    function getStoryQuizData(){
+      return normalizeStoryData(storyData).quiz;
+    }
+
+    function setStoryQuizProgress(value){
+      const progress = document.getElementById("storyQuizProgress");
+      if(progress) progress.textContent = value;
+    }
+
+    function openStoryQuizPanel(){
+      if(!storyQuizCleared && storyReadingPercent < 100) return;
+      const panel = document.getElementById("storyQuizPanel");
+      if(!panel) return;
+      if(!panel.classList.contains("open")){
+        storyQuizPreviousBodyOverflow = document.body.style.overflow;
+      }
+      panel.classList.add("open");
+      panel.setAttribute("aria-hidden","false");
+      document.body.classList.add("story-quiz-active");
+      document.body.style.overflow = "hidden";
+      if(storyQuizCleared){
+        renderStoryQuizSpecialScreen();
+      }else{
+        renderStoryQuizIntro();
+      }
+    }
+
+    function closeStoryQuizPanel(){
+      if(storyQuizState.active) return;
+      const panel = document.getElementById("storyQuizPanel");
+      panel?.classList.remove("open");
+      panel?.setAttribute("aria-hidden","true");
+      document.body.classList.remove("story-quiz-active");
+      document.body.style.overflow = storyQuizPreviousBodyOverflow;
+      storyQuizPreviousBodyOverflow = "";
+      setStoryQuizProgress("STANDBY");
+    }
+
+    function renderStoryQuizIntro(){
+      const content = document.getElementById("storyQuizContent");
+      if(!content) return;
+      setStoryQuizProgress("READY");
+      content.innerHTML = `
+        <section class="story-quiz-state">
+          <div class="story-quiz-state-mark" aria-hidden="true">ⅩⅩ</div>
+          <div class="eyebrow">ACCESS LEVEL 100</div>
+          <h3>最深部試験に挑戦する</h3>
+          <p class="story-quiz-state-copy">物語に関する20問の記録照合を開始します。\n各問、4つの選択肢から正しい答えをひとつ選んでください。</p>
+          <div class="story-quiz-warning">
+            1問でも間違えると、その時点で挑戦終了となり、物語熟読度は90％に戻ります。挑戦中にページを閉じる・再読み込みする・別のページへ移動する場合も同様です。端末を一時的にバックグラウンドへ移すだけなら、同じ問題から再開できます。
+          </div>
+          <div class="story-quiz-actions">
+            <button id="storyQuizStart" class="story-quiz-action" type="button">20問の照合を開始</button>
+            <button id="storyQuizIntroClose" class="story-quiz-action secondary" type="button">まだ挑戦しない</button>
+          </div>
+        </section>
+      `;
+      document.getElementById("storyQuizStart")?.addEventListener("click",startStoryQuizChallenge);
+      document.getElementById("storyQuizIntroClose")?.addEventListener("click",closeStoryQuizPanel);
+    }
+
+    function shuffleStoryQuizChoices(question){
+      const choices = question.choices.map((choice,index)=>({
+        text:choice,
+        correct:index === question.correctIndex
+      }));
+      for(let index=choices.length-1;index>0;index-=1){
+        const target = secureRandomInteger(index+1);
+        [choices[index],choices[target]] = [choices[target],choices[index]];
+      }
+      return choices;
+    }
+
+    function startStoryQuizChallenge(){
+      if(storyReadingPercent < 100 || storyQuizCleared){
+        closeStoryQuizPanel();
+        renderStoryReadingAchievement();
+        return;
+      }
+      storyQuizState.active = true;
+      storyQuizState.index = 0;
+      storyQuizState.choices = [];
+      storyQuizState.answerLocked = false;
+      storyQuizRecoveryNotice = "";
+      setStoryQuizActiveMarker(true);
+      renderStoryQuizQuestion();
+    }
+
+    function renderStoryQuizQuestion(){
+      const quiz = getStoryQuizData();
+      const question = quiz.questions[storyQuizState.index];
+      const content = document.getElementById("storyQuizContent");
+      if(!storyQuizState.active || !question || !content) return;
+      storyQuizState.answerLocked = false;
+      storyQuizState.choices = shuffleStoryQuizChoices(question);
+      const displayNumber = String(storyQuizState.index+1).padStart(2,"0");
+      setStoryQuizProgress(`${displayNumber} / ${quiz.questions.length}`);
+      content.innerHTML = `
+        <section class="story-quiz-question-card" aria-live="polite">
+          <div class="story-quiz-question-number">QUESTION ${displayNumber}</div>
+          <h3 class="story-quiz-question">${escapeHtml(question.text)}</h3>
+          <div class="story-quiz-choices">
+            ${storyQuizState.choices.map((choice,index)=>`
+              <button class="story-quiz-choice" type="button" data-story-quiz-choice="${index}">
+                <span class="story-quiz-choice-index">${String.fromCharCode(65+index)}</span>
+                <span>${escapeHtml(choice.text)}</span>
+              </button>
+            `).join("")}
+          </div>
+          <div class="story-quiz-question-footer">
+            <button id="storyQuizAbort" class="story-quiz-abort" type="button">挑戦を終了する</button>
+          </div>
+        </section>
+      `;
+      content.querySelectorAll("[data-story-quiz-choice]").forEach(button=>{
+        button.addEventListener("click",()=>handleStoryQuizChoice(Number(button.dataset.storyQuizChoice),button));
+      });
+      document.getElementById("storyQuizAbort")?.addEventListener("click",()=>{
+        if(confirm("挑戦を終了しますか？ 物語熟読度は90％になります。")){
+          failStoryQuiz("挑戦を途中で終了しました。物語熟読度は90％に戻りました。");
+        }
+      });
+    }
+
+    function handleStoryQuizChoice(choiceIndex,button){
+      if(!storyQuizState.active || storyQuizState.answerLocked) return;
+      const choice = storyQuizState.choices[choiceIndex];
+      if(!choice) return;
+      storyQuizState.answerLocked = true;
+      document.querySelectorAll("#storyQuizContent .story-quiz-choice").forEach(item=>item.disabled = true);
+      if(!choice.correct){
+        button?.classList.add("is-wrong");
+        window.setTimeout(()=>failStoryQuiz("不正解を検出しました。挑戦は終了し、物語熟読度は90％に戻りました。"),260);
+        return;
+      }
+
+      button?.classList.add("is-correct");
+      setStoryQuizProgress("CORRECT");
+      window.setTimeout(()=>{
+        if(!storyQuizState.active) return;
+        const quiz = getStoryQuizData();
+        if(storyQuizState.index >= quiz.questions.length-1){
+          completeStoryQuiz();
+          return;
+        }
+        storyQuizState.index += 1;
+        renderStoryQuizQuestion();
+      },420);
+    }
+
+    function renderStoryQuizFailureScreen(message){
+      const content = document.getElementById("storyQuizContent");
+      if(!content) return;
+      setStoryQuizProgress("ACCESS DENIED");
+      content.innerHTML = `
+        <section class="story-quiz-state failure">
+          <div class="story-quiz-state-mark" aria-hidden="true">×</div>
+          <div class="eyebrow">RECORD VERIFICATION FAILED</div>
+          <h3>照合失敗</h3>
+          <p class="story-quiz-state-copy">${escapeHtml(message)}</p>
+          <div class="story-quiz-actions">
+            <button id="storyQuizFailureClose" class="story-quiz-action secondary" type="button">戯言へ戻る</button>
+          </div>
+        </section>
+      `;
+      document.getElementById("storyQuizFailureClose")?.addEventListener("click",closeStoryQuizPanel);
+    }
+
+    function failStoryQuiz(message){
+      if(!storyQuizState.active) return;
+      storyQuizState.active = false;
+      storyQuizState.answerLocked = false;
+      setStoryQuizActiveMarker(false);
+      storyReadingPercent = 90;
+      storyQuizRecoveryNotice = message;
+      saveStoryReadingPercent();
+      renderStoryReadingAchievement();
+      renderStoryQuizFailureScreen(message);
+    }
+
+    function completeStoryQuiz(){
+      storyQuizState.active = false;
+      storyQuizState.answerLocked = false;
+      setStoryQuizActiveMarker(false);
+      storyQuizCleared = true;
+      try{
+        localStorage.setItem(storyQuizClearedStorageKey,"1");
+      }catch(error){
+        console.warn("物語試験の達成記録を保存できませんでした",error);
+      }
+      storyReadingPercent = 100;
+      saveStoryReadingPercent();
+      renderStoryReadingAchievement();
+      renderStoryQuizSpecialScreen();
+    }
+
+    function renderStoryQuizSpecialScreen(){
+      const quiz = getStoryQuizData();
+      const content = document.getElementById("storyQuizContent");
+      if(!content) return;
+      setStoryQuizProgress("20 / 20 · CLEARED");
+      content.innerHTML = `
+        <section class="story-quiz-state special">
+          <div class="story-quiz-state-mark" aria-hidden="true">U</div>
+          <div class="eyebrow">ALL RECORDS VERIFIED</div>
+          <h3>${escapeHtml(quiz.specialTitle)}</h3>
+          <p class="story-quiz-state-copy">${nl2br(quiz.specialBody)}</p>
+          <div class="story-quiz-actions">
+            <button id="storyQuizSpecialClose" class="story-quiz-action" type="button">特別記録を閉じる</button>
+          </div>
+        </section>
+      `;
+      document.getElementById("storyQuizSpecialClose")?.addEventListener("click",closeStoryQuizPanel);
+    }
+
+    function bindStoryQuizControls(){
+      document.getElementById("storyQuizButton")?.addEventListener("click",openStoryQuizPanel);
+    }
+
+    function bindStoryQuizAdminTestCommand(){
+      const triggers = [
+        document.querySelector(".story-reading-card .eyebrow"),
+        document.getElementById("storyReadingTitle")
+      ].filter(Boolean);
+      if(!triggers.length) return;
+      let taps = [];
+      const handleTap = ()=>{
+        if(!adminAuthorized) return;
+        const now = Date.now();
+        taps = taps.filter(time=>now-time<4000);
+        taps.push(now);
+        if(taps.length < 7) return;
+        taps = [];
+        const command = prompt("管理者用試験コマンドを入力してください。");
+        if(command === null) return;
+        if(command.trim().toUpperCase() !== "DEPTH-100"){
+          alert("コマンドが一致しません。");
+          return;
+        }
+        storyQuizState.active = false;
+        storyQuizState.answerLocked = false;
+        setStoryQuizActiveMarker(false);
+        storyQuizCleared = false;
+        localStorage.removeItem(storyQuizClearedStorageKey);
+        storyReadingPercent = 100;
+        storyQuizRecoveryNotice = "管理者テストモード：最深部試験を再挑戦できます。";
+        saveStoryReadingPercent();
+        renderStoryReadingAchievement();
+        alert("物語熟読度を100％に設定し、試験の達成記録を未クリアへ戻しました。");
+      };
+      triggers.forEach(trigger=>trigger.addEventListener("click",handleTap));
+    }
+
+    window.addEventListener("pagehide",()=>{
+      if(!storyQuizState.active) return;
+      storyReadingPercent = 90;
+      saveStoryReadingPercent();
+    });
+
+    window.addEventListener("pageshow",()=>{
+      if(!storyQuizState.active) return;
+      const storedPercent = Number(localStorage.getItem(storyReadingStorageKey));
+      if(storedPercent > 90) return;
+      storyQuizState.active = false;
+      storyQuizState.answerLocked = false;
+      setStoryQuizActiveMarker(false);
+      storyReadingPercent = 90;
+      storyQuizRecoveryNotice = "挑戦中にページを離れたため、物語熟読度が90％になりました。";
+      renderStoryReadingAchievement();
+      renderStoryQuizFailureScreen(storyQuizRecoveryNotice);
+    });
+
     function renderStoryReadingAchievement(){
       const percentElement = document.getElementById("storyReadingPercent");
       const meterElement = document.getElementById("storyReadingMeter");
       const fillElement = document.getElementById("storyReadingMeterFill");
       const copyElement = document.getElementById("storyReadingCopy");
+      const quizStatusElement = document.getElementById("storyQuizLockStatus");
+      const quizCopyElement = document.getElementById("storyQuizLockCopy");
+      const quizButton = document.getElementById("storyQuizButton");
       const percent = Math.min(100,Math.max(0,storyReadingPercent));
       if(percentElement) percentElement.textContent = String(percent);
       if(meterElement) meterElement.setAttribute("aria-valuenow",String(percent));
@@ -11647,6 +12601,40 @@
               : percent >= 25
                 ? "地下に残された記録を解析中。物語の輪郭が少しずつ見えてきました。"
                 : "物語と楽曲解説を読み込むことで、端末内の記録が進行します。";
+      }
+      if(storyQuizCleared){
+        if(quizStatusElement){
+          quizStatusElement.textContent = "ALL RECORDS VERIFIED";
+          quizStatusElement.className = "story-quiz-lock-status cleared";
+        }
+        if(quizCopyElement) quizCopyElement.textContent = "全20問の照合が完了しています。特別記録をいつでも確認できます。";
+        if(quizButton){
+          quizButton.disabled = false;
+          quizButton.textContent = "特別記録を開く";
+        }
+      }else if(percent >= 100){
+        if(quizStatusElement){
+          quizStatusElement.textContent = "CHALLENGE UNLOCKED";
+          quizStatusElement.className = "story-quiz-lock-status unlocked";
+        }
+        if(quizCopyElement) quizCopyElement.textContent = storyQuizRecoveryNotice || "物語記録・最深部試験への接続が許可されました。";
+        if(quizButton){
+          quizButton.disabled = false;
+          quizButton.textContent = "20問に挑戦する";
+        }
+      }else{
+        if(quizStatusElement){
+          quizStatusElement.textContent = "CHALLENGE LOCKED";
+          quizStatusElement.className = "story-quiz-lock-status";
+        }
+        if(quizCopyElement){
+          quizCopyElement.textContent = storyQuizRecoveryNotice
+            || `熟読度100％で最深部の試験が解放されます（あと${100-percent}％）。`;
+        }
+        if(quizButton){
+          quizButton.disabled = true;
+          quizButton.textContent = "熟読度100％で解放";
+        }
       }
     }
 
@@ -12929,6 +13917,7 @@
       initializeHomeData();
       initializeSongDetails();
       initializeStoryData();
+      recoverInterruptedStoryQuiz();
       await initializePerformanceCatalog();
       renderHomeDashboard();
       renderStories();
@@ -12939,6 +13928,7 @@
       renderMetronomeSongOptions();
       bindMetronomeControls();
       bindSetlistButtons();
+      bindStoryQuizControls();
       bindAdminControls();
       bindNestedScrollHandoff();
       bindStoryScrollGimmick();
@@ -13126,7 +14116,7 @@
 
         const publishId = `${Date.now()}-${currentFirebaseUser.uid.slice(0,8)}`;
         const payload = {
-          version:10,
+          version:11,
           publishId,
           catalog:portalData.catalog,
           home:portalData.home,
