@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260917-v78" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260917-v78" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260917-v78" />
-  <meta name="app-build" content="20260917-v78" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260917-v79" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260917-v79" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260917-v79" />
+  <meta name="app-build" content="20260917-v79" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4869,25 +4869,9 @@
     }
 
 
-    /* Percussion assignment image (v78). */
+    /* Percussion assignment image (v79). */
     .percpart-card{margin-bottom:18px}
-    .percpart-preview{display:block;width:100%;padding:0;margin-top:14px;border:1px solid rgba(217,179,122,.35);border-radius:12px;overflow:hidden;background:#fff;cursor:zoom-in}
-    .percpart-preview img{display:block;width:100%;height:auto}
-    .percpart-help{margin:10px 0 0;color:var(--muted);font-size:12px;line-height:1.7}
-    .percpart-dialog{position:fixed;inset:0;margin:auto;width:min(1100px,94vw);max-width:94vw;height:88vh;height:88dvh;max-height:94dvh;padding:0;border:1px solid rgba(217,179,122,.45);border-radius:16px;background:#111b20;color:#f5efe2;overflow:hidden}
-    .percpart-dialog::backdrop{background:rgba(0,0,0,.82)}
-    .percpart-dialog[open]{display:flex;flex-direction:column}
-    .percpart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px;flex-shrink:0;border-bottom:1px solid rgba(217,179,122,.25)}
-    .percpart-toolbar h2{font-size:17px;margin:0}
-    .percpart-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
-    .percpart-controls button{font:inherit;font-size:13px;min-width:44px;min-height:44px;padding:8px 12px;border:1px solid rgba(217,179,122,.45);border-radius:9px;background:#243238;color:#f5efe2;cursor:pointer}
-    .percpart-controls button:disabled{opacity:.4;cursor:default}
-    .percpart-controls output{min-width:44px;text-align:center;font-size:13px}
-    .percpart-preview:focus-visible,.percpart-controls button:focus-visible{outline:3px solid var(--gold,#d9b37a);outline-offset:3px}
-    .percpart-viewport{flex:1;min-height:0;width:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#202a2e}
-    .percpart-viewport img{display:block;width:100%;max-width:none;height:auto}
-    .percpart-viewer-help{margin:0;padding:8px 14px;font-size:12px;color:#c0c9cc;flex-shrink:0}
-    body.percpart-viewer-open{overflow:hidden}
+    .percpart-image{display:block;width:100%;height:auto;margin-top:14px;border:1px solid rgba(217,179,122,.35);border-radius:12px;background:#fff}
   </style>
 </head>
 <body class="home-active">
@@ -5061,10 +5045,7 @@
         <div class="card percpart-card" aria-labelledby="percpartTitle">
           <div class="eyebrow">PERCUSSION PARTS</div>
           <h2 id="percpartTitle" class="card-title">打楽器パート一覧</h2>
-          <button id="percpartOpen" class="percpart-preview" type="button" aria-label="打楽器パート一覧を拡大表示" aria-haspopup="dialog" aria-controls="percpartDialog">
-            <img src="./percpart.png?v=20260917-v78" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
-          </button>
-          <p class="percpart-help">タップで拡大表示できます。</p>
+          <img class="percpart-image" src="./percpart.png?v=20260917-v79" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
         </div>
         <div class="card message-archive-card">
           <div class="message-archive-head">
@@ -5094,23 +5075,6 @@
     <button class="nav-btn" data-page="story" type="button"><span>▣</span>物語</button>
     <button class="nav-btn" data-page="messages"><span>▥</span>戯言</button>
   </nav>
-
-  <dialog id="percpartDialog" class="percpart-dialog" aria-labelledby="percpartDialogTitle" aria-describedby="percpartViewerHelp">
-    <header class="percpart-toolbar">
-      <h2 id="percpartDialogTitle">打楽器パート一覧</h2>
-      <div class="percpart-controls">
-        <button id="percpartZoomOut" type="button" aria-label="画像を縮小">−</button>
-        <output id="percpartZoomLabel" aria-live="polite" aria-label="表示倍率">100%</output>
-        <button id="percpartZoomIn" type="button" aria-label="画像を拡大">＋</button>
-        <button id="percpartZoomReset" type="button">全体</button>
-        <button id="percpartClose" type="button" autofocus>閉じる</button>
-      </div>
-    </header>
-    <div id="percpartViewport" class="percpart-viewport" tabindex="0" aria-label="拡大画像。上下左右にスクロールできます">
-      <img id="percpartFullImage" src="./percpart.png?v=20260917-v78" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
-    </div>
-    <p id="percpartViewerHelp" class="percpart-viewer-help">＋／−で拡大・縮小。拡大後は上下左右にスクロールできます。</p>
-  </dialog>
 
   <aside id="storyQuizPanel" class="story-quiz-panel" aria-hidden="true">
     <div class="story-quiz-shell">
@@ -5572,40 +5536,8 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260917-v78";
+    const APP_BUILD_VERSION = "20260917-v79";
 
-    // Standalone image viewer; no changes to reading or quiz records.
-    (()=>{
-      const dialog = document.getElementById("percpartDialog");
-      const viewport = document.getElementById("percpartViewport");
-      const image = document.getElementById("percpartFullImage");
-      const zoomIn = document.getElementById("percpartZoomIn");
-      const zoomOut = document.getElementById("percpartZoomOut");
-      let zoom = 1;
-      function setZoom(next){
-        const previous = zoom;
-        zoom = Math.max(1,Math.min(4,next));
-        const centerX = (viewport.scrollLeft + viewport.clientWidth / 2) / previous;
-        const centerY = (viewport.scrollTop + viewport.clientHeight / 2) / previous;
-        image.style.width = `${zoom * 100}%`;
-        document.getElementById("percpartZoomLabel").textContent = `${Math.round(zoom * 100)}%`;
-        zoomOut.disabled = zoom === 1;
-        zoomIn.disabled = zoom === 4;
-        viewport.scrollLeft = zoom === 1 ? 0 : centerX * zoom - viewport.clientWidth / 2;
-        viewport.scrollTop = zoom === 1 ? 0 : centerY * zoom - viewport.clientHeight / 2;
-      }
-      document.getElementById("percpartOpen").addEventListener("click",()=>{
-        dialog.showModal();
-        document.body.classList.add("percpart-viewer-open");
-        setZoom(1);
-      });
-      zoomIn.addEventListener("click",()=>setZoom(zoom + .5));
-      zoomOut.addEventListener("click",()=>setZoom(zoom - .5));
-      document.getElementById("percpartZoomReset").addEventListener("click",()=>setZoom(1));
-      document.getElementById("percpartClose").addEventListener("click",()=>dialog.close());
-      dialog.addEventListener("click",event=>{if(event.target === dialog) dialog.close();});
-      dialog.addEventListener("close",()=>document.body.classList.remove("percpart-viewer-open"));
-    })();
 
 
     async function checkForAppUpdate(){
@@ -11719,7 +11651,6 @@
       };
 
       document.addEventListener("wheel",event=>{
-        if(event.target.closest?.("#percpartDialog")) return;
         if(!event.deltaY) return;
         const inner = findScrollableFromTarget(event.target);
         if(!inner) return;
@@ -11736,7 +11667,7 @@
 
       document.addEventListener("touchstart",event=>{
         stopInertia();
-        if(event.target.closest?.("#percpartDialog")){touchState = null;return;}
+        if(event.touches.length !== 1){touchState = null;return;}
         const touch = event.touches[0];
         const inner = findScrollableFromTarget(event.target);
         if(!touch || !inner){
@@ -11755,6 +11686,7 @@
       },{passive:true,capture:true});
 
       document.addEventListener("touchmove",event=>{
+        if(event.touches.length !== 1){touchState = null;return;}
         if(!touchState) return;
         const touch = event.touches[0];
         if(!touch) return;
