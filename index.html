@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260917-v79" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260917-v79" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260917-v79" />
-  <meta name="app-build" content="20260917-v79" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260918-v80" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260918-v80" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260918-v80" />
+  <meta name="app-build" content="20260918-v80" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -1171,7 +1171,10 @@
       color:var(--muted);
       font-size:11px;
     }
-    .mc-card-static{cursor:default}
+    .mc-card-button{font:inherit;cursor:pointer}
+    .mc-card-button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+    .mc-open-hint{flex:0 0 auto;font-size:12px;color:var(--gold)}
+    .mc-script-body{white-space:pre-wrap;overflow-wrap:anywhere;font-size:17px;line-height:1.9}
 
     .detail-panel{
       position:fixed;
@@ -5045,7 +5048,7 @@
         <div class="card percpart-card" aria-labelledby="percpartTitle">
           <div class="eyebrow">PERCUSSION PARTS</div>
           <h2 id="percpartTitle" class="card-title">打楽器パート一覧</h2>
-          <img class="percpart-image" src="./percpart.png?v=20260917-v79" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
+          <img class="percpart-image" src="./percpart.png?v=20260918-v80" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
         </div>
         <div class="card message-archive-card">
           <div class="message-archive-head">
@@ -5536,7 +5539,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260917-v79";
+    const APP_BUILD_VERSION = "20260918-v80";
 
 
 
@@ -10314,6 +10317,8 @@
 
       if(context.item.type==="song" || context.item.type==="medley"){
         renderSharedSongDetail(context.item,performance,context);
+      }else if(context.item.type==="mc"){
+        renderMcDetail(context.item,performance,context);
       }
 
     }
@@ -11169,6 +11174,11 @@
           fields = `
             <div class="admin-item-fields single">
               <input class="admin-input" data-item-field="title" data-item-id="${escapeHtml(item.id)}" value="${escapeHtml(item.title)}" placeholder="MC1">
+              <label class="admin-field">
+                <span class="admin-field-label">MC本文</span>
+                <textarea class="admin-textarea" data-item-field="body" data-item-id="${escapeHtml(item.id)}" rows="8" placeholder="この場面のMC本文を入力してください。改行・空行もそのまま表示されます。">${escapeHtml(item.body || "")}</textarea>
+              </label>
+              <div class="admin-hint">セットリストのMCをタップすると本文が開きます。この本番の、このMCだけに保存されます。</div>
             </div>
           `;
         }else if(item.type==="medley"){
@@ -12344,13 +12354,29 @@
       `;
     }
 
+    function renderMcDetail(item,performance,context){
+      const body = String(item.body || "");
+      document.getElementById("detailHeading").textContent = item.title || "MC";
+      document.getElementById("detailContent").innerHTML = `
+        <div class="card">
+          <span class="section-badge">${escapeHtml(performance.title)}${context.section ? `｜${escapeHtml(context.section.label)} ${escapeHtml(context.section.title)}` : ""}</span>
+          <span class="label">MC本文</span>
+          <div class="detail-copy mc-script-body">${body.trim() ? escapeHtml(body) : "MC本文は未登録です。"}</div>
+        </div>
+      `;
+      openDetailPanel();
+      const inner = document.querySelector("#detailPanel .detail-inner");
+      if(inner) inner.scrollTop = 0;
+    }
+
     function renderMcCard(item){
       return `
-        <div class="mc-card mc-card-static" role="note">
+        <button class="mc-card mc-card-button" type="button" data-open-performance-item="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.title || "MC")}の本文を読む">
           <span class="mc-copy">
-            <h3 class="mc-title">${escapeHtml(item.title || "MC")}</h3>
+            <span class="mc-title">${escapeHtml(item.title || "MC")}</span>
           </span>
-        </div>
+          <span class="mc-open-hint" aria-hidden="true">本文 ›</span>
+        </button>
       `;
     }
 
