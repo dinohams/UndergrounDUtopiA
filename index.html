@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260918-v80" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260918-v80" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260918-v80" />
-  <meta name="app-build" content="20260918-v80" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260920-v81" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260920-v81" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260920-v81" />
+  <meta name="app-build" content="20260920-v81" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4875,6 +4875,30 @@
     /* Percussion assignment image (v79). */
     .percpart-card{margin-bottom:18px}
     .percpart-image{display:block;width:100%;height:auto;margin-top:14px;border:1px solid rgba(217,179,122,.35);border-radius:12px;background:#fff}
+    /* Member records are separate from the public concert content. */
+    .member-card{margin-bottom:18px}
+    .member-card [hidden],#adminTabMembers [hidden]{display:none!important}
+    .member-grid{display:grid;gap:14px}
+    .member-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .member-row .btn{width:auto;min-height:44px}
+    .member-help{font-size:13px;line-height:1.8;color:var(--muted);margin:8px 0}
+    .member-status{font-size:13px;line-height:1.7;color:var(--gold);overflow-wrap:anywhere}
+    .member-error{color:#ffb9a9}
+    .member-input,.member-text{display:block;width:100%;box-sizing:border-box;border:1px solid rgba(217,179,122,.4);border-radius:10px;background:rgba(7,15,18,.75);color:var(--ivory);padding:12px;font:inherit;font-size:16px}
+    .member-text{min-height:220px;line-height:1.9;resize:vertical}
+    .member-label{display:block;margin:12px 0 7px;font-size:14px;color:var(--gold)}
+    .member-script{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px;line-height:1.9;margin:12px 0 0}
+    .member-stat{white-space:pre-line;border-left:3px solid var(--gold);padding:8px 12px;font-size:14px;line-height:1.9}
+    .member-reports{display:grid;gap:14px;margin-top:16px}
+    .member-report{border:1px solid rgba(217,179,122,.35);border-radius:14px;padding:16px;background:rgba(7,15,18,.65)}
+    .member-report h3{font-size:18px;margin:0 0 8px;color:var(--gold);overflow-wrap:anywhere}
+    .member-report summary{cursor:pointer;padding:12px 0;min-height:44px;line-height:1.6}
+    .member-reading-list{padding-left:22px;font-size:13px;line-height:1.9}
+    .member-reading-list .unread{color:var(--muted)}
+    .member-badge{display:inline-block;border-radius:6px;padding:3px 7px;background:rgba(217,179,122,.15);font-size:12px}
+    .member-title-row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+    .member-summary{font-size:14px;line-height:1.9;margin:14px 0}
+
   </style>
 </head>
 <body class="home-active">
@@ -5023,6 +5047,42 @@
 
       <section id="page-messages" class="page">
         <h2 class="page-title">戯言</h2>
+        <div class="card member-card" aria-labelledby="memberPortalTitle">
+          <div class="eyebrow">MEMBER RECORD</div>
+          <h2 id="memberPortalTitle" class="card-title">部員の記録・自己紹介</h2>
+          <p class="member-help">名前を登録すると、物語の閲覧状況と自己紹介文を顧問へ共有できます。記録と投稿文を見られるのは本人と管理者です。</p>
+          <div id="memberRegistration">
+            <label class="member-label" for="memberName">名前（部内で分かる名前）</label>
+            <input id="memberName" class="member-input" type="text" maxlength="40" autocomplete="nickname" placeholder="自分の名前を入力">
+            <p class="member-help">この端末・このブラウザで続けて使います。端末を替えるときや、名前を間違えたときは顧問へ相談してください。</p>
+            <button id="memberRegister" class="btn secondary" type="button">この名前で登録する</button>
+          </div>
+          <div id="memberWorkspace" class="member-grid" hidden>
+            <p id="memberIdentity" class="member-stat"></p>
+            <div>
+              <h3 class="card-title">プログラム用の自己紹介文</h3>
+              <label class="member-label" for="memberIntroduction">自己紹介文</label>
+              <textarea id="memberIntroduction" class="member-text" rows="8" maxlength="4000" placeholder="プログラムに載せる自己紹介文を入力してください。"></textarea>
+              <p class="member-help"><span id="memberCharacterCount">0</span>文字 ／ 入力中の文章はこの端末に自動保存されます。</p>
+              <div class="member-row">
+                <button id="memberSaveDraft" class="btn ghost" type="button">下書き保存</button>
+                <button id="memberSubmit" class="btn secondary" type="button">投稿する</button>
+              </div>
+              <p id="memberDraftStatus" class="member-status" role="status"></p>
+              <p id="memberSubmissionStatus" class="member-help"></p>
+              <details id="memberSubmittedPreview" hidden><summary>投稿済みの本文を見る</summary><p id="memberSubmittedText" class="member-script"></p></details>
+              <p class="member-help">投稿後も編集できます。修正した文章を届けるには「更新して再投稿」を押してください。下書き保存だけでは投稿済みの本文は変わりません。</p>
+            </div>
+            <div>
+              <h3 class="card-title">物語の閲覧記録</h3>
+              <p id="memberReadingSummary" class="member-stat"></p>
+              <p class="member-help">物語ページを15秒、各楽曲解説を10秒表示すると記録します。画面が裏にある時間は数えません。熟読度100％になった後も記録します。</p>
+              <p class="member-help">楽曲ごとの記録は名前の登録後から始まります。本文が更新された楽曲は、もう一度読むと新しい記録が付きます。</p>
+            </div>
+          </div>
+          <p id="memberConnectionStatus" class="member-status" role="status">共有保存の接続を準備しています…</p>
+          <button id="memberRetry" class="btn ghost" type="button" hidden>再接続・記録を送信</button>
+        </div>
         <div class="card story-reading-card" aria-labelledby="storyReadingTitle">
           <div class="story-reading-head">
             <div>
@@ -5048,7 +5108,7 @@
         <div class="card percpart-card" aria-labelledby="percpartTitle">
           <div class="eyebrow">PERCUSSION PARTS</div>
           <h2 id="percpartTitle" class="card-title">打楽器パート一覧</h2>
-          <img class="percpart-image" src="./percpart.png?v=20260918-v80" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
+          <img class="percpart-image" src="./percpart.png?v=20260920-v81" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
         </div>
         <div class="card message-archive-card">
           <div class="message-archive-head">
@@ -5179,7 +5239,20 @@
           <button class="admin-tab-button active" type="button" data-admin-tab="home" role="tab">ホーム編集</button>
           <button class="admin-tab-button" type="button" data-admin-tab="setlists" role="tab">本番・セットリスト</button>
           <button class="admin-tab-button" type="button" data-admin-tab="story" role="tab">物語編集</button>
+          <button class="admin-tab-button" type="button" data-admin-tab="members" role="tab">部員の記録</button>
         </div>
+
+        <section id="adminTabMembers" class="admin-tab-panel" data-admin-panel="members">
+          <h3 class="card-title">部員の閲覧状況・自己紹介文</h3>
+          <p class="member-help">名前を登録した部員が表示されます。未登録の部員は一覧に現れません。記録は画面を表示した状況の目安であり、読解や理解を保証するものではありません。</p>
+          <div class="member-row">
+            <button id="memberAdminRefresh" class="admin-btn secondary" type="button">一覧を再読み込み</button>
+            <button id="memberAdminCopy" class="admin-btn secondary" type="button" disabled>投稿文をまとめてコピー</button>
+          </div>
+          <p id="memberAdminStatus" class="member-status" role="status">管理者ログイン後に一覧を読み込みます。</p>
+          <p id="memberAdminSummary" class="member-summary"></p>
+          <div id="memberAdminReports" class="member-reports"></div>
+        </section>
 
         <section id="adminTabHome" class="admin-tab-panel active" data-admin-panel="home">
           <div class="admin-dashboard-grid">
@@ -5539,7 +5612,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260918-v80";
+    const APP_BUILD_VERSION = "20260920-v81";
 
 
 
@@ -7384,6 +7457,7 @@
       }catch(error){
         console.warn("物語熟読度を保存できませんでした",error);
       }
+      window.utopiaMemberPortal?.syncAchievement();
     }
 
     function setStoryQuizActiveMarker(active){
@@ -7407,8 +7481,7 @@
     }
 
     function canMeasureStoryReading(){
-      return storyReadingPercent < 100
-        && document.visibilityState === "visible"
+      return document.visibilityState === "visible"
         && getCurrentPageName() === "story";
     }
 
@@ -7434,6 +7507,7 @@
           return;
         }
         storyReadingSession.pageAwarded = true;
+        window.utopiaMemberPortal?.recordPage();
         increaseStoryReadingPercent();
       },Math.max(0,storyReadingSession.pageRemainingMs));
     }
@@ -7462,6 +7536,7 @@
           return;
         }
         storyReadingSession.songAwarded = true;
+        window.utopiaMemberPortal?.recordSong(activeItem);
         increaseStoryReadingPercent();
       },Math.max(0,storyReadingSession.songRemainingMs));
     }
@@ -7504,10 +7579,6 @@
       storyQuizRecoveryNotice = "";
       saveStoryReadingPercent();
       renderStoryReadingAchievement();
-      if(storyReadingPercent >= 100){
-        pauseStoryPageReadingTimer();
-        pauseStorySongReadingTimer();
-      }
     }
 
     document.addEventListener("visibilitychange",()=>{
@@ -12246,7 +12317,7 @@
         const songList = section.songs.map(song=>{
           songNumber += 1;
           return `
-            <details class="story-song-item">
+            <details class="story-song-item" data-member-song-key="${memberSongKey(song.title,song.description)}" data-member-song-title="${escapeHtml(song.title)}">
               <summary>
                 <span class="story-song-number">M-${songNumber}</span>
                 <span>${escapeHtml(song.title)}</span>
@@ -12270,6 +12341,7 @@
       }).join("");
       document.getElementById("page-story")?.style.setProperty("--story-scroll-room","0px");
       bindStorySongAccordions(map);
+      window.utopiaMemberPortal?.contentChanged();
       activeStorySectionIndex = -1;
       map.style.setProperty("--story-progress","0%");
       queueStoryScrollGimmick();
@@ -14335,6 +14407,299 @@
       refreshGeoRestriction();
     }
 
+    // Per-member submissions are never included in public portal data.
+    function memberSongKey(title,description){
+      const value = JSON.stringify([String(title || ""),String(description || "")]);
+      let hash = 2166136261;
+      for(let i=0;i<value.length;i++) hash = Math.imul(hash ^ value.charCodeAt(i),16777619);
+      return `song-${(hash >>> 0).toString(16)}`;
+    }
+
+    function memberSongInventory(){
+      const entries = normalizeStoryData(storyData).sections.flatMap(section=>section.songs.map(song=>({
+        key:memberSongKey(song.title,song.description),title:String(song.title || "曲名未設定")
+      })));
+      return [...new Map(entries.map(entry=>[entry.key,entry])).values()];
+    }
+
+    function normalizeMemberRecord(raw={}){
+      const number = value=>Number.isFinite(Number(value)) ? Math.max(0,Math.floor(Number(value))) : 0;
+      const reading = raw.reading || {};
+      const introduction = raw.introduction || {};
+      const songsRead = {};
+      Object.entries(reading.songs || {}).slice(-300).forEach(([key,value])=>{
+        if(!/^song-[0-9a-f]{1,8}$/.test(key) || !value || typeof value !== "object") return;
+        songsRead[key] = {title:String(value.title || "").slice(0,200),readAt:number(value.readAt)};
+      });
+      return {
+        uid:String(raw.uid || ""),name:String(raw.name || "").trim().slice(0,40),
+        reading:{percent:Math.min(100,number(reading.percent)),quizCleared:reading.quizCleared === true,
+          lastViewedAt:number(reading.lastViewedAt),pageVisits:number(reading.pageVisits),songs:songsRead},
+        introduction:{draft:String(introduction.draft || "").slice(0,4000),draftUpdatedAt:number(introduction.draftUpdatedAt),
+          submittedText:String(introduction.submittedText || "").slice(0,4000),submittedAt:number(introduction.submittedAt)}
+      };
+    }
+
+    window.utopiaMemberPortal = (()=>{
+      const profileKey = "utopia-member-profile-v1";
+      const recordPrefix = "utopia-member-record-v1-";
+      const $ = id=>document.getElementById(id);
+      let adapter = null, profile = null, record = null, user = null, isAdmin = false;
+      let connectedUid = "", loading = false, saving = false, dirty = false, syncTimer = 0;
+      let revision = 0, authEpoch = 0, records = [], adminStop = null;
+      let lastDraftMessage = "";
+      const formatTime = value=>value ? new Date(value).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "未記録";
+      function setStatus(message,error=false){
+        $("memberConnectionStatus").textContent = message;
+        $("memberConnectionStatus").classList.toggle("member-error",error);
+        $("memberRetry").hidden = !error;
+      }
+      function errorText(error){
+        if(error?.code === "auth/operation-not-allowed" || error?.code === "auth/admin-restricted-operation") return "登録の準備がまだ完了していません。顧問に連絡してください。";
+        if(error?.code === "permission-denied") return "共有保存が許可されていません。顧問に連絡してください。下書きはこの端末に残ります。";
+        if(error?.code === "identity-changed") return "この端末の本人情報が変わっています。新しく登録せず、顧問に相談してください。";
+        if(error?.code === "admin-account") return "管理者端末では部員登録できません。部員の端末で登録してください。";
+        return "接続できませんでした。下書きはこの端末に残っています。通信を確認して再接続してください。";
+      }
+      function readLocal(key){try{return JSON.parse(localStorage.getItem(key) || "null");}catch{return null;}}
+      profile = readLocal(profileKey);
+      if(profile?.uid && profile?.name){
+        record = normalizeMemberRecord(readLocal(recordPrefix+profile.uid) || profile);
+      }else profile = null;
+
+      function persistLocal(){
+        if(!record || !profile) return false;
+        try{
+          localStorage.setItem(profileKey,JSON.stringify(profile));
+          localStorage.setItem(recordPrefix+record.uid,JSON.stringify({...record,_dirty:dirty}));
+          return true;
+        }catch{
+          lastDraftMessage = "この端末に下書きを保存できません。文章をコピーして控えてください。";
+          $("memberDraftStatus").textContent = lastDraftMessage;
+          $("memberDraftStatus").classList.add("member-error");
+          return false;
+        }
+      }
+      function eligible(){return Boolean(record && profile && !isAdmin && user?.uid === record.uid);}
+      function countRead(data){return memberSongInventory().filter(song=>data.reading.songs[song.key]).length;}
+      function render(){
+        const registered = Boolean(profile && record && !isAdmin);
+        $("memberRegistration").hidden = registered || isAdmin;
+        $("memberWorkspace").hidden = !registered;
+        $("memberRegister").disabled = loading || saving || !adapter;
+        if(!registered) return;
+        $("memberIdentity").textContent = `登録名：${record.name} ／ 端末 ${record.uid.slice(-6)}`;
+        if(document.activeElement !== $("memberIntroduction")) $("memberIntroduction").value = record.introduction.draft;
+        $("memberCharacterCount").textContent = String([...record.introduction.draft].length);
+        $("memberIntroduction").disabled = saving;
+        $("memberSaveDraft").disabled = saving || loading;
+        $("memberSubmit").disabled = saving || loading || !record.introduction.draft.trim();
+        const intro = record.introduction;
+        $("memberSubmit").textContent = intro.submittedAt ? "更新して再投稿" : "投稿する";
+        $("memberSubmissionStatus").textContent = intro.submittedAt
+          ? `投稿済み：${formatTime(intro.submittedAt)}${intro.draft !== intro.submittedText ? " ／ 編集した下書きはまだ投稿されていません。" : ""}`
+          : "まだ投稿していません。下書きができたら「投稿する」を押してください。";
+        $("memberSubmittedPreview").hidden = !intro.submittedAt;
+        $("memberSubmittedText").textContent = intro.submittedText;
+        const total = memberSongInventory().length;
+        $("memberReadingSummary").textContent = `熟読度 ${record.reading.percent}% ／ 楽曲解説 ${countRead(record)} / ${total}曲\n最終閲覧：${formatTime(record.reading.lastViewedAt)} ／ 試験：${record.reading.quizCleared ? "合格" : "未合格"}`;
+      }
+      function markDirty(){
+        dirty = true;revision++;
+        persistLocal();render();
+      }
+      function scheduleSync(){
+        clearTimeout(syncTimer);
+        if(!eligible() || !connectedUid) return;
+        syncTimer = setTimeout(()=>flush(false),1800);
+      }
+      function syncAchievement(){
+        if(!eligible()) return;
+        record.reading.percent = storyReadingPercent;
+        record.reading.quizCleared = storyQuizCleared;
+        markDirty();scheduleSync();
+      }
+      function recordReading(songElement=null){
+        if(!eligible()) return;
+        const now = Date.now();
+        record.reading.lastViewedAt = now;
+        if(songElement){
+          const key = songElement.dataset.memberSongKey;
+          if(key) record.reading.songs[key] = {title:String(songElement.dataset.memberSongTitle || "").slice(0,200),readAt:now};
+          record.reading.songs = Object.fromEntries(Object.entries(record.reading.songs).sort((a,b)=>a[1].readAt-b[1].readAt).slice(-300));
+        }else record.reading.pageVisits++;
+        record.reading.percent = storyReadingPercent;
+        record.reading.quizCleared = storyQuizCleared;
+        markDirty();scheduleSync();
+      }
+
+      async function flush(submit=false,manual=false){
+        clearTimeout(syncTimer);
+        if(saving || !record || !adapter) return;
+        if(!eligible() || connectedUid !== record.uid){setStatus("共有保存へ接続できていません。「再接続・記録を送信」を押してください。",true);return;}
+        if(!navigator.onLine){setStatus("オフラインです。下書きは端末に保存しました。接続後に再送信してください。",true);return;}
+        if(submit && !record.introduction.draft.trim()) return;
+        const capturedUid = record.uid;
+        const capturedRevision = revision;
+        const payload = normalizeMemberRecord(record);
+        if(submit){payload.introduction.submittedText=payload.introduction.draft;payload.introduction.submittedAt=Date.now();}
+        saving = true;render();
+        setStatus(submit ? "投稿しています…" : "記録を送信しています…");
+        const pendingNotice = setTimeout(()=>{
+          if(saving && record?.uid === capturedUid) setStatus("送信の確認に時間がかかっています。下書きは端末に保存済みです。接続が戻るまでお待ちください。");
+        },12000);
+        try{
+          await adapter.write(payload);
+          if(record?.uid !== capturedUid || !eligible()) return;
+          if(submit){
+            record.introduction.submittedText = payload.introduction.submittedText;
+            record.introduction.submittedAt = payload.introduction.submittedAt;
+          }
+          dirty = revision !== capturedRevision;
+          persistLocal();
+          setStatus(submit ? "投稿が完了しました。顧問の一覧に反映されました。" : manual ? "下書きと閲覧記録を共有保存しました。" : "閲覧記録を共有保存しました。");
+          if(manual || submit){lastDraftMessage="端末・共有先に保存済み";$("memberDraftStatus").textContent=lastDraftMessage;}
+        }catch(error){
+          dirty = true;persistLocal();setStatus(errorText(error),true);
+        }finally{
+          clearTimeout(pendingNotice);saving=false;render();
+          if(dirty && revision !== capturedRevision && eligible()) scheduleSync();
+        }
+      }
+
+      function mergeReading(local,remote){
+        const songs = {...remote.songs};
+        Object.entries(local.songs).forEach(([key,value])=>{if(!songs[key] || songs[key].readAt < value.readAt) songs[key]=value;});
+        return {...local,songs,lastViewedAt:Math.max(local.lastViewedAt,remote.lastViewedAt),pageVisits:Math.max(local.pageVisits,remote.pageVisits)};
+      }
+      async function connectOwn(){
+        if(!adapter || !profile || !user || isAdmin || loading) return;
+        if(user.uid !== profile.uid){connectedUid="";setStatus(errorText({code:"identity-changed"}),true);return;}
+        const epoch=authEpoch,uid=user.uid;
+        loading=true;render();
+        try{
+          const remote = await adapter.read(uid);
+          if(epoch !== authEpoch || user?.uid !== uid) return;
+          if(remote){
+            const server = normalizeMemberRecord(remote);
+            if(server.uid !== uid) throw new Error("Record identity mismatch");
+            record.reading = mergeReading(record.reading,server.reading);
+            if(server.introduction.draftUpdatedAt > record.introduction.draftUpdatedAt){
+              record.introduction.draft = server.introduction.draft;
+              record.introduction.draftUpdatedAt = server.introduction.draftUpdatedAt;
+            }
+            if(server.introduction.submittedAt >= record.introduction.submittedAt){
+              record.introduction.submittedText = server.introduction.submittedText;
+              record.introduction.submittedAt = server.introduction.submittedAt;
+            }
+            record.name = server.name;profile.name=server.name;
+          }
+          connectedUid=uid;
+          record.reading.percent=storyReadingPercent;
+          record.reading.quizCleared=storyQuizCleared;
+          markDirty();setStatus("共有保存へ接続しました。");scheduleSync();
+        }catch(error){connectedUid="";setStatus(errorText(error),true);}
+        finally{loading=false;render();}
+      }
+
+      async function register(){
+        const name=$("memberName").value.trim();
+        if(!name){setStatus("名前を入力してください。",true);return;}
+        if(!adapter){setStatus("接続の準備中です。少し待ってから登録してください。",true);return;}
+        loading=true;render();setStatus("名前を登録しています…");
+        try{
+          const nextUser=await adapter.ensureUser();
+          user=nextUser;
+          if(adapter.isAdmin(nextUser)) throw Object.assign(new Error(),{code:"admin-account"});
+          if(profile && profile.uid !== nextUser.uid) throw Object.assign(new Error(),{code:"identity-changed"});
+          profile={uid:nextUser.uid,name};
+          record=normalizeMemberRecord(readLocal(recordPrefix+nextUser.uid) || {uid:nextUser.uid,name});
+          record.name=name;dirty=true;persistLocal();
+        }catch(error){setStatus(errorText(error),true);}
+        finally{loading=false;render();}
+        if(profile && record && user?.uid===profile.uid) await connectOwn();
+      }
+      function renderAdmin(){
+        if(!isAdmin){$("memberAdminReports").innerHTML="";$("memberAdminSummary").textContent="";$("memberAdminCopy").disabled=true;return;}
+        const inventory=memberSongInventory();
+        const submitted=records.filter(item=>item.introduction.submittedAt).length;
+        const viewed=records.filter(item=>item.reading.lastViewedAt).length;
+        $("memberAdminSummary").textContent=`登録 ${records.length}人 ／ 閲覧記録あり ${viewed}人 ／ 自己紹介 投稿済み ${submitted}人・未投稿 ${records.length-submitted}人`;
+        $("memberAdminCopy").disabled=submitted===0;
+        const nameCounts=new Map();records.forEach(item=>nameCounts.set(item.name,(nameCounts.get(item.name)||0)+1));
+        $("memberAdminReports").innerHTML=records.map(item=>{
+          const intro=item.introduction;
+          const unread=inventory.filter(song=>!item.reading.songs[song.key]);
+          return `<article class="member-report">
+            <div class="member-title-row"><h3>${escapeHtml(item.name)}</h3><span class="member-badge">${intro.submittedAt ? "投稿済み" : intro.draft.trim() ? "下書きあり・未投稿" : "未投稿"}</span></div>
+            <p class="member-help">端末 ${escapeHtml(item.uid.slice(-6))}${nameCounts.get(item.name)>1 ? " ／ 同じ名前の登録が複数あります。本人に端末を確認してください。" : ""}</p>
+            <p class="member-stat">熟読度 ${item.reading.percent}% ／ 楽曲解説 ${inventory.length-unread.length} / ${inventory.length}曲<br>最終閲覧：${escapeHtml(formatTime(item.reading.lastViewedAt))}<br>物語ページ15秒の達成：${item.reading.pageVisits}回 ／ 試験：${item.reading.quizCleared ? "合格" : "未合格"}</p>
+            <details><summary>楽曲ごとの閲覧状況</summary><ul class="member-reading-list">${inventory.map(song=>`<li class="${item.reading.songs[song.key] ? "" : "unread"}">${item.reading.songs[song.key] ? "記録あり" : "未記録"}：${escapeHtml(song.title)}${item.reading.songs[song.key] ? ` ／ ${escapeHtml(formatTime(item.reading.songs[song.key].readAt))}` : ""}</li>`).join("")}</ul></details>
+            <details><summary>自己紹介文${intro.submittedAt ? ` ／ ${escapeHtml(formatTime(intro.submittedAt))}` : " ／ 未投稿"}</summary><div class="member-script">${intro.submittedAt ? escapeHtml(intro.submittedText) : "まだ投稿されていません。"}</div>${intro.submittedAt && intro.draft !== intro.submittedText ? '<p class="member-help">投稿後の下書き編集あり。上は最後に投稿された本文です。</p>' : ""}</details>
+          </article>`;
+        }).join("") || '<p class="member-help">まだ部員の登録はありません。部員に「戯言」内の名前登録を案内してください。</p>';
+      }
+      function startAdmin(){
+        adminStop?.();adminStop=null;
+        if(!isAdmin || !adapter){records=[];renderAdmin();return;}
+        $("memberAdminStatus").textContent="部員の記録を読み込んでいます…";
+        adminStop=adapter.watchMembers(data=>{
+          records=data.map(normalizeMemberRecord).sort((a,b)=>a.name.localeCompare(b.name,"ja"));
+          $("memberAdminStatus").textContent="一覧は自動更新されます。投稿文の受信に「全員へ反映」は不要です。";
+          renderAdmin();
+        },error=>{
+          records=[];renderAdmin();
+          $("memberAdminStatus").textContent=error?.code === "permission-denied" ? "部員の記録を読み取れません。Firestoreの memberRecords 用ルールを設定して、再読み込みしてください。" : "一覧を取得できませんでした。通信を確認して再読み込みしてください。";
+        });
+      }
+      async function handleAuth(nextUser,admin){
+        authEpoch++;user=nextUser;isAdmin=admin;connectedUid="";
+        adminStop?.();adminStop=null;records=[];renderAdmin();render();
+        if(admin){setStatus("管理者として接続中です。管理画面の「部員の記録」で閲覧状況と投稿文を確認できます。");startAdmin();return;}
+        if(nextUser && profile){await connectOwn();return;}
+        if(!nextUser && profile){setStatus("本人情報へ接続できていません。再接続を押してください。",true);return;}
+        setStatus("最初に名前を登録してください。");
+      }
+      $("memberRegister").addEventListener("click",register);
+      $("memberIntroduction").addEventListener("input",()=>{
+        if(!record || isAdmin) return;
+        record.introduction.draft=$("memberIntroduction").value.slice(0,4000);
+        record.introduction.draftUpdatedAt=Date.now();dirty=true;revision++;
+        const saved=persistLocal();
+        if(saved){lastDraftMessage="この端末に下書き保存済み";$("memberDraftStatus").textContent=lastDraftMessage;$("memberDraftStatus").classList.remove("member-error");}
+        render();
+      });
+      $("memberSaveDraft").addEventListener("click",()=>flush(false,true));
+      $("memberSubmit").addEventListener("click",()=>flush(true,true));
+      $("memberRetry").addEventListener("click",async()=>{
+        if(!adapter){setStatus("接続を準備できませんでした。通信を確認し、ページを開き直してください。",true);return;}
+        if(!profile){await register();return;}
+        if(user?.uid===profile.uid){if(connectedUid) await flush(false,true);else await connectOwn();}
+        else setStatus(errorText({code:"identity-changed"}),true);
+      });
+      $("memberAdminRefresh").addEventListener("click",startAdmin);
+      $("memberAdminCopy").addEventListener("click",async()=>{
+        if(!isAdmin) return;
+        const text=records.filter(item=>item.introduction.submittedAt).map(item=>`【${item.name}】\n${item.introduction.submittedText}`).join("\n\n");
+        try{await navigator.clipboard.writeText(text);$("memberAdminStatus").textContent="投稿済みの自己紹介文をコピーしました。";}
+        catch{$("memberAdminStatus").textContent="自動コピーできませんでした。各投稿文を選択してコピーしてください。";}
+      });
+      window.addEventListener("online",()=>{if(eligible()){if(connectedUid) flush(false);else connectOwn();}});
+      window.addEventListener("storage",event=>{
+        if(!record || event.key!==recordPrefix+record.uid || saving) return;
+        const incoming=normalizeMemberRecord(readLocal(event.key)||{});
+        if(incoming.uid!==record.uid) return;
+        record.reading=mergeReading(record.reading,incoming.reading);
+        if(incoming.introduction.draftUpdatedAt>record.introduction.draftUpdatedAt) record.introduction.draft=incoming.introduction.draft,record.introduction.draftUpdatedAt=incoming.introduction.draftUpdatedAt;
+        if(incoming.introduction.submittedAt>record.introduction.submittedAt) record.introduction.submittedText=incoming.introduction.submittedText,record.introduction.submittedAt=incoming.introduction.submittedAt;
+        render();
+      });
+      render();
+      setTimeout(()=>{if(!adapter) setStatus("共有保存へ接続できませんでした。通信を確認してページを開き直してください。",true);},15000);
+      return {attach(value){adapter=value;render();},handleAuth,recordPage:()=>recordReading(),recordSong:recordReading,syncAchievement,
+        contentChanged(){render();renderAdmin();}};
+    })();
+
     initializeApp();
   </script>
 
@@ -14344,6 +14709,7 @@
       getAuth,
       GoogleAuthProvider,
       signInWithPopup,
+      signInAnonymously,
       signInWithRedirect,
       getRedirectResult,
       onAuthStateChanged,
@@ -14355,6 +14721,9 @@
       getFirestore,
       doc,
       getDoc,
+      getDocFromServer,
+      runTransaction,
+      collection,
       onSnapshot,
       setDoc,
       serverTimestamp
@@ -14401,6 +14770,7 @@
       if(!authStatus) return;
       const authorized = Boolean(user && user.uid === ADMIN_UID);
       window.utopiaSetlistApp?.setAdminAuthorized(authorized);
+      window.utopiaMemberPortal?.handleAuth(user,authorized);
 
       if(user && authorized){
         authStatus.textContent = `${user.displayName || "Googleアカウント"}で管理者ログイン中`;
@@ -14411,6 +14781,15 @@
         publishButton.disabled = false;
         publishButton.title = "公開設定・ホーム・セットリスト・楽曲詳細・物語を全員へ反映";
         statusDot.classList.add("online");
+      }else if(user?.isAnonymous){
+        authStatus.textContent = "部員用の端末で接続中です";
+        userDetail.textContent = "管理者はGoogleでログインしてください。";
+        signInButton.hidden = false;
+        signOutButton.hidden = true;
+        copyUidButton.hidden = true;
+        publishButton.disabled = false;
+        publishButton.title = "先にGoogleで管理者ログインしてください";
+        statusDot.classList.remove("online","warning");
       }else if(user){
         authStatus.textContent = "このGoogleアカウントには編集権限がありません";
         userDetail.textContent = `UID: ${user.uid}`;
@@ -14594,6 +14973,57 @@
         setDataStatus(firebaseErrorMessage(error), "warning");
       });
     }
+
+    // Private, per-device member records. Never write these to publicData.
+    const memberRef = uid=>doc(db,"memberRecords",uid);
+    window.utopiaMemberPortal?.attach({
+      isAdmin:user=>Boolean(user && user.uid === ADMIN_UID),
+      async ensureUser(){
+        await auth.authStateReady();
+        if(auth.currentUser) return auth.currentUser;
+        const credential = await signInAnonymously(auth);
+        return credential.user;
+      },
+      async read(uid){
+        const snapshot = await getDocFromServer(memberRef(uid));
+        return snapshot.exists() ? snapshot.data() : null;
+      },
+      async write(record){
+        if(!auth.currentUser || auth.currentUser.uid !== record.uid || auth.currentUser.uid === ADMIN_UID){
+          throw Object.assign(new Error("Member identity changed"),{code:"identity-changed"});
+        }
+        await runTransaction(db,async transaction=>{
+          const reference=memberRef(record.uid);
+          const snapshot=await transaction.get(reference);
+          const payload=normalizeMemberRecord(record);
+          if(snapshot.exists()){
+            const existing=normalizeMemberRecord(snapshot.data());
+            // An older tab must not replace a newer submitted introduction.
+            if(existing.introduction.submittedAt > payload.introduction.submittedAt){
+              payload.introduction.submittedText=existing.introduction.submittedText;
+              payload.introduction.submittedAt=existing.introduction.submittedAt;
+            }
+            if(existing.introduction.draftUpdatedAt > payload.introduction.draftUpdatedAt){
+              payload.introduction.draft=existing.introduction.draft;
+              payload.introduction.draftUpdatedAt=existing.introduction.draftUpdatedAt;
+            }
+            Object.entries(existing.reading.songs).forEach(([key,value])=>{
+              if(!payload.reading.songs[key] || value.readAt > payload.reading.songs[key].readAt) payload.reading.songs[key]=value;
+            });
+            payload.reading.songs=Object.fromEntries(Object.entries(payload.reading.songs).sort((a,b)=>a[1].readAt-b[1].readAt).slice(-300));
+            payload.reading.lastViewedAt=Math.max(payload.reading.lastViewedAt,existing.reading.lastViewedAt);
+            payload.reading.pageVisits=Math.max(payload.reading.pageVisits,existing.reading.pageVisits);
+          }
+          transaction.set(reference,{...payload,updatedAt:serverTimestamp()});
+        });
+      },
+      watchMembers(onData,onError){
+        if(auth.currentUser?.uid !== ADMIN_UID){onError({code:"permission-denied"});return ()=>{};}
+        return onSnapshot(collection(db,"memberRecords"),snapshot=>{
+          onData(snapshot.docs.map(item=>({...item.data(),uid:item.id})));
+        },onError);
+      }
+    });
 
     signInButton?.addEventListener("click", signInAdministrator);
     signOutButton?.addEventListener("click", async()=>{
