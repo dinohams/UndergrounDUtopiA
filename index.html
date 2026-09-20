@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260920-v81" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260920-v81" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260920-v81" />
-  <meta name="app-build" content="20260920-v81" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260920-v82" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20260920-v82" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260920-v82" />
+  <meta name="app-build" content="20260920-v82" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4885,7 +4885,9 @@
     .member-status{font-size:13px;line-height:1.7;color:var(--gold);overflow-wrap:anywhere}
     .member-error{color:#ffb9a9}
     .member-input,.member-text{display:block;width:100%;box-sizing:border-box;border:1px solid rgba(217,179,122,.4);border-radius:10px;background:rgba(7,15,18,.75);color:var(--ivory);padding:12px;font:inherit;font-size:16px}
-    .member-text{min-height:220px;line-height:1.9;resize:vertical}
+    .member-text{min-height:110px;line-height:1.9;resize:vertical}
+    .member-delete{color:#ffb9a9!important;border-color:rgba(255,185,169,.5)!important;margin-top:16px}
+    .member-field-note{margin-top:4px}
     .member-label{display:block;margin:12px 0 7px;font-size:14px;color:var(--gold)}
     .member-script{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px;line-height:1.9;margin:12px 0 0}
     .member-stat{white-space:pre-line;border-left:3px solid var(--gold);padding:8px 12px;font-size:14px;line-height:1.9}
@@ -5061,8 +5063,19 @@
             <p id="memberIdentity" class="member-stat"></p>
             <div>
               <h3 class="card-title">プログラム用の自己紹介文</h3>
-              <label class="member-label" for="memberIntroduction">自己紹介文</label>
-              <textarea id="memberIntroduction" class="member-text" rows="8" maxlength="4000" placeholder="プログラムに載せる自己紹介文を入力してください。"></textarea>
+              <label class="member-label" for="memberRecommendedSong">①おすすめの一曲</label>
+              <select id="memberRecommendedSong" class="member-input" aria-describedby="memberSongHint"></select>
+              <p id="memberSongHint" class="member-help member-field-note">アンコール曲は選べません。本編の中から一曲選んでください。</p>
+              <label class="member-label" for="memberHighlight">②ここに注目！</label>
+              <p class="member-help member-field-note">自分のことでも他人のことでもOK</p>
+              <textarea id="memberHighlight" class="member-text" rows="3" maxlength="1000" placeholder="ぜひ注目してほしいところを書いてください。"></textarea>
+              <label class="member-label" for="memberUtopia">③自分にとってのユートピアとは？</label>
+              <p class="member-help member-field-note">理想の世界について書いてください</p>
+              <textarea id="memberUtopia" class="member-text" rows="3" maxlength="1000" placeholder="あなたにとっての理想の世界は？"></textarea>
+              <label class="member-label" for="memberMessage">④みなさんへ一言</label>
+              <textarea id="memberMessage" class="member-text" rows="3" maxlength="1000" placeholder="お客さんへのメッセージを書いてください。"></textarea>
+              <p class="member-help">途中の状態でも下書き保存できます。投稿するときは4項目すべて記入してください。</p>
+              <details id="memberLegacyDraft" hidden><summary>以前の自由記述を見る（原文を保管しています）</summary><p id="memberLegacyText" class="member-script"></p></details>
               <p class="member-help"><span id="memberCharacterCount">0</span>文字 ／ 入力中の文章はこの端末に自動保存されます。</p>
               <div class="member-row">
                 <button id="memberSaveDraft" class="btn ghost" type="button">下書き保存</button>
@@ -5108,7 +5121,7 @@
         <div class="card percpart-card" aria-labelledby="percpartTitle">
           <div class="eyebrow">PERCUSSION PARTS</div>
           <h2 id="percpartTitle" class="card-title">打楽器パート一覧</h2>
-          <img class="percpart-image" src="./percpart.png?v=20260920-v81" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
+          <img class="percpart-image" src="./percpart.png?v=20260920-v82" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
         </div>
         <div class="card message-archive-card">
           <div class="message-archive-head">
@@ -5612,7 +5625,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260920-v81";
+    const APP_BUILD_VERSION = "20260920-v82";
 
 
 
@@ -14422,6 +14435,43 @@
       return [...new Map(entries.map(entry=>[entry.key,entry])).values()];
     }
 
+    const memberIntroFields = [
+      {key:"song",id:"memberRecommendedSong",label:"①おすすめの一曲"},
+      {key:"highlight",id:"memberHighlight",label:"②ここに注目！"},
+      {key:"utopia",id:"memberUtopia",label:"③自分にとってのユートピアとは？"},
+      {key:"message",id:"memberMessage",label:"④みなさんへ一言"}
+    ];
+    const memberIntroPrefix = "UTOPIA_INTRO_V2\n";
+    function decodeMemberIntroduction(text){
+      const source=String(text || "");
+      if(source.startsWith(memberIntroPrefix)){
+        try{
+          const data=JSON.parse(source.slice(memberIntroPrefix.length));
+          if(data && memberIntroFields.every(field=>typeof data[field.key] === "string")){
+            return {...Object.fromEntries(memberIntroFields.map(field=>[field.key,data[field.key]])),legacy:String(data.legacy || "")};
+          }
+        }catch{}
+      }
+      return {song:"",highlight:"",utopia:"",message:"",legacy:source};
+    }
+    function encodeMemberIntroduction(data){return memberIntroPrefix+JSON.stringify(data);}
+    function memberIntroductionText(text){
+      const data=decodeMemberIntroduction(text);
+      if(!memberIntroFields.some(field=>data[field.key])) return data.legacy;
+      return memberIntroFields.map(field=>`${field.label}\n${data[field.key] || "（未記入）"}`).join("\n\n");
+    }
+    function memberRecommendedSongs(){
+      const sections=normalizeStoryData(storyData).sections;
+      const encore=new Set(sections.filter(section=>section.id === "encore").flatMap(section=>section.songs.map(song=>song.title)));
+      return [...new Set(sections.filter(section=>section.id !== "encore").flatMap(section=>section.songs.map(song=>song.title)))].filter(title=>title && !encore.has(title));
+    }
+    function memberIntroductionProblem(text){
+      const data=decodeMemberIntroduction(text);
+      if(!memberRecommendedSongs().includes(data.song)) return "①おすすめの一曲を、本編の曲から選んでください。";
+      const empty=memberIntroFields.find(field=>!data[field.key].trim());
+      return empty ? `${empty.label}を記入してください。途中の場合は下書き保存できます。` : "";
+    }
+
     function normalizeMemberRecord(raw={}){
       const number = value=>Number.isFinite(Number(value)) ? Math.max(0,Math.floor(Number(value))) : 0;
       const reading = raw.reading || {};
@@ -14435,8 +14485,8 @@
         uid:String(raw.uid || ""),name:String(raw.name || "").trim().slice(0,40),
         reading:{percent:Math.min(100,number(reading.percent)),quizCleared:reading.quizCleared === true,
           lastViewedAt:number(reading.lastViewedAt),pageVisits:number(reading.pageVisits),songs:songsRead},
-        introduction:{draft:String(introduction.draft || "").slice(0,4000),draftUpdatedAt:number(introduction.draftUpdatedAt),
-          submittedText:String(introduction.submittedText || "").slice(0,4000),submittedAt:number(introduction.submittedAt)}
+        introduction:{draft:String(introduction.draft || "").slice(0,16000),draftUpdatedAt:number(introduction.draftUpdatedAt),
+          submittedText:String(introduction.submittedText || "").slice(0,16000),submittedAt:number(introduction.submittedAt)}
       };
     }
 
@@ -14448,6 +14498,7 @@
       let connectedUid = "", loading = false, saving = false, dirty = false, syncTimer = 0;
       let revision = 0, authEpoch = 0, records = [], adminStop = null;
       let lastDraftMessage = "";
+      const deletingMembers=new Set();
       const formatTime = value=>value ? new Date(value).toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "未記録";
       function setStatus(message,error=false){
         $("memberConnectionStatus").textContent = message;
@@ -14489,18 +14540,29 @@
         $("memberRegister").disabled = loading || saving || !adapter;
         if(!registered) return;
         $("memberIdentity").textContent = `登録名：${record.name} ／ 端末 ${record.uid.slice(-6)}`;
-        if(document.activeElement !== $("memberIntroduction")) $("memberIntroduction").value = record.introduction.draft;
-        $("memberCharacterCount").textContent = String([...record.introduction.draft].length);
-        $("memberIntroduction").disabled = saving;
+        const fields=decodeMemberIntroduction(record.introduction.draft);
+        const songSelect=$("memberRecommendedSong");
+        const choices=memberRecommendedSongs();
+        const options='<option value="">本編から一曲選んでください</option>'+choices.map(title=>`<option value="${escapeHtml(title)}">${escapeHtml(title)}</option>`).join("")
+          +(fields.song && !choices.includes(fields.song) ? `<option value="${escapeHtml(fields.song)}" disabled>選び直してください：${escapeHtml(fields.song)}</option>` : "");
+        if(songSelect.innerHTML !== options) songSelect.innerHTML=options;
+        memberIntroFields.forEach(field=>{
+          const input=$(field.id);
+          if(document.activeElement !== input || field.key === "song") input.value=fields[field.key];
+          input.disabled=saving || loading;
+        });
+        $("memberLegacyDraft").hidden=!fields.legacy;
+        $("memberLegacyText").textContent=fields.legacy;
+        $("memberCharacterCount").textContent=String(memberIntroFields.reduce((sum,field)=>sum+[...fields[field.key]].length,0));
         $("memberSaveDraft").disabled = saving || loading;
-        $("memberSubmit").disabled = saving || loading || !record.introduction.draft.trim();
+        $("memberSubmit").disabled = saving || loading;
         const intro = record.introduction;
         $("memberSubmit").textContent = intro.submittedAt ? "更新して再投稿" : "投稿する";
         $("memberSubmissionStatus").textContent = intro.submittedAt
           ? `投稿済み：${formatTime(intro.submittedAt)}${intro.draft !== intro.submittedText ? " ／ 編集した下書きはまだ投稿されていません。" : ""}`
           : "まだ投稿していません。下書きができたら「投稿する」を押してください。";
         $("memberSubmittedPreview").hidden = !intro.submittedAt;
-        $("memberSubmittedText").textContent = intro.submittedText;
+        $("memberSubmittedText").textContent = memberIntroductionText(intro.submittedText);
         const total = memberSongInventory().length;
         $("memberReadingSummary").textContent = `熟読度 ${record.reading.percent}% ／ 楽曲解説 ${countRead(record)} / ${total}曲\n最終閲覧：${formatTime(record.reading.lastViewedAt)} ／ 試験：${record.reading.quizCleared ? "合格" : "未合格"}`;
       }
@@ -14538,7 +14600,7 @@
         if(saving || !record || !adapter) return;
         if(!eligible() || connectedUid !== record.uid){setStatus("共有保存へ接続できていません。「再接続・記録を送信」を押してください。",true);return;}
         if(!navigator.onLine){setStatus("オフラインです。下書きは端末に保存しました。接続後に再送信してください。",true);return;}
-        if(submit && !record.introduction.draft.trim()) return;
+        if(submit){const problem=memberIntroductionProblem(record.introduction.draft);if(problem){$("memberDraftStatus").textContent=problem;return;}}
         const capturedUid = record.uid;
         const capturedRevision = revision;
         const payload = normalizeMemberRecord(record);
@@ -14560,7 +14622,8 @@
           setStatus(submit ? "投稿が完了しました。顧問の一覧に反映されました。" : manual ? "下書きと閲覧記録を共有保存しました。" : "閲覧記録を共有保存しました。");
           if(manual || submit){lastDraftMessage="端末・共有先に保存済み";$("memberDraftStatus").textContent=lastDraftMessage;}
         }catch(error){
-          dirty = true;persistLocal();setStatus(errorText(error),true);
+          if(error?.code === "record-deleted") clearDeletedRecord();
+          else {dirty = true;persistLocal();setStatus(errorText(error),true);}
         }finally{
           clearTimeout(pendingNotice);saving=false;render();
           if(dirty && revision !== capturedRevision && eligible()) scheduleSync();
@@ -14572,6 +14635,17 @@
         Object.entries(local.songs).forEach(([key,value])=>{if(!songs[key] || songs[key].readAt < value.readAt) songs[key]=value;});
         return {...local,songs,lastViewedAt:Math.max(local.lastViewedAt,remote.lastViewedAt),pageVisits:Math.max(local.pageVisits,remote.pageVisits)};
       }
+      function clearDeletedRecord(){
+        clearTimeout(syncTimer);
+        const uid=record?.uid || profile?.uid;
+        try{localStorage.removeItem(profileKey);if(uid) localStorage.removeItem(recordPrefix+uid);}catch{}
+        profile=null;record=null;connectedUid="";dirty=false;revision++;
+        $("memberName").value="";
+        memberIntroFields.forEach(field=>$(field.id).value="");
+        $("memberDraftStatus").textContent="";
+        $("memberSubmittedText").textContent="";
+        render();setStatus("管理者により部員の記録が削除されました。必要な場合は、名前を入力して新しく登録してください。");
+      }
       async function connectOwn(){
         if(!adapter || !profile || !user || isAdmin || loading) return;
         if(user.uid !== profile.uid){connectedUid="";setStatus(errorText({code:"identity-changed"}),true);return;}
@@ -14580,6 +14654,7 @@
         try{
           const remote = await adapter.read(uid);
           if(epoch !== authEpoch || user?.uid !== uid) return;
+          if(!remote){clearDeletedRecord();return;}
           if(remote){
             const server = normalizeMemberRecord(remote);
             if(server.uid !== uid) throw new Error("Record identity mismatch");
@@ -14612,9 +14687,11 @@
           user=nextUser;
           if(adapter.isAdmin(nextUser)) throw Object.assign(new Error(),{code:"admin-account"});
           if(profile && profile.uid !== nextUser.uid) throw Object.assign(new Error(),{code:"identity-changed"});
-          profile={uid:nextUser.uid,name};
-          record=normalizeMemberRecord(readLocal(recordPrefix+nextUser.uid) || {uid:nextUser.uid,name});
-          record.name=name;dirty=true;persistLocal();
+          const registered=await adapter.register(normalizeMemberRecord({uid:nextUser.uid,name}));
+          if(user?.uid !== nextUser.uid || isAdmin) return;
+          // A deleted registration starts empty. Existing remote data wins on explicit registration.
+          record=normalizeMemberRecord(registered);
+          profile={uid:record.uid,name:record.name};dirty=false;persistLocal();
         }catch(error){setStatus(errorText(error),true);}
         finally{loading=false;render();}
         if(profile && record && user?.uid===profile.uid) await connectOwn();
@@ -14635,7 +14712,8 @@
             <p class="member-help">端末 ${escapeHtml(item.uid.slice(-6))}${nameCounts.get(item.name)>1 ? " ／ 同じ名前の登録が複数あります。本人に端末を確認してください。" : ""}</p>
             <p class="member-stat">熟読度 ${item.reading.percent}% ／ 楽曲解説 ${inventory.length-unread.length} / ${inventory.length}曲<br>最終閲覧：${escapeHtml(formatTime(item.reading.lastViewedAt))}<br>物語ページ15秒の達成：${item.reading.pageVisits}回 ／ 試験：${item.reading.quizCleared ? "合格" : "未合格"}</p>
             <details><summary>楽曲ごとの閲覧状況</summary><ul class="member-reading-list">${inventory.map(song=>`<li class="${item.reading.songs[song.key] ? "" : "unread"}">${item.reading.songs[song.key] ? "記録あり" : "未記録"}：${escapeHtml(song.title)}${item.reading.songs[song.key] ? ` ／ ${escapeHtml(formatTime(item.reading.songs[song.key].readAt))}` : ""}</li>`).join("")}</ul></details>
-            <details><summary>自己紹介文${intro.submittedAt ? ` ／ ${escapeHtml(formatTime(intro.submittedAt))}` : " ／ 未投稿"}</summary><div class="member-script">${intro.submittedAt ? escapeHtml(intro.submittedText) : "まだ投稿されていません。"}</div>${intro.submittedAt && intro.draft !== intro.submittedText ? '<p class="member-help">投稿後の下書き編集あり。上は最後に投稿された本文です。</p>' : ""}</details>
+            <details><summary>自己紹介文${intro.submittedAt ? ` ／ ${escapeHtml(formatTime(intro.submittedAt))}` : " ／ 未投稿"}</summary><div class="member-script">${intro.submittedAt ? escapeHtml(memberIntroductionText(intro.submittedText)) : "まだ投稿されていません。"}</div>${intro.submittedAt && intro.draft !== intro.submittedText ? '<p class="member-help">投稿後の下書き編集あり。上は最後に投稿された本文です。</p>' : ""}</details>
+            <button class="admin-btn secondary member-delete" type="button" data-member-delete="${escapeHtml(item.uid)}" ${deletingMembers.has(item.uid) ? "disabled" : ""}>${deletingMembers.has(item.uid) ? "削除中…" : "この部員の記録を削除"}</button>
           </article>`;
         }).join("") || '<p class="member-help">まだ部員の登録はありません。部員に「戯言」内の名前登録を案内してください。</p>';
       }
@@ -14661,13 +14739,40 @@
         setStatus("最初に名前を登録してください。");
       }
       $("memberRegister").addEventListener("click",register);
-      $("memberIntroduction").addEventListener("input",()=>{
-        if(!record || isAdmin) return;
-        record.introduction.draft=$("memberIntroduction").value.slice(0,4000);
+      memberIntroFields.forEach(field=>$(field.id).addEventListener(field.key === "song" ? "change" : "input",()=>{
+        if(!record || isAdmin || saving) return;
+        const data=decodeMemberIntroduction(record.introduction.draft);
+        memberIntroFields.forEach(item=>data[item.key]=$(item.id).value);
+        const encoded=encodeMemberIntroduction(data);
+        if(encoded.length>16000){
+          $(field.id).value=decodeMemberIntroduction(record.introduction.draft)[field.key];
+          $("memberDraftStatus").textContent="保存できる文字量を超えました。文章を短くしてください。";return;
+        }
+        record.introduction.draft=encoded;
         record.introduction.draftUpdatedAt=Date.now();dirty=true;revision++;
         const saved=persistLocal();
         if(saved){lastDraftMessage="この端末に下書き保存済み";$("memberDraftStatus").textContent=lastDraftMessage;$("memberDraftStatus").classList.remove("member-error");}
         render();
+      }));
+      $("memberAdminReports").addEventListener("click",async event=>{
+        const button=event.target.closest("[data-member-delete]");
+        if(!button || !isAdmin || !adapter) return;
+        const uid=button.dataset.memberDelete;
+        const target=records.find(item=>item.uid===uid);
+        if(!target || deletingMembers.has(uid)) return;
+        if(!window.confirm(`「${target.name}」（端末 ${uid.slice(-6)}）の記録を削除しますか？\n閲覧記録・自己紹介の下書き・投稿文をすべて削除します。元には戻せません。`)) return;
+        deletingMembers.add(uid);renderAdmin();
+        $("memberAdminStatus").textContent="記録を削除しています…";
+        try{
+          await adapter.remove(uid);
+          if(!isAdmin) return;
+          records=records.filter(item=>item.uid!==uid);
+          $("memberAdminStatus").textContent=`「${target.name}」の記録を削除しました。`;
+        }catch(error){
+          if(isAdmin) $("memberAdminStatus").textContent=error?.code === "permission-denied"
+            ? "削除権限がありません。Firestoreの部員用ルールで管理者の削除を許可してください。"
+            : "削除できませんでした。通信を確認して、もう一度お試しください。";
+        }finally{deletingMembers.delete(uid);renderAdmin();}
       });
       $("memberSaveDraft").addEventListener("click",()=>flush(false,true));
       $("memberSubmit").addEventListener("click",()=>flush(true,true));
@@ -14680,12 +14785,13 @@
       $("memberAdminRefresh").addEventListener("click",startAdmin);
       $("memberAdminCopy").addEventListener("click",async()=>{
         if(!isAdmin) return;
-        const text=records.filter(item=>item.introduction.submittedAt).map(item=>`【${item.name}】\n${item.introduction.submittedText}`).join("\n\n");
+        const text=records.filter(item=>item.introduction.submittedAt).map(item=>`【${item.name}】\n${memberIntroductionText(item.introduction.submittedText)}`).join("\n\n");
         try{await navigator.clipboard.writeText(text);$("memberAdminStatus").textContent="投稿済みの自己紹介文をコピーしました。";}
         catch{$("memberAdminStatus").textContent="自動コピーできませんでした。各投稿文を選択してコピーしてください。";}
       });
       window.addEventListener("online",()=>{if(eligible()){if(connectedUid) flush(false);else connectOwn();}});
       window.addEventListener("storage",event=>{
+        if(record && event.key===profileKey && !event.newValue){clearDeletedRecord();return;}
         if(!record || event.key!==recordPrefix+record.uid || saving) return;
         const incoming=normalizeMemberRecord(readLocal(event.key)||{});
         if(incoming.uid!==record.uid) return;
@@ -14726,7 +14832,8 @@
       collection,
       onSnapshot,
       setDoc,
-      serverTimestamp
+      serverTimestamp,
+      deleteDoc
     } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -14988,6 +15095,23 @@
         const snapshot = await getDocFromServer(memberRef(uid));
         return snapshot.exists() ? snapshot.data() : null;
       },
+      async register(record){
+        if(!auth.currentUser || auth.currentUser.uid !== record.uid || auth.currentUser.uid === ADMIN_UID){
+          throw Object.assign(new Error("Member identity changed"),{code:"identity-changed"});
+        }
+        return runTransaction(db,async transaction=>{
+          const reference=memberRef(record.uid);
+          const snapshot=await transaction.get(reference);
+          if(snapshot.exists()) return normalizeMemberRecord(snapshot.data());
+          const payload=normalizeMemberRecord(record);
+          transaction.set(reference,{...payload,updatedAt:serverTimestamp()});
+          return payload;
+        });
+      },
+      async remove(uid){
+        if(auth.currentUser?.uid !== ADMIN_UID) throw Object.assign(new Error("Admin required"),{code:"permission-denied"});
+        await deleteDoc(memberRef(uid));
+      },
       async write(record){
         if(!auth.currentUser || auth.currentUser.uid !== record.uid || auth.currentUser.uid === ADMIN_UID){
           throw Object.assign(new Error("Member identity changed"),{code:"identity-changed"});
@@ -14995,6 +15119,7 @@
         await runTransaction(db,async transaction=>{
           const reference=memberRef(record.uid);
           const snapshot=await transaction.get(reference);
+          if(!snapshot.exists()) throw Object.assign(new Error("Member record deleted"),{code:"record-deleted"});
           const payload=normalizeMemberRecord(record);
           if(snapshot.exists()){
             const existing=normalizeMemberRecord(snapshot.data());
