@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20260920-v82" />
-  <link rel="icon" type="image/png" href="./icon.png?v=20260920-v82" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20260920-v82" />
-  <meta name="app-build" content="20260920-v82" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20261020-v83" />
+  <link rel="icon" type="image/png" href="./icon.png?v=20261020-v83" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=20261020-v83" />
+  <meta name="app-build" content="20261020-v83" />
   <script>
     if(window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true){
       document.documentElement.classList.add("standalone-shell");
@@ -4948,6 +4948,7 @@
 
     <main>
       <section id="page-home" class="page active">
+        <div class="card"><div class="eyebrow">POSTER OUTREACH</div><h3 class="card-title">ポスター掲示状況</h3><p>訪問済み・お断り・検討中の場所を一覧と地図で確認できます。</p><button class="btn secondary" type="button" onclick="window.utopiaPosters.open()">一覧・地図を開く</button></div>
         <div id="countdownList" class="countdown-list" aria-live="polite"></div>
 
         <div class="card" id="todayRehearsalCard">
@@ -5049,6 +5050,7 @@
 
       <section id="page-messages" class="page">
         <h2 class="page-title">戯言</h2>
+        <div class="card"><div class="eyebrow">POSTER OUTREACH</div><h3 class="card-title">ポスター掲示状況</h3><p>訪問前に一覧を確認。お断りされた場所への再依頼は控えてください。</p><button type="button" class="btn secondary" onclick="window.utopiaPosters.open()">一覧・地図を開く</button></div>
         <div class="card member-card" aria-labelledby="memberPortalTitle">
           <div class="eyebrow">MEMBER RECORD</div>
           <h2 id="memberPortalTitle" class="card-title">部員の記録・自己紹介</h2>
@@ -5121,7 +5123,7 @@
         <div class="card percpart-card" aria-labelledby="percpartTitle">
           <div class="eyebrow">PERCUSSION PARTS</div>
           <h2 id="percpartTitle" class="card-title">打楽器パート一覧</h2>
-          <img class="percpart-image" src="./percpart.png?v=20260920-v82" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
+          <img class="percpart-image" src="./percpart.png?v=20261020-v83" alt="演奏会の曲ごとの打楽器担当パート一覧" loading="lazy" decoding="async">
         </div>
         <div class="card message-archive-card">
           <div class="message-archive-head">
@@ -5253,6 +5255,7 @@
           <button class="admin-tab-button" type="button" data-admin-tab="setlists" role="tab">本番・セットリスト</button>
           <button class="admin-tab-button" type="button" data-admin-tab="story" role="tab">物語編集</button>
           <button class="admin-tab-button" type="button" data-admin-tab="members" role="tab">部員の記録</button>
+          <button class="admin-tab-button" type="button" onclick="window.utopiaPosters.open()">ポスター管理</button>
         </div>
 
         <section id="adminTabMembers" class="admin-tab-panel" data-admin-panel="members">
@@ -5625,7 +5628,7 @@
   </aside>
 
   <script>
-    const APP_BUILD_VERSION = "20260920-v82";
+    const APP_BUILD_VERSION = "20261020-v83";
 
 
 
@@ -14878,6 +14881,7 @@
       const authorized = Boolean(user && user.uid === ADMIN_UID);
       window.utopiaSetlistApp?.setAdminAuthorized(authorized);
       window.utopiaMemberPortal?.handleAuth(user,authorized);
+      window.utopiaPosters?.handleAuth(user,authorized);
 
       if(user && authorized){
         authStatus.textContent = `${user.displayName || "Googleアカウント"}で管理者ログイン中`;
@@ -15151,6 +15155,49 @@
     });
 
     signInButton?.addEventListener("click", signInAdministrator);
+    const posterRef=doc(db,'posterOutreach','current');
+    function posterValidRecord(r){
+      return r && typeof r.id==='string' && r.id.length>0 && r.id.length<=80
+        && typeof r.name==='string' && r.name.trim().length>0 && r.name.length<=120
+        && ['approved','rejected','pending','unknown'].includes(r.status)
+        && typeof r.date==='string' && (r.date===''||/^\d{4}-\d{2}-\d{2}$/.test(r.date))
+        && typeof r.address==='string' && r.address.length<=200
+        && typeof r.note==='string' && r.note.length<=1000
+        && typeof r.locationSource==='string' && r.locationSource.length<=500
+        && Number.isInteger(r.revision) && r.revision>0
+        && ((r.lat===null&&r.lng===null)||(typeof r.lat==='number'&&Number.isFinite(r.lat)&&Math.abs(r.lat)<=90&&typeof r.lng==='number'&&Number.isFinite(r.lng)&&Math.abs(r.lng)<=180));
+    }
+    window.utopiaPosters.attach({
+      async ensureUser(){await auth.authStateReady();if(!auth.currentUser)await signInAnonymously(auth);},
+      watch(onData,onError){return onSnapshot(posterRef,{includeMetadataChanges:true},snapshot=>{
+        const data=snapshot.exists()?snapshot.data():null;
+        if(data && (!Array.isArray(data.rows)||!data.rows.every(posterValidRecord))){onError(new Error('invalid-data'));return;}
+        onData({exists:snapshot.exists(),rows:data?.rows||[],fromCache:snapshot.metadata.fromCache});
+      },onError);},
+      async mutate(kind,record,expectedRevision,seed){
+        if(auth.currentUser?.uid!==ADMIN_UID)throw Object.assign(new Error('Admin required'),{code:'permission-denied'});
+        return runTransaction(db,async transaction=>{
+          const snapshot=await transaction.get(posterRef);
+          const existing=snapshot.exists()?snapshot.data():null;
+          if(existing&&(!Array.isArray(existing.rows)||!existing.rows.every(posterValidRecord)))throw new Error('invalid-data');
+          let rows=existing?existing.rows.slice():[];
+          if(kind==='initialize'){
+            if(existing)throw Object.assign(new Error('Already initialized'),{code:'already-initialized'});
+            rows=seed.map(r=>({...r}));
+          }else{
+            if(!existing)throw Object.assign(new Error('Not initialized'),{code:'conflict'});
+            const index=rows.findIndex(r=>r.id===record.id),old=rows[index];
+            if((expectedRevision===null&&old)||(expectedRevision!==null&&(!old||old.revision!==expectedRevision)))throw Object.assign(new Error('Record changed'),{code:'conflict'});
+            if(kind==='delete'){if(!old)throw Object.assign(new Error('Record missing'),{code:'conflict'});rows.splice(index,1);}
+            else if(kind==='save'){if(!posterValidRecord(record))throw new Error('invalid-data');const value={...record,revision:(old?.revision||0)+1};if(index<0)rows.push(value);else rows[index]=value;}
+            else throw new Error('invalid-data');
+          }
+          if(rows.length>500||!rows.every(posterValidRecord))throw new Error('invalid-data');
+          transaction.set(posterRef,{schemaVersion:1,rows,updatedAt:serverTimestamp()});
+          return {rows};
+        });
+      }
+    });
     signOutButton?.addEventListener("click", async()=>{
       await signOut(auth);
     });
@@ -15178,5 +15225,113 @@
     startSetlistListener();
   </script>
 
+<style>
+#posterDialog{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;padding:0;background:#111b20;color:#eef2f1;z-index:20000;overflow:auto}
+#posterDialog::backdrop{background:#0009}#posterDialog [hidden]{display:none!important}
+.poster-shell{max-width:1000px;margin:auto;padding:22px 18px calc(32px + env(safe-area-inset-bottom))}.poster-head{display:flex;justify-content:space-between;gap:12px;align-items:center;position:sticky;top:0;background:#111b20;z-index:1100;padding:10px 0}
+#posterDialog button,#posterDialog input,#posterDialog select,#posterDialog textarea{font:inherit;min-height:44px;border:1px solid #597078;border-radius:9px;padding:9px 12px;background:#203039;color:#fff;max-width:100%}
+#posterDialog button{cursor:pointer}#posterDialog button:disabled{opacity:.45;cursor:wait}#posterDialog button:focus-visible,#posterDialog a:focus-visible{outline:3px solid #f4c578;outline-offset:3px}#posterDialog a{color:#9ce5de}
+.poster-tools{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.poster-tools input{flex:1;min-width:180px}.poster-note{font-size:13px;line-height:1.7;color:#b7cacd}.poster-status{min-height:24px;color:#f5cf8a;white-space:pre-wrap}
+#posterMap{height:380px;max-height:55vh;border-radius:12px;background:#26383e;isolation:isolate}.poster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;margin-top:18px}.poster-item{padding:16px;background:#1a292f;border:1px solid #3d535b;border-radius:12px;overflow-wrap:anywhere}.poster-item h3{margin:8px 0;font-size:17px}.poster-item p{margin:8px 0;white-space:pre-wrap}.poster-badge{display:inline-block;border-radius:20px;padding:4px 10px;font-weight:bold;background:#3b4751;color:white}.poster-approved{background:#225f4d}.poster-rejected{background:#893f49}.poster-pending{background:#77591d}.poster-unknown{background:#4a5360}
+#posterEditor{padding:18px;border:1px solid #8bb9b7;border-radius:12px;margin:16px 0;background:#1a292f}#posterEditor label{display:block;margin:12px 0 4px}#posterEditor input,#posterEditor textarea,#posterEditor select{width:100%}.poster-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.poster-pin{border:2px solid white!important;border-radius:50%;box-shadow:0 2px 5px #0008;color:white;text-align:center;font:bold 17px/28px sans-serif}.leaflet-popup-content{color:#15242b}.poster-close{flex-shrink:0}
+@media(max-width:480px){.poster-pair{grid-template-columns:1fr}.poster-shell{padding-left:12px;padding-right:12px}.poster-head h2{font-size:20px}}
+</style>
+<dialog id="posterDialog" aria-labelledby="posterTitle">
+<div class="poster-shell">
+ <header class="poster-head"><div><div class="eyebrow">POSTER OUTREACH</div><h2 id="posterTitle">ポスター掲示状況</h2></div><button id="posterClose" class="poster-close" type="button">閉じる</button></header>
+ <p>訪問前に確認して、重複したお願いを防ごう。</p>
+ <p class="poster-note">○ 掲示OK　× お断り（再依頼しない）　△ 検討中　？ 未確認<br>ピンのない地域＝未訪問とは限りません。位置未確認の記録も一覧で確認してください。○は許可の報告であり、現在の掲示を保証するものではありません。</p>
+ <div class="poster-tools"><button id="posterConnect" type="button">再接続</button><button id="posterMapOpen" type="button">地図を表示</button><button id="posterFit" type="button" hidden>表示中のピン全体へ</button></div>
+ <p id="posterStatus" class="poster-status" role="status" aria-live="polite"></p>
+ <div id="posterAdmin" hidden><p class="poster-note">管理者モード：ここでの保存・削除は直ちに全員へ共有されます。上部の「全員へ反映」は不要です。</p><div class="poster-tools"><button id="posterAdd" type="button">＋ 訪問記録を追加</button><button id="posterImport" type="button">LINEの初期103件を登録</button></div></div>
+ <form id="posterEditor" hidden>
+  <h3 id="posterEditorTitle">訪問記録</h3>
+  <fieldset id="posterFields" style="border:0;padding:0;margin:0">
+  <label for="posterName">店舗・施設名（必須）</label><input id="posterName" required maxlength="120">
+  <div class="poster-pair"><div><label for="posterResult">結果</label><select id="posterResult"><option value="approved">○ 掲示OK</option><option value="rejected">× お断り</option><option value="pending">△ 検討中</option><option value="unknown">？ 未確認</option></select></div><div><label for="posterDate">訪問・報告日（不明なら空欄）</label><input id="posterDate" type="date"></div></div>
+  <label for="posterAddress">住所・地域</label><input id="posterAddress" maxlength="200" placeholder="栃木県…">
+  <label for="posterNote">共有メモ（個人情報は書かない）</label><textarea id="posterNote" rows="3" maxlength="1000"></textarea>
+  <p class="poster-note">ピンは地図上の正しい場所をタップして設定できます。緯度・経度の直接入力も可能。場所が不明なら両方空欄にしてください。</p>
+  <div class="poster-tools"><button id="posterPick" type="button">地図で場所を選ぶ</button><button id="posterClearLocation" type="button">位置を未確認にする</button><a id="posterSearchPlace" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">地図検索で確認 ↗</a></div>
+  <div class="poster-pair"><div><label for="posterLat">緯度</label><input id="posterLat" type="number" step="any" min="-90" max="90"></div><div><label for="posterLng">経度</label><input id="posterLng" type="number" step="any" min="-180" max="180"></div></div>
+  <div class="poster-tools"><button type="submit">保存して全員に共有</button><button id="posterCancel" type="button">編集をやめる</button><button id="posterDelete" type="button" hidden>この記録を削除</button></div>
+  </fieldset>
+  <p id="posterEditStatus" class="poster-status" role="status"></p>
+ </form>
+ <p id="posterMapStatus" class="poster-note" role="status"></p><div id="posterMap" hidden aria-label="訪問先の地図"></div>
+ <div class="poster-tools"><input id="posterQuery" type="search" placeholder="店名・住所・メモで検索" aria-label="店名・住所・メモで検索"><select id="posterFilter" aria-label="結果で絞り込み"><option value="all">すべての結果</option><option value="approved">○ 掲示OK</option><option value="rejected">× お断り</option><option value="pending">△ 検討中</option><option value="unknown">？ 未確認</option></select><select id="posterLocationFilter" aria-label="位置で絞り込み"><option value="all">すべての位置</option><option value="mapped">ピンあり</option><option value="missing">位置未確認</option></select></div>
+ <p id="posterCount" class="poster-note"></p><div id="posterList" class="poster-grid"></div>
+</div></dialog>
+
+<script>
+// Poster outreach v83. Standalone UI; all shared mutations go through the guarded adapter.
+window.utopiaPosters=(()=>{
+ const $=id=>document.getElementById(id), labels={approved:'○ 掲示OK',rejected:'× お断り',pending:'△ 検討中',unknown:'？ 未確認'};
+ const symbols={approved:'○',rejected:'×',pending:'△',unknown:'？'};
+ const seed=[{"id":"line-202610-001","name":"セブンイレブン益子大沢店","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-002","name":"セブンイレブン益子西","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-003","name":"amano","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-004","name":"益子市役所","status":"approved","date":"","address":"","note":"LINE原文の名称。正式な施設名・場所を要確認。","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-005","name":"益子駅","status":"approved","date":"","address":"栃木県芳賀郡益子町益子1591-2","note":"","lat":36.463322,"lng":140.088931,"locationSource":"https://iplusone.co.jp/front/stations/9374","revision":1},{"id":"line-202610-006","name":"真岡珈琲寺内駅舎","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-007","name":"道の駅ましこ","status":"approved","date":"","address":"栃木県芳賀郡益子町長堤2271","note":"","lat":36.4312788,"lng":140.0727057,"locationSource":"https://m-mashiko.com/access/","revision":1},{"id":"line-202610-008","name":"ローソン真岡寺内店","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-009","name":"大山呉服店","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-010","name":"田野郵便局","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-011","name":"田野保育園","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-012","name":"益子町農村環境改善センター","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-013","name":"南運動公園","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-014","name":"ヤマザキショップほりうち","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-015","name":"真岡アリラン","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-016","name":"かましんもぴあ店","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-017","name":"茂木カワチ薬局","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-018","name":"茂木パシフィックスポーツプラザ","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-019","name":"茂木コメリ","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-020","name":"茂木カンセキ","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-021","name":"セブンイレブン増井","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-022","name":"レストラン蘭","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-023","name":"床屋Coupe","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-024","name":"てっぺんや","status":"approved","date":"","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-025","name":"かましん益子店","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-026","name":"アオキ真岡荒町店","status":"rejected","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-027","name":"ファミリーマート真岡寺内店","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-028","name":"ファミリーマート荒町店","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-029","name":"ウエルシア真岡高間木店","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-030","name":"とりせん高間木店","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-031","name":"トライアル茂木","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-032","name":"道の駅もてぎ","status":"approved","date":"2026-10-02","address":"栃木県芳賀郡茂木町大字茂木1090-1","note":"","lat":36.5278259,"lng":140.1728576,"locationSource":"https://www.michi-no-eki.jp/stations/views/19054","revision":1},{"id":"line-202610-033","name":"セブンイレブン道の駅前","status":"approved","date":"2026-10-02","address":"","note":"掲示OKと確認済み。正式な店舗名・場所は要確認。","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-034","name":"Fairfield by Marriott 茂木","status":"pending","date":"2026-10-02","address":"","note":"本社へ許可を取り次第","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-035","name":"ホテル若葉","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-036","name":"御菓子柏屋","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-037","name":"NISHIKAWA化粧店","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-038","name":"こがねや","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-039","name":"珈琲工房Swing","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-040","name":"ガソリンスタンド茂木","status":"approved","date":"2026-10-02","address":"","note":"店名・場所を要確認","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-041","name":"まるいや","status":"approved","date":"2026-10-02","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-042","name":"ふみの森茂木","status":"approved","date":"2026-10-02","address":"","note":"チケットもOK","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-043","name":"七井ベイシア","status":"approved","date":"2026-10-03","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-044","name":"七井ローソン","status":"approved","date":"2026-10-03","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-045","name":"七井セブンイレブン","status":"approved","date":"2026-10-03","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-046","name":"コメリ益子七井店","status":"approved","date":"2026-10-03","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-047","name":"益子ファミック","status":"approved","date":"2026-10-03","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-048","name":"セブンイレブン益子中央店","status":"approved","date":"2026-10-03","address":"","note":"LINEで益子中央店と確認済み","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-049","name":"ファッションセンターしまむら益子店","status":"approved","date":"2026-10-03","address":"","note":"改装前までならOK","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-050","name":"ファッションセンターしまむら芳賀店","status":"pending","date":"2026-10-05","address":"","note":"店長不在のため検討中","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-051","name":"菓子舗いねや / 桃の樹Cafe","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-052","name":"道の駅はが","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-053","name":"芳賀温泉ロマンの湯","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-054","name":"かましんカルナ市貝店","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-055","name":"芳賀中","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-056","name":"陶房ましやま","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-057","name":"象嵌てん zouganten","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-058","name":"益子焼 大宿窯","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-059","name":"TOKO STREET","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-060","name":"うめの民芸店","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-061","name":"やまに大塚本店","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-062","name":"益子焼窯元共販センター","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-063","name":"甘味処鎌倉益子城内坂店","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-064","name":"ほっとるーむけやき","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-065","name":"益子焼ふくしま","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-066","name":"G+OO","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-067","name":"ウエルシア荒町店","status":"approved","date":"2026-10-05","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-068","name":"芳賀町情報館","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-069","name":"大内中学校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-070","name":"真岡飯貝店セブンイレブン","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-071","name":"芳賀町農業者トレーニングセンター","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-072","name":"芳賀町民会館","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-073","name":"ひやま","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-074","name":"塚本商会","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-075","name":"キッチンマグノリア","status":"approved","date":"2026-10-06","address":"","note":"ポスター置き","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-076","name":"茂木町民センター","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-077","name":"ローソン真岡上太田和店","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-078","name":"茂木高校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-079","name":"壺々炉 益子焼＆カフェレストラン","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-080","name":"長豊陶苑","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-081","name":"こうじんや","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-082","name":"知床窯益子ギャラリー","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-083","name":"もえぎ 城内坂店","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-084","name":"物部中学校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-085","name":"井頭温泉","status":"pending","date":"2026-10-06","address":"","note":"検討中","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-086","name":"益子焼山口","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-087","name":"添谷書店","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-088","name":"ヒジノワカフェ＆スペース","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-089","name":"花のいけがみ池 上生花店","status":"approved","date":"2026-10-06","address":"","note":"LINE原文の表記。正式名称を要確認。","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-090","name":"有）三宅菓子舗","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-091","name":"セブンイレブン真岡下籠谷","status":"pending","date":"2026-10-06","address":"","note":"検討中","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-092","name":"北陵高校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-093","name":"かましん真岡亀山北店","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-094","name":"セブンイレブン熊倉店","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-095","name":"真岡工業高校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-096","name":"真岡ベイシア","status":"rejected","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-097","name":"茂木中学校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-098","name":"真岡高校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-099","name":"真岡女子高校","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-100","name":"ローソン田町店","status":"pending","date":"2026-10-06","address":"","note":"検討中","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-101","name":"和菓子竹垣","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-102","name":"ローソン真岡八條店","status":"approved","date":"2026-10-06","address":"","note":"","lat":null,"lng":null,"locationSource":"","revision":1},{"id":"line-202610-103","name":"茂木駅","status":"pending","date":"2026-10-09","address":"栃木県芳賀郡茂木町茂木1499-2","note":"本部に掛け合うため確認待ち","lat":36.530714,"lng":140.18155,"locationSource":"https://en.wikipedia.org/wiki/Motegi_Station","revision":1}];
+ let api=null,rows=[],initialized=false,ready=false,admin=false,busy=false,stop=null,epoch=0,active=false,editing=null,baseRevision=null,map=null,layer=null,pick=false,preview=null,mapLoading=null,seenServer=false;
+ const coord=r=>typeof r.lat==='number'&&Number.isFinite(r.lat)&&Math.abs(r.lat)<=90&&typeof r.lng==='number'&&Number.isFinite(r.lng)&&Math.abs(r.lng)<=180;
+ const text=(tag,value,cls)=>{const el=document.createElement(tag);el.textContent=value;if(cls)el.className=cls;return el;};
+ const status=s=>{$('posterStatus').textContent=s;};
+ const errorText=e=>e?.code==='permission-denied'?'アクセスが拒否されました。管理者はログインと v83 のFirestoreルール公開を確認してください。':e?.code==='conflict'?'別の画面で変更されています。編集を閉じて、最新の記録を開き直してください。':e?.code==='already-initialized'?'初期登録は済んでいます。再接続して確認してください。':e?.message==='invalid-data'?'入力内容を確認してください。':'通信・保存に失敗しました。接続を確認して再度お試しください。';
+ function filtered(){const q=$('posterQuery').value.trim().normalize('NFKC').toLowerCase(),f=$('posterFilter').value,l=$('posterLocationFilter').value;return rows.filter(r=>(f==='all'||r.status===f)&&(l==='all'||(l==='mapped'?coord(r):!coord(r)))&&(!q||[r.name,r.address,r.note].join(' ').normalize('NFKC').toLowerCase().includes(q))).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||a.name.localeCompare(b.name,'ja'));}
+ function access(){
+  $('posterAdmin').hidden=!admin; $('posterAdd').disabled=busy||!ready||!initialized;$('posterImport').hidden=initialized;$('posterImport').disabled=busy||!ready;
+  $('posterFields').disabled=busy||!admin||!ready;$('posterConnect').disabled=busy;
+  $('posterClose').disabled=busy;
+ }
+ function resetEditor(){editing=null;baseRevision=null;pick=false;$('posterEditor').hidden=true;$('posterEditor').reset();$('posterEditStatus').textContent='';if(preview){preview.remove();preview=null;}}
+ function render(){
+  access();const list=$('posterList');list.replaceChildren();const visible=filtered();
+  const counts=Object.keys(labels).map(k=>`${labels[k]} ${rows.filter(r=>r.status===k).length}件`).join(' ／ ');
+  $('posterCount').textContent=`全${rows.length}件｜${counts}。表示 ${visible.length}件（ピン ${visible.filter(coord).length}件／位置未確認 ${visible.filter(r=>!coord(r)).length}件）`;
+  if(!visible.length)list.append(text('p',!initialized?'初期データは管理者の登録後に表示されます。':'該当する記録はありません。','poster-note'));
+  visible.forEach(r=>{
+   const card=text('article','','poster-item');card.append(text('span',labels[r.status]||labels.unknown,'poster-badge poster-'+(labels[r.status]?r.status:'unknown')),text('h3',r.name));
+   card.append(text('p',`${r.date||'日付未確認'} ｜ ${coord(r)?'ピン登録済み':'位置未確認'}`,'poster-note'));
+   if(r.address)card.append(text('p',r.address,'poster-note'));if(r.note)card.append(text('p',r.note));
+   if(/^https:\/\//.test(r.locationSource||'')){const source=text('a','位置の参照元 ↗');source.href=r.locationSource;source.target='_blank';source.rel='noopener noreferrer';card.append(source);}
+   const actions=text('div','','poster-tools');
+   if(coord(r)){const b=text('button','ピンを見る');b.type='button';b.onclick=async()=>{await showMap();if(map){map.setView([r.lat,r.lng],16);$('posterMap').scrollIntoView({block:'center',behavior:'smooth'});}};actions.append(b);}
+   const link=text('a','地図検索 ↗');link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(coord(r)?`${r.lat},${r.lng}`:`栃木県 ${r.name} ${r.address}`);link.target='_blank';link.rel='noopener noreferrer';actions.append(link);
+   if(admin){const b=text('button','編集');b.type='button';b.disabled=busy||!ready;b.onclick=()=>edit(r);actions.append(b);}card.append(actions);list.append(card);
+  });drawPins();
+ }
+ function popup(r){const div=text('div','');div.append(text('strong',r.name),text('p',labels[r.status]||labels.unknown),text('p',r.note||r.address||''));return div;}
+ function drawPins(){if(!map||!layer)return;layer.clearLayers();filtered().filter(coord).forEach(r=>{const k=labels[r.status]?r.status:'unknown';L.marker([r.lat,r.lng],{icon:L.divIcon({className:'poster-pin poster-'+k,html:symbols[k],iconSize:[30,30],iconAnchor:[15,15]}),title:r.name}).bindPopup(popup(r)).addTo(layer);});}
+ function fit(){if(!map)return;const points=filtered().filter(coord).map(r=>[r.lat,r.lng]);if(points.length)map.fitBounds(points,{padding:[24,24],maxZoom:15});}
+ async function showMap(){
+  $('posterMap').hidden=false;$('posterMapStatus').textContent='地図を読み込み中…';
+  try{
+   if(!window.L){
+    if(!mapLoading)mapLoading=new Promise((resolve,reject)=>{
+     const css=document.createElement('link');css.rel='stylesheet';css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';css.integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';css.crossOrigin='anonymous';document.head.append(css);
+     const script=document.createElement('script');script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';script.integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';script.crossOrigin='anonymous';
+     const timer=setTimeout(()=>{script.remove();reject(new Error('map-timeout'));},15000);script.onload=()=>{clearTimeout(timer);resolve();};script.onerror=()=>{clearTimeout(timer);script.remove();reject(new Error('map-load'));};document.head.append(script);
+    }).catch(e=>{mapLoading=null;throw e;});
+    await mapLoading;
+   }
+   if(!map){map=L.map('posterMap').setView([36.49,140.1],11);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).on('tileerror',()=>{$('posterMapStatus').textContent='背景地図を読み込めません。一覧や地図検索をご利用ください。';}).addTo(map);layer=L.layerGroup().addTo(map);map.on('click',e=>{if(!pick||!admin||busy||!ready||$('posterEditor').hidden)return;$('posterLat').value=e.latlng.lat.toFixed(6);$('posterLng').value=e.latlng.lng.toFixed(6);if(preview)preview.remove();preview=L.circleMarker(e.latlng,{radius:10,color:'#fff',fillColor:'#e4a853',fillOpacity:1}).addTo(map);pick=false;$('posterEditStatus').textContent='位置を選択しました。内容を確認して保存してください。';$('posterEditor').scrollIntoView({block:'start',behavior:'smooth'});});drawPins();fit();}
+   requestAnimationFrame(()=>map.invalidateSize());$('posterFit').hidden=false;$('posterMapStatus').textContent='○ 掲示OK ／ × お断り ／ △ 検討中 ／ ？ 未確認。位置未確認の記録は地図に表示されません。地図表示には外部サービスへの接続を使用します。';
+  }catch(e){$('posterMapStatus').textContent='地図を読み込めませんでした。「地図を表示」で再試行できます。一覧はそのまま利用できます。';}
+ }
+ function edit(record){if(!admin||!ready||busy)return;if(!$('posterEditor').hidden&&!confirm('現在の未保存の編集を破棄しますか？'))return;resetEditor();editing=record?record.id:crypto.randomUUID();baseRevision=record?record.revision:null;$('posterEditor').hidden=false;$('posterEditorTitle').textContent=record?'訪問記録を編集':'訪問記録を追加';for(const [field,key] of Object.entries({posterName:'name',posterResult:'status',posterDate:'date',posterAddress:'address',posterNote:'note',posterLat:'lat',posterLng:'lng'}))$(field).value=record?.[key]??(key==='status'?'unknown':'');$('posterDelete').hidden=!record;updateSearch();$('posterName').focus();$('posterEditor').scrollIntoView({block:'start'});}
+ function updateSearch(){$('posterSearchPlace').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(`栃木県 ${$('posterName').value} ${$('posterAddress').value}`);}
+ function formRecord(){const lat=$('posterLat').value.trim(),lng=$('posterLng').value.trim();if((lat==='')!==(lng===''))throw new Error('緯度・経度は両方入力するか、両方空欄にしてください。');const r={id:editing,name:$('posterName').value.trim(),status:$('posterResult').value,date:$('posterDate').value,address:$('posterAddress').value.trim(),note:$('posterNote').value.trim(),lat:lat===''?null:Number(lat),lng:lng===''?null:Number(lng),revision:(baseRevision||0)+1,locationSource:baseRevision!==null?(rows.find(r=>r.id===editing)?.locationSource||''):''};if(!r.name||(!coord(r)&&lat!==''))throw new Error('店舗名と座標を確認してください。');const old=rows.find(x=>x.id===editing);if(!old||old.lat!==r.lat||old.lng!==r.lng)r.locationSource=coord(r)?'管理者が確認・設定':'';return r;}
+ async function mutate(kind,record){if(!admin||!ready||busy)return;busy=true;access();$('posterEditStatus').textContent='保存中…';status('保存中です。画面を閉じずにお待ちください。');const authEpoch=epoch;try{const data=await api.mutate(kind,record,baseRevision,seed);if(authEpoch!==epoch)return;rows=data.rows;initialized=true;resetEditor();render();status(kind==='delete'?'記録を削除しました。':kind==='initialize'?'初期103件を登録しました。全員へ共有されています。':'保存しました。全員へ共有されています。');}catch(e){if(authEpoch===epoch){const message=errorText(e);status(message);$('posterEditStatus').textContent=message;}}finally{busy=false;render();}}
+ async function connect(){if(!api){status('Firebaseを準備しています。少し待って「再接続」を押してください。');return;}const run=++epoch;stop?.();stop=null;ready=false;seenServer=false;rows=[];initialized=false;render();status('共有データを読み込み中…');try{await api.ensureUser();if(run!==epoch)return;stop=api.watch(data=>{if(run!==epoch)return;seenServer=seenServer||!data.fromCache;ready=seenServer&&!data.fromCache;initialized=data.exists;rows=data.rows;render();status(data.fromCache?'端末のキャッシュを表示中です。最新状況の確認と編集にはオンライン接続が必要です。':initialized?'最新の共有データを表示しています。':'管理者が「LINEの初期103件を登録」を押すと全員に表示されます。');},e=>{if(run!==epoch)return;ready=false;rows=[];render();status(errorText(e));});}catch(e){if(run===epoch){ready=false;render();status(errorText(e));}}}
+ $('posterConnect').onclick=()=>connect();$('posterMapOpen').onclick=()=>showMap();$('posterFit').onclick=fit;$('posterAdd').onclick=()=>edit(null);
+ $('posterImport').onclick=()=>{if(admin&&ready&&!initialized&&confirm('LINEの103件を初期登録し、メンバーに共有しますか？（位置確認済み4件・残りは位置未確認）'))mutate('initialize');};
+ $('posterEditor').onsubmit=e=>{e.preventDefault();try{const record=formRecord();if(rows.some(r=>r.id!==record.id&&r.name.normalize('NFKC').replace(/\s/g,'')===record.name.normalize('NFKC').replace(/\s/g,''))&&!confirm('同名の記録があります。重複ではないことを確認して保存しますか？'))return;mutate('save',record);}catch(e){$('posterEditStatus').textContent=e.message;}};
+ $('posterCancel').onclick=()=>{if(!busy&&confirm('未保存の編集を破棄しますか？'))resetEditor();};$('posterDelete').onclick=()=>{if(admin&&baseRevision!==null&&confirm(`「${$('posterName').value}」を削除しますか？この操作は元に戻せません。`))mutate('delete',{id:editing});};
+ $('posterPick').onclick=async()=>{await showMap();if(map&&admin&&!busy){pick=true;$('posterMapStatus').textContent='保存する場所を地図上でタップしてください。';$('posterMap').scrollIntoView({block:'center',behavior:'smooth'});}};
+ $('posterClearLocation').onclick=()=>{$('posterLat').value='';$('posterLng').value='';pick=false;if(preview){preview.remove();preview=null;}};
+ ['posterName','posterAddress'].forEach(id=>$(id).addEventListener('input',updateSearch));['posterQuery','posterFilter','posterLocationFilter'].forEach(id=>$(id).addEventListener('input',render));
+ function close(){if(busy)return;if(!$('posterEditor').hidden&&!confirm('未保存の編集を破棄して閉じますか？'))return;resetEditor();active=false;epoch++;stop?.();stop=null;$('posterDialog').close();}
+ $('posterClose').onclick=close;$('posterDialog').addEventListener('cancel',e=>{e.preventDefault();close();});
+ return {attach(adapter){api=adapter;},handleAuth(user,isAdmin){const changed=admin!==Boolean(isAdmin);admin=Boolean(isAdmin);if(!admin)resetEditor();access();if(active&&(changed||!user))connect();},open(){active=true;if(!$('posterDialog').open)$('posterDialog').showModal();connect();if(map)requestAnimationFrame(()=>map.invalidateSize());}};
+})();
+
+</script>
 </body>
 </html>
